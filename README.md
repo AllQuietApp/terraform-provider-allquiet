@@ -1,7 +1,7 @@
 # Terraform Provider for All Quiet
 This is the terraform provider for the modern incident management and escalation platform [All Quiet](https://allquiet.app).
 
-![Test](https://github.com/AllQuietApp/allquiet-terraform-provider-internal/actions/workflows/test.yml/badge.svg)
+![Test](https://github.com/AllQuietApp/terraform-provider-allquiet/actions/workflows/test.yml/badge.svg)
 
 ## Documentation
 Documentation: https://registry.terraform.io/providers/allquiet/allquiet/latest/docs
