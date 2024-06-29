@@ -14,7 +14,7 @@ description: |-
 
 ```terraform
 provider "allquiet" {
-  # example configuration here
+  api_key = "your_api_key"
 }
 ```
 
