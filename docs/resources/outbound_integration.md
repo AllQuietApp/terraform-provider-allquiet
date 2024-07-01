@@ -3,12 +3,12 @@
 page_title: "allquiet_outbound_integration Resource - allquiet"
 subcategory: ""
 description: |-
-  OutboundIntegration resource
+  The outbound_integration resource represents an outbound integration in All Quiet. Outbound integrations are used to send alerts to external systems like Slack or Discord.
 ---
 
 # allquiet_outbound_integration (Resource)
 
-OutboundIntegration resource
+The `outbound_integration` resource represents an outbound integration in All Quiet. Outbound integrations are used to send alerts to external systems like Slack or Discord.
 
 ## Example Usage
 

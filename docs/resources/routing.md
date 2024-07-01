@@ -3,12 +3,12 @@
 page_title: "allquiet_routing Resource - allquiet"
 subcategory: ""
 description: |-
-  Routing resource
+  The routing resource allows you to define routing rules for incidents based on various conditions and actions.
 ---
 
 # allquiet_routing (Resource)
 
-Routing resource
+The routing resource allows you to define routing rules for incidents based on various conditions and actions.
 
 ## Example Usage
 

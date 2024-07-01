@@ -3,12 +3,12 @@
 page_title: "allquiet_team Resource - allquiet"
 subcategory: ""
 description: |-
-  Team resource
+  The team resource represents a team in All Quiet. Teams are used to group members and define schedules, its tiers and rorations.
 ---
 
 # allquiet_team (Resource)
 
-Team resource
+The team resource represents a team in All Quiet. Teams are used to group members and define schedules, its tiers and rorations.
 
 ## Example Usage
 

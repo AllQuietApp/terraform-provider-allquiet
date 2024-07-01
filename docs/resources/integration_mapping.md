@@ -3,12 +3,15 @@
 page_title: "allquiet_integration_mapping Resource - allquiet"
 subcategory: ""
 description: |-
-  IntegrationMapping resource
+  The integration_mapping resource represents an integration mapping in All Quiet. Integration mappings are used to map attributes from an external system to All Quiet attributes. This allows you to map attributes like severity or status from an external system to All Quiet attributes.
+  An integration mapping is associated with an integration and is optional. You only need to define an integration mapping if you want to override the default mapping of the integration.
 ---
 
 # allquiet_integration_mapping (Resource)
 
-IntegrationMapping resource
+The `integration_mapping` resource represents an integration mapping in All Quiet. Integration mappings are used to map attributes from an external system to All Quiet attributes. This allows you to map attributes like severity or status from an external system to All Quiet attributes. 
+
+An integration mapping is associated with an integration and is optional. You only need to define an integration mapping if you want to override the default mapping of the integration.
 
 ## Example Usage
 

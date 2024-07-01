@@ -83,7 +83,7 @@ func (r *Routing) Metadata(_ context.Context, req resource.MetadataRequest, resp
 func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Routing resource",
+		MarkdownDescription: "The routing resource allows you to define routing rules for incidents based on various conditions and actions.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

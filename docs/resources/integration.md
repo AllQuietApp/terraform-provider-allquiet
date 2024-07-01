@@ -3,12 +3,12 @@
 page_title: "allquiet_integration Resource - allquiet"
 subcategory: ""
 description: |-
-  Integration resource
+  The integration resource represents an integration in All Quiet. Integrations are used to receive alerts from external systems like Datadog or Prometheus.
 ---
 
 # allquiet_integration (Resource)
 
-Integration resource
+The `integration` resource represents an integration in All Quiet. Integrations are used to receive alerts from external systems like Datadog or Prometheus.
 
 ## Example Usage
 

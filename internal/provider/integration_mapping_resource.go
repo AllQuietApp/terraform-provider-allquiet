@@ -61,7 +61,8 @@ func (r *IntegrationMapping) Metadata(_ context.Context, req resource.MetadataRe
 func (r *IntegrationMapping) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "IntegrationMapping resource",
+		MarkdownDescription: "The `integration_mapping` resource represents an integration mapping in All Quiet. Integration mappings are used to map attributes from an external system to All Quiet attributes. This allows you to map attributes like severity or status from an external system to All Quiet attributes. \n\n" +
+			"An integration mapping is associated with an integration and is optional. You only need to define an integration mapping if you want to override the default mapping of the integration.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

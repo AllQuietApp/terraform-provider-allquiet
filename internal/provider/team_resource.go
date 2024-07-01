@@ -93,7 +93,7 @@ func (r *Team) Metadata(_ context.Context, req resource.MetadataRequest, resp *r
 func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Team resource",
+		MarkdownDescription: "The team resource represents a team in All Quiet. Teams are used to group members and define schedules, its tiers and rorations.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

@@ -44,7 +44,7 @@ func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataR
 func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "OutboundIntegration resource",
+		MarkdownDescription: "The `outbound_integration` resource represents an outbound integration in All Quiet. Outbound integrations are used to send alerts to external systems like Slack or Discord.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

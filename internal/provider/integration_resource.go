@@ -47,7 +47,7 @@ func (r *Integration) Metadata(_ context.Context, req resource.MetadataRequest, 
 func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Integration resource",
+		MarkdownDescription: "The `integration` resource represents an integration in All Quiet. Integrations are used to receive alerts from external systems like Datadog or Prometheus.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
