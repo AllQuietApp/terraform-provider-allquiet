@@ -241,7 +241,7 @@ resource "allquiet_team" "test_with_members" {
 }
 
 func testAccTeamResourceExample() string {
-	absPath, _ := filepath.Abs("../../examples/resources/team/resource.tf")
+	absPath, _ := filepath.Abs("../../examples/resources/allquiet_team/resource.tf")
 
 	dat, err := os.ReadFile(absPath)
 	if err != nil {

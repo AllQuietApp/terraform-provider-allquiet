@@ -88,7 +88,7 @@ resource "allquiet_integration" "test" {
 }
 
 func testAccIntegrationResourceExample() string {
-	absPath, _ := filepath.Abs("../../examples/resources/integration/resource.tf")
+	absPath, _ := filepath.Abs("../../examples/resources/allquiet_integration/resource.tf")
 
 	dat, err := os.ReadFile(absPath)
 	if err != nil {

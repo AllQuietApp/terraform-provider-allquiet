@@ -120,7 +120,7 @@ resource "allquiet_routing" "test" {
 }
 
 func testAccRoutingResourceExample() string {
-	absPath, _ := filepath.Abs("../../examples/resources/routing/resource.tf")
+	absPath, _ := filepath.Abs("../../examples/resources/allquiet_routing/resource.tf")
 
 	dat, err := os.ReadFile(absPath)
 	if err != nil {

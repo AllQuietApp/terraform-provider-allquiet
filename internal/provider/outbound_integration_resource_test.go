@@ -88,7 +88,7 @@ resource "allquiet_outbound_integration" "test" {
 }
 
 func testAccOutboundIntegrationResourceExample() string {
-	absPath, _ := filepath.Abs("../../examples/resources/outbound_integration/resource.tf")
+	absPath, _ := filepath.Abs("../../examples/resources/allquiet_outbound_integration/resource.tf")
 
 	dat, err := os.ReadFile(absPath)
 	if err != nil {
