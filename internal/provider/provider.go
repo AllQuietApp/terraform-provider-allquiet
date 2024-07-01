@@ -30,8 +30,7 @@ type AllQuietProvider struct {
 
 // AllQuietProviderModel describes the provider data model.
 type AllQuietProviderModel struct {
-	Endpoint types.String `tfsdk:"endpoint"`
-	ApiKey   types.String `tfsdk:"api_key"`
+	ApiKey types.String `tfsdk:"api_key"`
 }
 
 func (p *AllQuietProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -44,10 +43,6 @@ func (p *AllQuietProvider) Schema(ctx context.Context, req provider.SchemaReques
 		Attributes: map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "All Quiet's API key. If not provided explicitly, make sure to provide it via the `ALLQUIET_API_KEY` environment variable",
-				Optional:            true,
-			},
-			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "All Quiet's API URL endpoint. Defaults to `https://allquiet.app/api/public/v1`.",
 				Optional:            true,
 			},
 		},
@@ -65,15 +60,6 @@ func (p *AllQuietProvider) Configure(ctx context.Context, req provider.Configure
 
 	// If practitioner provided a configuration value for any of the
 	// attributes, it must be a known value.
-
-	if config.Endpoint.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("endpoint"),
-			"Unknown All Quiet API Endpoint",
-			"The provider cannot create the All Quiet API client as there is an unknown configuration value for the API endpoint. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the ALLQUIET_ENDPOINT environment variable.",
-		)
-	}
 
 	if config.ApiKey.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
@@ -93,10 +79,6 @@ func (p *AllQuietProvider) Configure(ctx context.Context, req provider.Configure
 
 	endpoint := os.Getenv("ALLQUIET_ENDPOINT")
 	apiKey := os.Getenv("ALLQUIET_API_KEY")
-
-	if !config.Endpoint.IsNull() {
-		endpoint = config.Endpoint.ValueString()
-	}
 
 	if !config.ApiKey.IsNull() {
 		apiKey = config.ApiKey.ValueString()
