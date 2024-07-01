@@ -24,4 +24,3 @@ provider "allquiet" {
 ### Optional
 
 - `api_key` (String) All Quiet's API key. If not provided explicitly, make sure to provide it via the `ALLQUIET_API_KEY` environment variable
-- `endpoint` (String) All Quiet's API URL endpoint. Defaults to `https://allquiet.app/api/public/v1`.
