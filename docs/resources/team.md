@@ -24,7 +24,7 @@ Team resource
 - `incident_engagement_report_settings` (Attributes) Settings when to send the incident report for the team (see [below for nested schema](#nestedatt--incident_engagement_report_settings))
 - `members` (Attributes Set) (see [below for nested schema](#nestedatt--members))
 - `tiers` (Attributes List) (see [below for nested schema](#nestedatt--tiers))
-- `time_zone_id` (String) The timezone id, defaults to 'UTC' if not provided
+- `time_zone_id` (String) The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)
 
 ### Read-Only
 

@@ -55,9 +55,9 @@ type rotationMember struct {
 }
 
 type scheduleSettings struct {
-	Start        *string   `json:"start"`
-	End          *string   `json:"end"`
-	SelectedDays *[]string `json:"selectedDays"`
+	Start        *string  `json:"start"`
+	End          *string  `json:"end"`
+	SelectedDays []string `json:"selectedDays"`
 }
 
 type rotationSettings struct {
@@ -107,7 +107,7 @@ func mapTier(tier TeamTierModel) *teamTier {
 		schedules[i] = teamSchedule{}
 
 		if schedule.ScheduleSettings != nil {
-			selectedDays := ListToStringArray(schedule.ScheduleSettings.SelectedDays)
+			selectedDays := NonNullableArrayToStringArray(ListToStringArray(schedule.ScheduleSettings.SelectedDays))
 
 			schedules[i].ScheduleSettings = &scheduleSettings{
 				Start:        schedule.ScheduleSettings.Start.ValueStringPointer(),
@@ -156,8 +156,7 @@ func (c *AllQuietAPIClient) CreateTeamResource(ctx context.Context, data *TeamMo
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for POST %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result teamResponse
@@ -178,8 +177,7 @@ func (c *AllQuietAPIClient) DeleteTeamResource(ctx context.Context, id string) e
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return fmt.Errorf("non-200 response from API for DELETE %s: %d", url, httpResp.StatusCode)
+		return logErrorResponse(httpResp)
 	}
 
 	return nil
@@ -196,8 +194,7 @@ func (c *AllQuietAPIClient) UpdateTeamResource(ctx context.Context, id string, d
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for PUT %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result teamResponse
@@ -218,8 +215,7 @@ func (c *AllQuietAPIClient) GetTeamResource(ctx context.Context, id string) (*te
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for GET %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result teamResponse

@@ -9,12 +9,12 @@ import (
 )
 
 type integrationResponse struct {
-	Id              string
-	DisplayName     string
-	TeamId          string
-	IsMuted         bool
-	IsInMaintenance bool
-	Type            string
+	Id              string `json:"id"`
+	DisplayName     string `json:"displayName"`
+	TeamId          string `json:"teamId"`
+	IsMuted         bool   `json:"isMuted"`
+	IsInMaintenance bool   `json:"isInMaintenance"`
+	Type            string `json:"type"`
 }
 
 type integrationCreateRequest struct {
@@ -46,8 +46,7 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, data 
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for POST %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result integrationResponse
@@ -68,8 +67,7 @@ func (c *AllQuietAPIClient) DeleteIntegrationResource(ctx context.Context, id st
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return fmt.Errorf("non-200 response from API for DELETE %s: %d", url, httpResp.StatusCode)
+		return logErrorResponse(httpResp)
 	}
 
 	return nil
@@ -86,8 +84,7 @@ func (c *AllQuietAPIClient) UpdateIntegrationResource(ctx context.Context, id st
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for PUT %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result integrationResponse
@@ -108,8 +105,7 @@ func (c *AllQuietAPIClient) GetIntegrationResource(ctx context.Context, id strin
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for GET %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result integrationResponse

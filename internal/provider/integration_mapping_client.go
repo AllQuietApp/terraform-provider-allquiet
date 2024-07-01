@@ -9,41 +9,25 @@ import (
 )
 
 type integrationMappingResponse struct {
-	AttributesMapping integrationAttributeMappingResponse
-}
-
-type integrationAttributeMappingResponse struct {
-	Attributes []attributeResponse
-}
-
-type attributeResponse struct {
-	Name     string
-	Mappings []mappingResponse
-}
-
-type mappingResponse struct {
-	XPath    *string
-	JSONPath *string
-	Regex    *string
-	Replace  *string
-	Map      *string
-	Static   *string
+	Id                string                      `json:"id"`
+	IntegrationId     string                      `json:"integrationId"`
+	AttributesMapping integrationAttributeMapping `json:"attributesMapping"`
 }
 
 type integrationMappingCreateRequest struct {
-	AttributesMapping attributesMappingCreateRequest `json:"attributesMapping"`
+	AttributesMapping integrationAttributeMapping `json:"attributesMapping"`
 }
 
-type attributesMappingCreateRequest struct {
-	Attributes []attributeCreateRequest `json:"attributes"`
+type integrationAttributeMapping struct {
+	Attributes []attribute `json:"attributes"`
 }
 
-type attributeCreateRequest struct {
-	Name     string                 `json:"name"`
-	Mappings []mappingCreateRequest `json:"mappings"`
+type attribute struct {
+	Name     string    `json:"name"`
+	Mappings []mapping `json:"mappings"`
 }
 
-type mappingCreateRequest struct {
+type mapping struct {
 	XPath    *string `json:"xPath"`
 	JSONPath *string `json:"jsonPath"`
 	Regex    *string `json:"regex"`
@@ -63,8 +47,7 @@ func (c *AllQuietAPIClient) CreateIntegrationMappingResource(ctx context.Context
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for POST %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result integrationMappingResponse
@@ -78,20 +61,20 @@ func (c *AllQuietAPIClient) CreateIntegrationMappingResource(ctx context.Context
 
 func mapIntegrationMappingCreateRequest(plan *IntegrationMappingModel) *integrationMappingCreateRequest {
 	var req integrationMappingCreateRequest
-	req.AttributesMapping.Attributes = make([]attributeCreateRequest, len(plan.AttributesMapping.Attributes))
+	req.AttributesMapping.Attributes = make([]attribute, len(plan.AttributesMapping.Attributes))
 
 	for i, attribute := range plan.AttributesMapping.Attributes {
 		req.AttributesMapping.Attributes[i].Name = attribute.Name.ValueString()
-		req.AttributesMapping.Attributes[i].Mappings = make([]mappingCreateRequest, len(attribute.Mappings))
+		req.AttributesMapping.Attributes[i].Mappings = make([]mapping, len(attribute.Mappings))
 
-		for j, mapping := range attribute.Mappings {
-			req.AttributesMapping.Attributes[i].Mappings[j] = mappingCreateRequest{
-				XPath:    mapping.XPath.ValueStringPointer(),
-				JSONPath: mapping.JSONPath.ValueStringPointer(),
-				Regex:    mapping.Regex.ValueStringPointer(),
-				Replace:  mapping.Replace.ValueStringPointer(),
-				Map:      mapping.Map.ValueStringPointer(),
-				Static:   mapping.Static.ValueStringPointer(),
+		for j, m := range attribute.Mappings {
+			req.AttributesMapping.Attributes[i].Mappings[j] = mapping{
+				XPath:    m.XPath.ValueStringPointer(),
+				JSONPath: m.JSONPath.ValueStringPointer(),
+				Regex:    m.Regex.ValueStringPointer(),
+				Replace:  m.Replace.ValueStringPointer(),
+				Map:      m.Map.ValueStringPointer(),
+				Static:   m.Static.ValueStringPointer(),
 			}
 		}
 	}
@@ -108,8 +91,7 @@ func (c *AllQuietAPIClient) DeleteIntegrationMappingResource(ctx context.Context
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return fmt.Errorf("non-200 response from API for DELETE %s: %d", url, httpResp.StatusCode)
+		return logErrorResponse(httpResp)
 	}
 
 	return nil
@@ -126,8 +108,7 @@ func (c *AllQuietAPIClient) UpdateIntegrationMappingResource(ctx context.Context
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for PUT %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result integrationMappingResponse
@@ -148,8 +129,7 @@ func (c *AllQuietAPIClient) GetIntegrationMappingResource(ctx context.Context, i
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for GET %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result integrationMappingResponse

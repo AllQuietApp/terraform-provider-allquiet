@@ -40,8 +40,7 @@ func (c *AllQuietAPIClient) CreateOutboundIntegrationResource(ctx context.Contex
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for POST %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result outboundIntegrationResponse
@@ -62,8 +61,7 @@ func (c *AllQuietAPIClient) DeleteOutboundIntegrationResource(ctx context.Contex
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return fmt.Errorf("non-200 response from API for DELETE %s: %d", url, httpResp.StatusCode)
+		return logErrorResponse(httpResp)
 	}
 
 	return nil
@@ -80,8 +78,7 @@ func (c *AllQuietAPIClient) UpdateOutboundIntegrationResource(ctx context.Contex
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for PUT %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result outboundIntegrationResponse
@@ -102,8 +99,7 @@ func (c *AllQuietAPIClient) GetOutboundIntegrationResource(ctx context.Context, 
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for GET %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result outboundIntegrationResponse

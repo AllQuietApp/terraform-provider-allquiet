@@ -5,6 +5,8 @@ package provider
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -33,6 +35,36 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing Two"),
+				),
+			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
+func TestAccRoutingResourceExample(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccRoutingResourceExample(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_routing.example_1", "display_name", "Route to specific team based on attribute"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:      "allquiet_routing.example_1",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read testing
+			{
+				Config: testAccRoutingResourceExample(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_routing.example_1", "display_name", "Route to specific team based on attribute"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -85,4 +117,15 @@ resource "allquiet_routing" "test" {
 }
 `, display_name)
 
+}
+
+func testAccRoutingResourceExample() string {
+	absPath, _ := filepath.Abs("../../examples/resources/routing/resource.tf")
+
+	dat, err := os.ReadFile(absPath)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(dat)
 }

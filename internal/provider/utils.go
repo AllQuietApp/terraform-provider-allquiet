@@ -2,8 +2,8 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"regexp"
 
@@ -11,6 +11,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+func NonNullableArrayToStringArray(array *[]string) []string {
+	if array == nil {
+		return []string{}
+	}
+	return *array
+}
 
 func ListToStringArray(list types.List) *[]string {
 	if list.IsNull() {
@@ -50,15 +57,28 @@ func MapNullableList(ctx context.Context, stringArray *[]string) types.List {
 	return listValue
 }
 
-func logErrorResponse(resp *http.Response) {
-	if resp.StatusCode >= 400 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Printf("Error reading response body: %v\n", err)
-			return
+type badRequestResponse struct {
+	Errors map[string][]string `json:"errors"`
+}
+
+func logErrorResponse(resp *http.Response) error {
+
+	err := fmt.Errorf("%s %s: %d", resp.Request.Method, resp.Request.URL.RequestURI(), resp.StatusCode)
+
+	if resp.StatusCode == 400 {
+
+		var badRequestResponse badRequestResponse
+		errDecode := json.NewDecoder(resp.Body).Decode(&badRequestResponse)
+		if errDecode != nil {
+			err = fmt.Errorf("%s\ncould not decode 400 response: %s", err, errDecode)
 		}
-		fmt.Printf("Error response (status %d): %s\n", resp.StatusCode, string(body))
+
+		for key, value := range badRequestResponse.Errors {
+			err = fmt.Errorf("%s\n%s: %s", err, key, value)
+		}
 	}
+
+	return err
 }
 
 func IntentValidator(message string) validator.String {

@@ -140,8 +140,7 @@ func (c *AllQuietAPIClient) CreateRoutingResource(ctx context.Context, data *Rou
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for POST %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result routingResponse
@@ -162,8 +161,7 @@ func (c *AllQuietAPIClient) DeleteRoutingResource(ctx context.Context, id string
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return fmt.Errorf("non-200 response from API for DELETE %s: %d", url, httpResp.StatusCode)
+		return logErrorResponse(httpResp)
 	}
 
 	return nil
@@ -180,8 +178,7 @@ func (c *AllQuietAPIClient) UpdateRoutingResource(ctx context.Context, id string
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for PUT %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result routingResponse
@@ -202,8 +199,7 @@ func (c *AllQuietAPIClient) GetRoutingResource(ctx context.Context, id string) (
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		logErrorResponse(httpResp)
-		return nil, fmt.Errorf("non-200 response from API for GET %s: %d", url, httpResp.StatusCode)
+		return nil, logErrorResponse(httpResp)
 	}
 
 	var result routingResponse

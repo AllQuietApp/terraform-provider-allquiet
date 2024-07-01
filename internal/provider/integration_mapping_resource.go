@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -29,6 +31,7 @@ type IntegrationMapping struct {
 
 // IntegrationMappingModel describes the resource data model.
 type IntegrationMappingModel struct {
+	Id                types.String                              `tfsdk:"id"`
 	IntegrationId     types.String                              `tfsdk:"integration_id"`
 	AttributesMapping *IntegrationMappingAttributesMappingModel `tfsdk:"attributes_mapping"`
 }
@@ -61,6 +64,13 @@ func (r *IntegrationMapping) Schema(ctx context.Context, req resource.SchemaRequ
 		MarkdownDescription: "IntegrationMapping resource",
 
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "Id",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"integration_id": schema.StringAttribute{
 				Required:            true,
 				MarkdownDescription: "Id of the associated integration",
@@ -170,8 +180,7 @@ func (r *IntegrationMapping) Read(ctx context.Context, req resource.ReadRequest,
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	integrationResponse, err := r.client.GetIntegrationMappingResource(ctx, data.IntegrationId.ValueString())
+	integrationResponse, err := r.client.GetIntegrationMappingResource(ctx, data.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to get integration resource, got error: %s", err))
 		return
@@ -197,7 +206,7 @@ func (r *IntegrationMapping) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	integrationResponse, err := r.client.UpdateIntegrationMappingResource(ctx, data.IntegrationId.ValueString(), &data)
+	integrationResponse, err := r.client.UpdateIntegrationMappingResource(ctx, data.Id.ValueString(), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update integration resource, got error: %s", err))
 		return
@@ -220,7 +229,7 @@ func (r *IntegrationMapping) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	err := r.client.DeleteIntegrationMappingResource(ctx, data.IntegrationId.ValueString())
+	err := r.client.DeleteIntegrationMappingResource(ctx, data.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update integration resource, got error: %s", err))
 		return
@@ -236,7 +245,8 @@ func (r *IntegrationMapping) ImportState(ctx context.Context, req resource.Impor
 }
 
 func mapIntegrationMappingResponseToModel(response *integrationMappingResponse, data *IntegrationMappingModel) {
-
+	data.Id = types.StringValue(response.Id)
+	data.IntegrationId = types.StringValue(response.IntegrationId)
 	data.AttributesMapping = &IntegrationMappingAttributesMappingModel{
 		Attributes: make([]IntegrationMappingAttributeModel, len(response.AttributesMapping.Attributes)),
 	}
@@ -256,5 +266,4 @@ func mapIntegrationMappingResponseToModel(response *integrationMappingResponse, 
 			}
 		}
 	}
-
 }

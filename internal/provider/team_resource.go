@@ -108,7 +108,7 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 				Required:            true,
 			},
 			"time_zone_id": schema.StringAttribute{
-				MarkdownDescription: "The timezone id, defaults to 'UTC' if not provided",
+				MarkdownDescription: "The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)",
 				Optional:            true,
 				Default:             stringdefault.StaticString("UTC"),
 				Computed:            true,
@@ -450,7 +450,7 @@ func mapTeamScheduleSettingsResponseToData(ctx context.Context, scheduleSettings
 	return &TeamScheduleSettingsModel{
 		Start:        types.StringPointerValue(scheduleSettings.Start),
 		End:          types.StringPointerValue(scheduleSettings.End),
-		SelectedDays: MapNullableList(ctx, scheduleSettings.SelectedDays),
+		SelectedDays: MapNullableList(ctx, &scheduleSettings.SelectedDays),
 	}
 }
 

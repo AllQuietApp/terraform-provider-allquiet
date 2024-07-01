@@ -23,6 +23,10 @@ IntegrationMapping resource
 
 - `attributes_mapping` (Attributes) The attributes mapping of the integration (see [below for nested schema](#nestedatt--attributes_mapping))
 
+### Read-Only
+
+- `id` (String) Id
+
 <a id="nestedatt--attributes_mapping"></a>
 ### Nested Schema for `attributes_mapping`
 

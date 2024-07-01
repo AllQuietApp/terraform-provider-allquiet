@@ -5,6 +5,8 @@ package provider
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -123,6 +125,32 @@ func TestAccTeamWithMembersResource(t *testing.T) {
 	})
 }
 
+func TestAccTeamExample(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccTeamResourceExample(),
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// ImportState testing
+			{
+				ResourceName:      "allquiet_team.my_team_with_weekend_rotation",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read testing
+			{
+				Config: testAccTeamResourceExample(),
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
 func testAccTeamResourceWithMembersConfig(display_name string, member1_email string, member2_email string) string {
 	return fmt.Sprintf(`
 resource "allquiet_team" "test_with_members" {
@@ -210,4 +238,16 @@ resource "allquiet_team" "test_with_members" {
 	]
 }
 `, display_name, member1_email, member2_email)
+}
+
+func testAccTeamResourceExample() string {
+	absPath, _ := filepath.Abs("../../examples/resources/team/resource.tf")
+
+	dat, err := os.ReadFile(absPath)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(dat)
+
 }
