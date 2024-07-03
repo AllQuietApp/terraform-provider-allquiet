@@ -58,8 +58,6 @@ resource "allquiet_routing" "example_1" {
           }
         ]
       },
-      channels = {
-      },
       actions = {
         route_to_teams = [allquiet_team.pres_sales.id]
       }
@@ -74,8 +72,6 @@ resource "allquiet_routing" "example_1" {
             value    = "After Sales"
           }
         ]
-      },
-      channels = {
       },
       actions = {
         route_to_teams = [allquiet_team.after_sales.id]
@@ -96,8 +92,6 @@ resource "allquiet_routing" "example_2" {
         outbound_integrations       = [allquiet_outbound_integration.slack.id]
         outbound_integrations_muted = true
       },
-      actions = {
-      }
     },
   ]
 }
@@ -110,8 +104,6 @@ resource "allquiet_routing" "example_3" {
       conditions = {
         severities   = ["Minor", "Warning"]
         integrations = [allquiet_integration.custom_webhook.id]
-      },
-      channels = {
       },
       actions = {
         add_interaction = "Resolved"
@@ -142,32 +134,12 @@ resource "allquiet_routing" "example_3" {
 
 Required:
 
-- `actions` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--actions))
-- `channels` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--channels))
 - `conditions` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--conditions))
 
-<a id="nestedatt--rules--actions"></a>
-### Nested Schema for `rules.actions`
-
 Optional:
 
-- `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'
-- `change_severity` (String) Will change the severity of the incident
-- `discard` (Boolean) If true will discard and delete the incident
-- `route_to_teams` (List of String) Will route the incident to the specified teams
-- `rule_flow_control` (String) If 'Skip' will not evaluate further rules
-
-
-<a id="nestedatt--rules--channels"></a>
-### Nested Schema for `rules.channels`
-
-Optional:
-
-- `notification_channels` (List of String) Notification channels
-- `notification_channels_muted` (Boolean) If true will mute the notification channels
-- `outbound_integrations` (List of String) Outbound integrations
-- `outbound_integrations_muted` (Boolean) If true will mute the outbound integrations
-
+- `actions` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--actions))
+- `channels` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--channels))
 
 <a id="nestedatt--rules--conditions"></a>
 ### Nested Schema for `rules.conditions`
@@ -191,3 +163,27 @@ Required:
 Optional:
 
 - `value` (String) The value of the attribute to match with the operator against
+
+
+
+<a id="nestedatt--rules--actions"></a>
+### Nested Schema for `rules.actions`
+
+Optional:
+
+- `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'
+- `change_severity` (String) Will change the severity of the incident
+- `discard` (Boolean) If true will discard and delete the incident
+- `route_to_teams` (List of String) Will route the incident to the specified teams
+- `rule_flow_control` (String) If 'Skip' will not evaluate further rules
+
+
+<a id="nestedatt--rules--channels"></a>
+### Nested Schema for `rules.channels`
+
+Optional:
+
+- `notification_channels` (List of String) Notification channels
+- `notification_channels_muted` (Boolean) If true will mute the notification channels
+- `outbound_integrations` (List of String) Outbound integrations
+- `outbound_integrations_muted` (Boolean) If true will mute the outbound integrations
