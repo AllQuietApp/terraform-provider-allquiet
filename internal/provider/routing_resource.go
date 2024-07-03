@@ -165,7 +165,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 						},
 						"actions": schema.SingleNestedAttribute{
 							MarkdownDescription: "Settings for the schedule",
-							Required:            true,
+							Optional:            true,
 							Attributes: map[string]schema.Attribute{
 								"route_to_teams": schema.ListAttribute{
 									Optional:            true,
@@ -202,7 +202,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 						},
 						"channels": schema.SingleNestedAttribute{
 							MarkdownDescription: "Settings for the schedule",
-							Required:            true,
+							Optional:            true,
 							Attributes: map[string]schema.Attribute{
 								"outbound_integrations": schema.ListAttribute{
 									Optional:            true,
@@ -377,6 +377,10 @@ func mapRoutingRuleResponseToModel(ctx context.Context, rules []routingRule) []R
 }
 
 func mapRoutingRuleConditionsResponseToModel(ctx context.Context, conditions *routingRuleConditions) *RoutingRuleConditionsModel {
+	if conditions == nil {
+		return nil
+	}
+
 	return &RoutingRuleConditionsModel{
 		Statuses:     MapNullableList(ctx, conditions.Statuses),
 		Severities:   MapNullableList(ctx, conditions.Severities),
@@ -401,6 +405,11 @@ func mapRoutingRuleConditionsAttributeResponseToModel(attributes []routingRuleAt
 }
 
 func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingRuleActions) *RoutingRuleActionsModel {
+
+	if actions == nil {
+		return nil
+	}
+
 	return &RoutingRuleActionsModel{
 		RouteToTeams:    MapNullableList(ctx, actions.RouteToTeams),
 		Discard:         types.BoolValue(actions.Discard),
@@ -411,6 +420,10 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 }
 
 func mapRoutingRuleChannelsResponseToModel(ctx context.Context, channels *routingRuleChannels) *RoutingRuleChannelsModel {
+	if channels == nil {
+		return nil
+	}
+
 	return &RoutingRuleChannelsModel{
 		OutboundIntegrations:      MapNullableList(ctx, channels.OutboundIntegrations),
 		OutboundIntegrationsMuted: types.BoolValue(channels.OutboundIntegrationsMuted),

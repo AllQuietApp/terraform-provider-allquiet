@@ -43,8 +43,6 @@ resource "allquiet_routing" "example_1" {
           }
         ]
       },
-      channels = {
-      },
       actions = {
         route_to_teams = [allquiet_team.pres_sales.id]
       }
@@ -59,8 +57,6 @@ resource "allquiet_routing" "example_1" {
             value    = "After Sales"
           }
         ]
-      },
-      channels = {
       },
       actions = {
         route_to_teams = [allquiet_team.after_sales.id]
@@ -81,8 +77,6 @@ resource "allquiet_routing" "example_2" {
         outbound_integrations       = [allquiet_outbound_integration.slack.id]
         outbound_integrations_muted = true
       },
-      actions = {
-      }
     },
   ]
 }
@@ -95,8 +89,6 @@ resource "allquiet_routing" "example_3" {
       conditions = {
         severities   = ["Minor", "Warning"]
         integrations = [allquiet_integration.custom_webhook.id]
-      },
-      channels = {
       },
       actions = {
         add_interaction = "Resolved"
