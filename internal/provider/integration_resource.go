@@ -78,7 +78,7 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Default:             booldefault.StaticBool(false),
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "The type of the integration. See all types here: https://allquiet.app/api/public/v1/integration/types",
+				MarkdownDescription: "The type of the integration. See all types here: https://allquiet.app/api/public/v1/inbound-integration/types",
 				Required:            true,
 			},
 		},
