@@ -31,7 +31,7 @@ resource "allquiet_integration" "datadog" {
 
 - `display_name` (String) The display name of the integration
 - `team_id` (String) The team id of the integration
-- `type` (String) The type of the integration. See all types here: https://allquiet.app/api/public/v1/integration/types
+- `type` (String) The type of the integration. See all types here: [All Quiet integration types](https://allquiet.app/api/public/v1/inbound-integration/types)
 
 ### Optional
 
