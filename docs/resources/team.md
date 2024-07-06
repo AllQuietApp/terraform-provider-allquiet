@@ -76,7 +76,8 @@ resource "allquiet_team" "my_team_with_weekend_rotation" {
             end : "08:00"
           }
           rotation_settings = {
-            repeats = "weekly"
+            repeats               = "weekly"
+            starts_on_day_of_week = "sat"
           }
           rotations = [
             {
@@ -163,12 +164,14 @@ resource "allquiet_team" "my_team_with_day_and_night_rotation" {
             }
           ]
         },
+
         {
           schedule_settings = {
             selected_days = ["sat", "sun"]
           }
           rotation_settings = {
-            repeats = "weekly"
+            repeats               = "weekly"
+            starts_on_day_of_week = "sat"
           }
           rotations = [
             {
@@ -277,11 +280,14 @@ Required:
 <a id="nestedatt--tiers--schedules--rotation_settings"></a>
 ### Nested Schema for `tiers.schedules.rotation_settings`
 
+Required:
+
+- `repeats` (String) The rotation will repeat on the given interval
+
 Optional:
 
-- `repeats` (String) If set, the rotation will repeat on the given interval
-- `starts_on_date_of_month` (Number) If set, starts on date of the month
-- `starts_on_day_of_week` (String) If set, starts on day of the week
+- `starts_on_date_of_month` (Number) If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'
+- `starts_on_day_of_week` (String) Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'
 
 
 <a id="nestedatt--tiers--schedules--schedule_settings"></a>

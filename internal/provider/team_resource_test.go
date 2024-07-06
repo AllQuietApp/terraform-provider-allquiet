@@ -196,7 +196,6 @@ resource "allquiet_team" "test_with_members" {
 					rotation_settings = {
 						repeats = "weekly"
 						starts_on_day_of_week = "mon"
-						starts_on_date_of_month = 1
 					},
 					rotations = [
 						{

@@ -1,9 +1,11 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -61,21 +63,76 @@ type badRequestResponse struct {
 	Errors map[string][]string `json:"errors"`
 }
 
+type badRequestResultResponse struct {
+	Succeeded bool                            `json:"succeeded"`
+	Errors    []badRequestResultErrorResponse `json:"errors"`
+}
+
+type badRequestResultErrorResponse struct {
+	Description string `json:"description"`
+	Field       string `json:"field"`
+}
+
+func handleBadRequestResponse(data []byte) (error, error) {
+	var badRequestResponse badRequestResponse
+	reader := bytes.NewReader(data)
+	errDecode := json.NewDecoder(reader).Decode(&badRequestResponse)
+
+	if errDecode != nil {
+		return errDecode, nil
+	}
+
+	err := fmt.Errorf("")
+	for key, value := range badRequestResponse.Errors {
+		err = fmt.Errorf("%s\n%s: %s", err, key, value)
+	}
+
+	return nil, err
+}
+
+func handleBadRequestResultResponse(data []byte) (error, error) {
+	var badRequestResponse badRequestResultResponse
+
+	reader := bytes.NewReader(data)
+	errDecode := json.NewDecoder(reader).Decode(&badRequestResponse)
+
+	if errDecode != nil {
+		return errDecode, nil
+	}
+
+	err := fmt.Errorf("")
+	for _, value := range badRequestResponse.Errors {
+		if value.Field == "" {
+			err = fmt.Errorf("%s\n%s", err, value.Description)
+			continue
+		}
+
+		err = fmt.Errorf("%s\n%s: %s", err, value.Field, value.Description)
+	}
+
+	return nil, err
+}
+
 func logErrorResponse(resp *http.Response) error {
 
 	err := fmt.Errorf("%s %s: %d", resp.Request.Method, resp.Request.URL.RequestURI(), resp.StatusCode)
 
 	if resp.StatusCode == 400 {
+		data, _ := io.ReadAll(resp.Body)
 
-		var badRequestResponse badRequestResponse
-		errDecode := json.NewDecoder(resp.Body).Decode(&badRequestResponse)
+		errDecode, errBadRequest := handleBadRequestResponse(data)
 		if errDecode != nil {
-			err = fmt.Errorf("%s\ncould not decode 400 response: %s", err, errDecode)
+			errDecode, errBadRequest = handleBadRequestResultResponse(data)
+
+			if errDecode != nil {
+				err = fmt.Errorf("%s\ncould not decode 400 response: %s", err, errDecode)
+			}
 		}
 
-		for key, value := range badRequestResponse.Errors {
-			err = fmt.Errorf("%s\n%s: %s", err, key, value)
+		if errBadRequest != nil {
+			return fmt.Errorf("%s\n%s", err, errBadRequest)
 		}
+
 	}
 
 	return err

@@ -62,7 +62,8 @@ resource "allquiet_team" "my_team_with_weekend_rotation" {
             end : "08:00"
           }
           rotation_settings = {
-            repeats = "weekly"
+            repeats               = "weekly"
+            starts_on_day_of_week = "sat"
           }
           rotations = [
             {
@@ -149,12 +150,14 @@ resource "allquiet_team" "my_team_with_day_and_night_rotation" {
             }
           ]
         },
+
         {
           schedule_settings = {
             selected_days = ["sat", "sun"]
           }
           rotation_settings = {
-            repeats = "weekly"
+            repeats               = "weekly"
+            starts_on_day_of_week = "sat"
           }
           rotations = [
             {

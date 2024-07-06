@@ -224,18 +224,18 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 										Optional:            true,
 										Attributes: map[string]schema.Attribute{
 											"repeats": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "If set, the rotation will repeat on the given interval",
+												Required:            true,
+												MarkdownDescription: "The rotation will repeat on the given interval",
 												Validators:          []validator.String{stringvalidator.OneOf([]string{"daily", "weekly", "biweekly", "monthly"}...)},
 											},
 											"starts_on_day_of_week": schema.StringAttribute{
 												Optional:            true,
-												MarkdownDescription: "If set, starts on day of the week",
+												MarkdownDescription: "Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'",
 												Validators:          []validator.String{stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)},
 											},
 											"starts_on_date_of_month": schema.Int64Attribute{
 												Optional:            true,
-												MarkdownDescription: "If set, starts on date of the month",
+												MarkdownDescription: "If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'",
 												Validators:          []validator.Int64{int64validator.Between(1, 31)},
 											},
 										},
