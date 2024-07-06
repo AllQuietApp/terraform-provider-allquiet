@@ -4,7 +4,8 @@ This is the terraform provider for the modern incident management and escalation
 ![Test](https://github.com/AllQuietApp/terraform-provider-allquiet/actions/workflows/test.yml/badge.svg)
 
 ## Documentation
-Documentation: https://registry.terraform.io/providers/allquiet/allquiet/latest/docs
+
+[Documentation in Terraform Registry](https://registry.terraform.io/providers/AllQuietApp/allquiet/latest)
 
 ## Requirements
 
