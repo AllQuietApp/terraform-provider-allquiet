@@ -74,6 +74,9 @@ type TeamRotationSettingsModel struct {
 	Repeats             types.String `tfsdk:"repeats"`
 	StartsOnDayOfWeek   types.String `tfsdk:"starts_on_day_of_week"`
 	StartsOnDateOfMonth types.Int64  `tfsdk:"starts_on_date_of_month"`
+	StartsOnTime        types.String `tfsdk:"starts_on_time"`
+	CustomRepeatUnit    types.String `tfsdk:"custom_repeat_unit"`
+	CustomRepeatValue   types.Int64  `tfsdk:"custom_repeat_value"`
 }
 
 // TeamModel describes the resource data model.
@@ -226,7 +229,7 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 											"repeats": schema.StringAttribute{
 												Required:            true,
 												MarkdownDescription: "The rotation will repeat on the given interval",
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"daily", "weekly", "biweekly", "monthly"}...)},
+												Validators:          []validator.String{stringvalidator.OneOf([]string{"daily", "weekly", "biweekly", "monthly", "custom"}...)},
 											},
 											"starts_on_day_of_week": schema.StringAttribute{
 												Optional:            true,
@@ -237,6 +240,24 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 												Optional:            true,
 												MarkdownDescription: "If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'",
 												Validators:          []validator.Int64{int64validator.Between(1, 31)},
+											},
+											"starts_on_time": schema.StringAttribute{
+												Optional:            true,
+												MarkdownDescription: "If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'",
+												Validators: []validator.String{stringvalidator.RegexMatches(
+													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
+													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
+												)},
+											},
+											"custom_repeat_unit": schema.StringAttribute{
+												Optional:            true,
+												MarkdownDescription: "In what interval unit the rotation should repeat. Needs to be set if 'repeats' is 'custom'",
+												Validators:          []validator.String{stringvalidator.OneOf([]string{"months", "weeks", "days", "hours"}...)},
+											},
+											"custom_repeat_value": schema.Int64Attribute{
+												Optional:            true,
+												MarkdownDescription: "How often the rotation should repeat. Needs to be set if 'repeats' is 'custom'",
+												Validators:          []validator.Int64{int64validator.Between(1, 365)},
 											},
 										},
 									},
@@ -440,6 +461,9 @@ func mapTeamRotationSettingsResponseToData(rotationSettings *rotationSettings) *
 		Repeats:             types.StringPointerValue(rotationSettings.Repeats),
 		StartsOnDayOfWeek:   types.StringPointerValue(rotationSettings.StartsOnDayOfWeek),
 		StartsOnDateOfMonth: types.Int64PointerValue(rotationSettings.StartsOnDateOfMonth),
+		StartsOnTime:        types.StringPointerValue(rotationSettings.StartsOnTime),
+		CustomRepeatUnit:    types.StringPointerValue(rotationSettings.CustomRepeatUnit),
+		CustomRepeatValue:   types.Int64PointerValue(rotationSettings.CustomRepeatValue),
 	}
 }
 

@@ -64,6 +64,9 @@ type rotationSettings struct {
 	Repeats             *string `json:"repeats"`
 	StartsOnDayOfWeek   *string `json:"startsOnDayOfWeek"`
 	StartsOnDateOfMonth *int64  `json:"startsOnDateOfMonth"`
+	StartsOnTime        *string `json:"startsOnTime"`
+	CustomRepeatUnit    *string `json:"customRepeatUnit"`
+	CustomRepeatValue   *int64  `json:"customRepeatValue"`
 }
 
 func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
@@ -121,6 +124,9 @@ func mapTier(tier TeamTierModel) *teamTier {
 				Repeats:             schedule.RotationSettings.Repeats.ValueStringPointer(),
 				StartsOnDayOfWeek:   schedule.RotationSettings.StartsOnDayOfWeek.ValueStringPointer(),
 				StartsOnDateOfMonth: schedule.RotationSettings.StartsOnDateOfMonth.ValueInt64Pointer(),
+				StartsOnTime:        schedule.RotationSettings.StartsOnTime.ValueStringPointer(),
+				CustomRepeatUnit:    schedule.RotationSettings.CustomRepeatUnit.ValueStringPointer(),
+				CustomRepeatValue:   schedule.RotationSettings.CustomRepeatValue.ValueInt64Pointer(),
 			}
 		}
 

@@ -186,3 +186,49 @@ resource "allquiet_team" "my_team_with_day_and_night_rotation" {
     }
   ]
 }
+
+resource "allquiet_team" "my_team_with_hourly_rotation" {
+  display_name = "My team with hourly rotation"
+  time_zone_id = "America/Los_Angeles"
+  members = [
+    {
+      email = "cantor@acme.com"
+      role  = "Administrator"
+    },
+    {
+      email = "riemann@acme.com"
+      role  = "Member"
+    },
+    {
+      email = "galois@acme.com"
+      role  = "Member"
+    }
+  ]
+  tiers = [
+    {
+      auto_escalation_after_minutes = 5
+      schedules = [
+        {
+          rotation_settings = {
+            repeats             = "custom"
+            custom_repeat_unit  = "hours"
+            custom_repeat_value = 6
+            starts_on_time      = "00:00"
+          }
+          rotations = [
+            {
+              members = [
+                {
+                  email = "riemann@acme.com"
+                },
+                {
+                  email = "galois@acme.com"
+                },
+              ]
+            }
+          ]
+        },
+      ]
+    }
+  ]
+}
