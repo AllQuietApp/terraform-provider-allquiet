@@ -214,6 +214,7 @@ resource "allquiet_team" "my_team_with_hourly_rotation" {
             custom_repeat_unit  = "hours"
             custom_repeat_value = 6
             starts_on_time      = "00:00"
+            effective_from      = "2024-07-10"
           }
           rotations = [
             {

@@ -67,6 +67,7 @@ type rotationSettings struct {
 	StartsOnTime        *string `json:"startsOnTime"`
 	CustomRepeatUnit    *string `json:"customRepeatUnit"`
 	CustomRepeatValue   *int64  `json:"customRepeatValue"`
+	EffectiveFrom       *string `json:"effectiveFrom"`
 }
 
 func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
@@ -127,6 +128,7 @@ func mapTier(tier TeamTierModel) *teamTier {
 				StartsOnTime:        schedule.RotationSettings.StartsOnTime.ValueStringPointer(),
 				CustomRepeatUnit:    schedule.RotationSettings.CustomRepeatUnit.ValueStringPointer(),
 				CustomRepeatValue:   schedule.RotationSettings.CustomRepeatValue.ValueInt64Pointer(),
+				EffectiveFrom:       schedule.RotationSettings.EffectiveFrom.ValueStringPointer(),
 			}
 		}
 

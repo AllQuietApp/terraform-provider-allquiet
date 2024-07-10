@@ -77,6 +77,7 @@ type TeamRotationSettingsModel struct {
 	StartsOnTime        types.String `tfsdk:"starts_on_time"`
 	CustomRepeatUnit    types.String `tfsdk:"custom_repeat_unit"`
 	CustomRepeatValue   types.Int64  `tfsdk:"custom_repeat_value"`
+	EffectiveFrom       types.String `tfsdk:"effective_from"`
 }
 
 // TeamModel describes the resource data model.
@@ -258,6 +259,14 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 												Optional:            true,
 												MarkdownDescription: "How often the rotation should repeat. Needs to be set if 'repeats' is 'custom'",
 												Validators:          []validator.Int64{int64validator.Between(1, 365)},
+											},
+											"effective_from": schema.StringAttribute{
+												Optional:            true,
+												MarkdownDescription: "If sets, the rotation will be effective from the given date in ISO 8601 format",
+												Validators: []validator.String{stringvalidator.RegexMatches(
+													regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`),
+													"must contain ISO date matching the pattern '^\\d{4}-\\d{2}-\\d{2}$'",
+												)},
 											},
 										},
 									},
@@ -464,6 +473,7 @@ func mapTeamRotationSettingsResponseToData(rotationSettings *rotationSettings) *
 		StartsOnTime:        types.StringPointerValue(rotationSettings.StartsOnTime),
 		CustomRepeatUnit:    types.StringPointerValue(rotationSettings.CustomRepeatUnit),
 		CustomRepeatValue:   types.Int64PointerValue(rotationSettings.CustomRepeatValue),
+		EffectiveFrom:       types.StringPointerValue(rotationSettings.EffectiveFrom),
 	}
 }
 
