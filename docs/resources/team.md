@@ -228,6 +228,7 @@ resource "allquiet_team" "my_team_with_hourly_rotation" {
             custom_repeat_unit  = "hours"
             custom_repeat_value = 6
             starts_on_time      = "00:00"
+            effective_from      = "2024-07-10"
           }
           rotations = [
             {
@@ -334,6 +335,7 @@ Optional:
 
 - `custom_repeat_unit` (String) In what interval unit the rotation should repeat. Needs to be set if 'repeats' is 'custom'
 - `custom_repeat_value` (Number) How often the rotation should repeat. Needs to be set if 'repeats' is 'custom'
+- `effective_from` (String) If sets, the rotation will be effective from the given date in ISO 8601 format
 - `starts_on_date_of_month` (Number) If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'
 - `starts_on_day_of_week` (String) Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'
 - `starts_on_time` (String) If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'

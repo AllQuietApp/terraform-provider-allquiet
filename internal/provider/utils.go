@@ -42,6 +42,29 @@ func ListToStringArray(list types.List) *[]string {
 	return &result
 }
 
+func MapNullableListWithEmpty(ctx context.Context, stringArray *[]string) types.List {
+	if stringArray == nil {
+		return types.ListNull(types.StringType)
+	}
+
+	if (len(*stringArray)) == 0 {
+		listValue, _ := types.ListValueFrom(ctx, types.StringType, []string{})
+		return listValue
+	}
+
+	var stringList []types.String
+	for _, s := range *stringArray {
+		stringList = append(stringList, types.StringValue(s))
+	}
+
+	listValue, diags := types.ListValueFrom(ctx, types.StringType, stringList)
+	if diags.HasError() {
+		return types.List{}
+	}
+
+	return listValue
+}
+
 func MapNullableList(ctx context.Context, stringArray *[]string) types.List {
 	if stringArray == nil {
 		return types.ListNull(types.StringType)
