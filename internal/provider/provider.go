@@ -119,6 +119,7 @@ func (p *AllQuietProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewOutboundIntegration,
 		NewRouting,
 		NewUser,
+		NewTeamMembership,
 	}
 }
 

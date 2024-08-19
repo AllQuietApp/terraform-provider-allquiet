@@ -51,7 +51,7 @@ type teamRotation struct {
 }
 
 type rotationMember struct {
-	Email string `json:"email"`
+	TeamMembershipId string `json:"teamMembershipId"`
 }
 
 type scheduleSettings struct {
@@ -71,14 +71,6 @@ type rotationSettings struct {
 }
 
 func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
-	members := make([]teamMember, len(plan.Members))
-	for i, member := range plan.Members {
-		members[i] = teamMember{
-			Email: member.Email.ValueString(),
-			Role:  member.Role.ValueString(),
-		}
-	}
-
 	var settings *incidentEngagementReportSettings
 
 	if plan.IncidentEngagementReportSettings != nil {
@@ -97,7 +89,6 @@ func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
 	return &teamCreateRequest{
 		DisplayName:                      plan.DisplayName.ValueString(),
 		TimeZoneId:                       plan.TimeZoneId.ValueString(),
-		Members:                          members,
 		IncidentEngagementReportSettings: settings,
 		Tiers:                            tiers,
 	}
@@ -137,7 +128,7 @@ func mapTier(tier TeamTierModel) *teamTier {
 			members := make([]rotationMember, len(rotation.Members))
 			for k, member := range rotation.Members {
 				members[k] = rotationMember{
-					Email: member.Email.ValueString(),
+					TeamMembershipId: member.TeamMembershipId.ValueString(),
 				}
 			}
 			rotations[j] = teamRotation{

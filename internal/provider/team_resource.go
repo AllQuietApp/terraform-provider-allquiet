@@ -40,11 +40,6 @@ type IncidentEngagementReportSettingsModel struct {
 	Time      types.String `tfsdk:"time"`
 }
 
-type TeamMemberModel struct {
-	Email types.String `tfsdk:"email"`
-	Role  types.String `tfsdk:"role"`
-}
-
 type TeamTierModel struct {
 	AutoEscalationAfterMinutes types.Int64         `tfsdk:"auto_escalation_after_minutes"`
 	Schedules                  []TeamScheduleModel `tfsdk:"schedules"`
@@ -61,7 +56,7 @@ type TeamRotationModel struct {
 }
 
 type TeamRotationMemberModel struct {
-	Email types.String `tfsdk:"email"`
+	TeamMembershipId types.String `tfsdk:"teamMembershipId"`
 }
 
 type TeamScheduleSettingsModel struct {
@@ -86,7 +81,6 @@ type TeamModel struct {
 	DisplayName                      types.String                           `tfsdk:"display_name"`
 	TimeZoneId                       types.String                           `tfsdk:"time_zone_id"`
 	IncidentEngagementReportSettings *IncidentEngagementReportSettingsModel `tfsdk:"incident_engagement_report_settings"`
-	Members                          []TeamMemberModel                      `tfsdk:"members"`
 	Tiers                            []TeamTierModel                        `tfsdk:"tiers"`
 }
 
@@ -136,26 +130,6 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 				},
 			},
-			"members": schema.SetNestedAttribute{
-				Optional: true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"email": schema.StringAttribute{
-							Required:            true,
-							MarkdownDescription: "Email of the member",
-							Validators: []validator.String{stringvalidator.RegexMatches(
-								regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`),
-								"must contain email matching the pattern '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'",
-							)},
-						},
-						"role": schema.StringAttribute{
-							Required:            true,
-							MarkdownDescription: "Role of the member (either 'Member' or 'Administrator')",
-							Validators:          []validator.String{stringvalidator.OneOf([]string{"Member", "Administrator"}...)},
-						},
-					},
-				},
-			},
 			"tiers": schema.ListNestedAttribute{
 				Optional: true,
 				NestedObject: schema.NestedAttributeObject{
@@ -179,13 +153,9 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 													Required: true,
 													NestedObject: schema.NestedAttributeObject{
 														Attributes: map[string]schema.Attribute{
-															"email": schema.StringAttribute{
+															"teamMembershipId": schema.StringAttribute{
 																Required:            true,
-																MarkdownDescription: "Email of the member",
-																Validators: []validator.String{stringvalidator.RegexMatches(
-																	regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`),
-																	"must contain email matching the pattern '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'",
-																)},
+																MarkdownDescription: "Id of the team membership",
 															},
 														},
 													},
@@ -406,7 +376,6 @@ func mapTeamResponseToModel(ctx context.Context, response *teamResponse, data *T
 			Time:      types.StringValue(response.IncidentEngagementReportSettings.Time),
 		}
 	}
-	data.Members = mapTeamMembersResponseToData(response.Members)
 	data.Tiers = mapTeamTiersResponseToData(ctx, response.Tiers)
 
 }
@@ -456,7 +425,7 @@ func mapTeamRotationMembersResponseToData(data []rotationMember) []TeamRotationM
 	var members []TeamRotationMemberModel
 	for _, member := range data {
 		members = append(members, TeamRotationMemberModel{
-			Email: types.StringValue(member.Email),
+			TeamMembershipId: types.StringValue(member.TeamMembershipId),
 		})
 	}
 	return members
@@ -486,15 +455,4 @@ func mapTeamScheduleSettingsResponseToData(ctx context.Context, scheduleSettings
 		End:          types.StringPointerValue(scheduleSettings.End),
 		SelectedDays: MapNullableList(ctx, &scheduleSettings.SelectedDays),
 	}
-}
-
-func mapTeamMembersResponseToData(data []teamMember) []TeamMemberModel {
-	var members []TeamMemberModel
-	for _, member := range data {
-		members = append(members, TeamMemberModel{
-			Email: types.StringValue(member.Email),
-			Role:  types.StringValue(member.Role),
-		})
-	}
-	return members
 }
