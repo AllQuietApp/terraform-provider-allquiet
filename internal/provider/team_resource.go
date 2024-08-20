@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -40,48 +38,12 @@ type IncidentEngagementReportSettingsModel struct {
 	Time      types.String `tfsdk:"time"`
 }
 
-type TeamTierModel struct {
-	AutoEscalationAfterMinutes types.Int64         `tfsdk:"auto_escalation_after_minutes"`
-	Schedules                  []TeamScheduleModel `tfsdk:"schedules"`
-}
-
-type TeamScheduleModel struct {
-	ScheduleSettings *TeamScheduleSettingsModel `tfsdk:"schedule_settings"`
-	RotationSettings *TeamRotationSettingsModel `tfsdk:"rotation_settings"`
-	Rotations        []TeamRotationModel        `tfsdk:"rotations"`
-}
-
-type TeamRotationModel struct {
-	Members []TeamRotationMemberModel `tfsdk:"members"`
-}
-
-type TeamRotationMemberModel struct {
-	TeamMembershipId types.String `tfsdk:"teamMembershipId"`
-}
-
-type TeamScheduleSettingsModel struct {
-	Start        types.String `tfsdk:"start"`
-	End          types.String `tfsdk:"end"`
-	SelectedDays types.List   `tfsdk:"selected_days"`
-}
-
-type TeamRotationSettingsModel struct {
-	Repeats             types.String `tfsdk:"repeats"`
-	StartsOnDayOfWeek   types.String `tfsdk:"starts_on_day_of_week"`
-	StartsOnDateOfMonth types.Int64  `tfsdk:"starts_on_date_of_month"`
-	StartsOnTime        types.String `tfsdk:"starts_on_time"`
-	CustomRepeatUnit    types.String `tfsdk:"custom_repeat_unit"`
-	CustomRepeatValue   types.Int64  `tfsdk:"custom_repeat_value"`
-	EffectiveFrom       types.String `tfsdk:"effective_from"`
-}
-
 // TeamModel describes the resource data model.
 type TeamModel struct {
 	Id                               types.String                           `tfsdk:"id"`
 	DisplayName                      types.String                           `tfsdk:"display_name"`
 	TimeZoneId                       types.String                           `tfsdk:"time_zone_id"`
 	IncidentEngagementReportSettings *IncidentEngagementReportSettingsModel `tfsdk:"incident_engagement_report_settings"`
-	Tiers                            []TeamTierModel                        `tfsdk:"tiers"`
 }
 
 func (r *Team) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -130,122 +92,6 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 				},
 			},
-			"tiers": schema.ListNestedAttribute{
-				Optional: true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"auto_escalation_after_minutes": schema.Int64Attribute{
-							Optional:            true,
-							MarkdownDescription: "After how many minutes the incident should be escalated to the next tier.",
-							Validators: []validator.Int64{
-								int64validator.Between(0, 60*24*30),
-							},
-						},
-						"schedules": schema.ListNestedAttribute{
-							Required: true,
-							NestedObject: schema.NestedAttributeObject{
-								Attributes: map[string]schema.Attribute{
-									"rotations": schema.ListNestedAttribute{
-										Required: true,
-										NestedObject: schema.NestedAttributeObject{
-											Attributes: map[string]schema.Attribute{
-												"members": schema.ListNestedAttribute{
-													Required: true,
-													NestedObject: schema.NestedAttributeObject{
-														Attributes: map[string]schema.Attribute{
-															"teamMembershipId": schema.StringAttribute{
-																Required:            true,
-																MarkdownDescription: "Id of the team membership",
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-									"schedule_settings": schema.SingleNestedAttribute{
-										MarkdownDescription: "Settings for the schedule",
-										Optional:            true,
-										Attributes: map[string]schema.Attribute{
-											"start": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "Start time of the schedule",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
-													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
-												)},
-											},
-											"end": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "End time of the schedule",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
-													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
-												)},
-											},
-											"selected_days": schema.ListAttribute{
-												Optional:            true,
-												MarkdownDescription: "Selected days of the week",
-												ElementType:         types.StringType,
-												Validators: []validator.List{
-													listvalidator.ValueStringsAre(stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)),
-												},
-											},
-										},
-									},
-									"rotation_settings": schema.SingleNestedAttribute{
-										MarkdownDescription: "Settings for the rotation",
-										Optional:            true,
-										Attributes: map[string]schema.Attribute{
-											"repeats": schema.StringAttribute{
-												Required:            true,
-												MarkdownDescription: "The rotation will repeat on the given interval",
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"daily", "weekly", "biweekly", "monthly", "custom"}...)},
-											},
-											"starts_on_day_of_week": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'",
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)},
-											},
-											"starts_on_date_of_month": schema.Int64Attribute{
-												Optional:            true,
-												MarkdownDescription: "If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'",
-												Validators:          []validator.Int64{int64validator.Between(1, 31)},
-											},
-											"starts_on_time": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
-													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
-												)},
-											},
-											"custom_repeat_unit": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "In what interval unit the rotation should repeat. Needs to be set if 'repeats' is 'custom'",
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"months", "weeks", "days", "hours"}...)},
-											},
-											"custom_repeat_value": schema.Int64Attribute{
-												Optional:            true,
-												MarkdownDescription: "How often the rotation should repeat. Needs to be set if 'repeats' is 'custom'",
-												Validators:          []validator.Int64{int64validator.Between(1, 365)},
-											},
-											"effective_from": schema.StringAttribute{
-												Optional:            true,
-												MarkdownDescription: "If sets, the rotation will be effective from the given date in ISO 8601 format",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`),
-													"must contain ISO date matching the pattern '^\\d{4}-\\d{2}-\\d{2}$'",
-												)},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -285,7 +131,7 @@ func (r *Team) Create(ctx context.Context, req resource.CreateRequest, resp *res
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create team resource, got error: %s", err))
 		return
 	}
-	mapTeamResponseToModel(ctx, teamResponse, &data)
+	mapTeamResponseToModel(teamResponse, &data)
 
 	tflog.Trace(ctx, "created team resource")
 
@@ -313,7 +159,7 @@ func (r *Team) Read(ctx context.Context, req resource.ReadRequest, resp *resourc
 		return
 	}
 
-	mapTeamResponseToModel(ctx, teamResponse, &data)
+	mapTeamResponseToModel(teamResponse, &data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -334,7 +180,7 @@ func (r *Team) Update(ctx context.Context, req resource.UpdateRequest, resp *res
 		return
 	}
 
-	mapTeamResponseToModel(ctx, teamResponse, &data)
+	mapTeamResponseToModel(teamResponse, &data)
 
 	tflog.Trace(ctx, "updated team resource")
 
@@ -366,7 +212,7 @@ func (r *Team) ImportState(ctx context.Context, req resource.ImportStateRequest,
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapTeamResponseToModel(ctx context.Context, response *teamResponse, data *TeamModel) {
+func mapTeamResponseToModel(response *teamResponse, data *TeamModel) {
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.TimeZoneId = types.StringValue(response.TimeZoneId)
@@ -376,83 +222,5 @@ func mapTeamResponseToModel(ctx context.Context, response *teamResponse, data *T
 			Time:      types.StringValue(response.IncidentEngagementReportSettings.Time),
 		}
 	}
-	data.Tiers = mapTeamTiersResponseToData(ctx, response.Tiers)
 
-}
-
-func mapTeamTiersResponseToData(ctx context.Context, data []teamTier) []TeamTierModel {
-	var tiers []TeamTierModel
-	for _, tier := range data {
-
-		var autoEscalationAfterMinutes types.Int64
-		if tier.AutoEscalationAfterMinutes != nil {
-			autoEscalationAfterMinutes = types.Int64PointerValue(tier.AutoEscalationAfterMinutes)
-		} else {
-			autoEscalationAfterMinutes = types.Int64Null()
-		}
-
-		tiers = append(tiers, TeamTierModel{
-			AutoEscalationAfterMinutes: autoEscalationAfterMinutes,
-			Schedules:                  mapTeamSchedulesResponseToData(ctx, tier.Schedules),
-		})
-	}
-	return tiers
-}
-
-func mapTeamSchedulesResponseToData(ctx context.Context, teamSchedule []teamSchedule) []TeamScheduleModel {
-	var schedules []TeamScheduleModel
-	for _, schedule := range teamSchedule {
-		schedules = append(schedules, TeamScheduleModel{
-			ScheduleSettings: mapTeamScheduleSettingsResponseToData(ctx, schedule.ScheduleSettings),
-			RotationSettings: mapTeamRotationSettingsResponseToData(schedule.RotationSettings),
-			Rotations:        mapTeamRotationsResponseToData(schedule.Rotations),
-		})
-	}
-	return schedules
-}
-
-func mapTeamRotationsResponseToData(data []teamRotation) []TeamRotationModel {
-	var rotations []TeamRotationModel
-	for _, rotation := range data {
-		rotations = append(rotations, TeamRotationModel{
-			Members: mapTeamRotationMembersResponseToData(rotation.Members),
-		})
-	}
-	return rotations
-}
-
-func mapTeamRotationMembersResponseToData(data []rotationMember) []TeamRotationMemberModel {
-	var members []TeamRotationMemberModel
-	for _, member := range data {
-		members = append(members, TeamRotationMemberModel{
-			TeamMembershipId: types.StringValue(member.TeamMembershipId),
-		})
-	}
-	return members
-}
-
-func mapTeamRotationSettingsResponseToData(rotationSettings *rotationSettings) *TeamRotationSettingsModel {
-	if rotationSettings == nil {
-		return nil
-	}
-	return &TeamRotationSettingsModel{
-		Repeats:             types.StringPointerValue(rotationSettings.Repeats),
-		StartsOnDayOfWeek:   types.StringPointerValue(rotationSettings.StartsOnDayOfWeek),
-		StartsOnDateOfMonth: types.Int64PointerValue(rotationSettings.StartsOnDateOfMonth),
-		StartsOnTime:        types.StringPointerValue(rotationSettings.StartsOnTime),
-		CustomRepeatUnit:    types.StringPointerValue(rotationSettings.CustomRepeatUnit),
-		CustomRepeatValue:   types.Int64PointerValue(rotationSettings.CustomRepeatValue),
-		EffectiveFrom:       types.StringPointerValue(rotationSettings.EffectiveFrom),
-	}
-}
-
-func mapTeamScheduleSettingsResponseToData(ctx context.Context, scheduleSettings *scheduleSettings) *TeamScheduleSettingsModel {
-	if scheduleSettings == nil {
-		return nil
-	}
-	return &TeamScheduleSettingsModel{
-		Start:        types.StringPointerValue(scheduleSettings.Start),
-		End:          types.StringPointerValue(scheduleSettings.End),
-		SelectedDays: MapNullableList(ctx, &scheduleSettings.SelectedDays),
-	}
 }

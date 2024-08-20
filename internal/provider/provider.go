@@ -114,12 +114,13 @@ func (p *AllQuietProvider) Configure(ctx context.Context, req provider.Configure
 func (p *AllQuietProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewTeam,
+		NewUser,
+		NewTeamMembership,
+		NewTeamEscalations,
 		NewIntegration,
 		NewIntegrationMapping,
 		NewOutboundIntegration,
 		NewRouting,
-		NewUser,
-		NewTeamMembership,
 	}
 }
 
