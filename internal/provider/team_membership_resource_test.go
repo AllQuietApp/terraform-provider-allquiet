@@ -21,7 +21,7 @@ func TestAccTeamMembershipResource(t *testing.T) {
 			{
 				Config: testAccTeamMembershipResourceConfig("taylor_swift"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("allquiet_team_membership.test", "user_id", "allquiet_user.taylor_swift.id"),
+					resource.TestCheckResourceAttrSet("allquiet_team_membership.test", "user_id"),
 				),
 			},
 			// ImportState testing
@@ -34,7 +34,7 @@ func TestAccTeamMembershipResource(t *testing.T) {
 			{
 				Config: testAccTeamMembershipResourceConfig("millie_brown"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("allquiet_team_membership.test", "user_id", "allquiet_user.millie_brown.id"),
+					resource.TestCheckResourceAttrSet("allquiet_team_membership.test", "user_id"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -51,12 +51,12 @@ func TestAccTeamMembershipResourceExample(t *testing.T) {
 			{
 				Config: testAccTeamMembershipResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("allquiet_team_membership.my_team_millie_brown", "user_id", "allquiet_user.millie_brown.id"),
+					resource.TestCheckResourceAttrSet("allquiet_team_membership.my_team_millie_brown", "user_id"),
 				),
 			},
 			// ImportState testing
 			{
-				ResourceName:      "allquiet_team_membership.millie_brown",
+				ResourceName:      "allquiet_team_membership.my_team_millie_brown",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -64,7 +64,7 @@ func TestAccTeamMembershipResourceExample(t *testing.T) {
 			{
 				Config: testAccTeamMembershipResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("allquiet_team_membership.my_team_millie_brown", "user_id", "allquiet_user.millie_brown.id"),
+					resource.TestCheckResourceAttrSet("allquiet_team_membership.my_team_millie_brown", "user_id"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -89,7 +89,7 @@ resource "allquiet_user" "taylor_swift" {
 }
 
 resource "allquiet_team_membership" "test" {
-	user_id = allquiet_user.%[1]q.id
+	user_id = allquiet_user.%[1]s.id
   	team_id = allquiet_team.team.id
 	role = "Member"
 }

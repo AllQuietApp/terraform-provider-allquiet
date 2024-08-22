@@ -52,7 +52,7 @@ resource "allquiet_team_membership" "my_team_with_weekend_rotation_kolmogorov" {
 
 resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation" {
   team_id = allquiet_team.my_team_with_weekend_rotation.id
-  tiers = [
+  escalation_tiers = [
     {
       auto_escalation_after_minutes = 5
       schedules = [
@@ -64,16 +64,16 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
             {
               members = [
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_riemann.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_riemann.id
                 },
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_galois.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_galois.id
                 },
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_gauss.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_gauss.id
                 },
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_kolmogorov.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov.id
                 }
               ]
             }
@@ -92,20 +92,20 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
             {
               members = [
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_riemann.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_riemann.id
                 },
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_galois.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_galois.id
                 }
               ]
             },
             {
               members = [
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_gauss.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_gauss.id
                 },
                 {
-                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov_kolmogorov.id
+                  team_membership_id = allquiet_team_membership.my_team_with_weekend_rotation_kolmogorov.id
                 }
               ]
             }
@@ -148,8 +148,7 @@ resource "allquiet_team_membership" "my_team_with_day_and_night_rotation_kolmogo
 
 resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rotation" {
   team_id = allquiet_team.my_team_with_day_and_night_rotation.id
-
-  tiers = [
+  escalation_tiers = [
     {
       auto_escalation_after_minutes = 5
       schedules = [
@@ -235,7 +234,7 @@ resource "allquiet_team_membership" "my_team_with_hourly_rotation_galois" {
 
 resource "allquiet_team_escalations" "my_team_escalations_with_hourly_rotation" {
   team_id = allquiet_team.my_team_with_hourly_rotation.id
-  tiers = [
+  escalation_tiers = [
     {
       auto_escalation_after_minutes = 5
       schedules = [

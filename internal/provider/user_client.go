@@ -82,7 +82,7 @@ func (c *AllQuietAPIClient) CreateUserResource(ctx context.Context, data *UserMo
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result userResponse
@@ -103,7 +103,7 @@ func (c *AllQuietAPIClient) DeleteUserResource(ctx context.Context, id string) e
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -120,7 +120,7 @@ func (c *AllQuietAPIClient) UpdateUserResource(ctx context.Context, id string, d
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result userResponse
@@ -141,7 +141,7 @@ func (c *AllQuietAPIClient) GetUserResource(ctx context.Context, id string) (*us
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result userResponse

@@ -140,7 +140,7 @@ func (c *AllQuietAPIClient) CreateRoutingResource(ctx context.Context, data *Rou
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result routingResponse
@@ -161,7 +161,7 @@ func (c *AllQuietAPIClient) DeleteRoutingResource(ctx context.Context, id string
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -178,7 +178,7 @@ func (c *AllQuietAPIClient) UpdateRoutingResource(ctx context.Context, id string
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result routingResponse
@@ -199,7 +199,7 @@ func (c *AllQuietAPIClient) GetRoutingResource(ctx context.Context, id string) (
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result routingResponse

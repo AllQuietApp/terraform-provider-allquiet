@@ -19,11 +19,6 @@ type teamEscalationsCreateRequest struct {
 	EscalationTiers []teamEscalationsTier `json:"escalationTiers"`
 }
 
-type teamEscalationsMember struct {
-	Email string `json:"email"`
-	Role  string `json:"role"`
-}
-
 type teamEscalationsTier struct {
 	AutoEscalationAfterMinutes *int64                    `json:"autoEscalationAfterMinutes"`
 	Schedules                  []teamEscalationsSchedule `json:"schedules"`
@@ -67,6 +62,7 @@ func mapTeamEscalationsCreateRequest(plan *TeamEscalationsModel) *teamEscalation
 	}
 
 	return &teamEscalationsCreateRequest{
+		TeamId:          plan.TeamId.ValueString(),
 		EscalationTiers: tiers,
 	}
 }
@@ -124,7 +120,7 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 func (c *AllQuietAPIClient) CreateTeamEscalationsResource(ctx context.Context, data *TeamEscalationsModel) (*teamEscalationsResponse, error) {
 	reqBody := mapTeamEscalationsCreateRequest(data)
 
-	url := "/teamEscalations"
+	url := "/team-escalations"
 	httpResp, err := c.post(ctx, url, reqBody)
 	if err != nil {
 		return nil, err
@@ -132,7 +128,7 @@ func (c *AllQuietAPIClient) CreateTeamEscalationsResource(ctx context.Context, d
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamEscalationsResponse
@@ -145,7 +141,7 @@ func (c *AllQuietAPIClient) CreateTeamEscalationsResource(ctx context.Context, d
 }
 
 func (c *AllQuietAPIClient) DeleteTeamEscalationsResource(ctx context.Context, id string) error {
-	url := fmt.Sprintf("/teamEscalations/%s", url.PathEscape(id))
+	url := fmt.Sprintf("/team-escalations/%s", url.PathEscape(id))
 	httpResp, err := c.delete(ctx, url)
 	if err != nil {
 		return err
@@ -153,7 +149,7 @@ func (c *AllQuietAPIClient) DeleteTeamEscalationsResource(ctx context.Context, i
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -162,7 +158,7 @@ func (c *AllQuietAPIClient) DeleteTeamEscalationsResource(ctx context.Context, i
 func (c *AllQuietAPIClient) UpdateTeamEscalationsResource(ctx context.Context, id string, data *TeamEscalationsModel) (*teamEscalationsResponse, error) {
 	reqBody := mapTeamEscalationsCreateRequest(data)
 
-	url := fmt.Sprintf("/teamEscalations/%s", url.PathEscape(id))
+	url := fmt.Sprintf("/team-escalations/%s", url.PathEscape(id))
 	httpResp, err := c.put(ctx, url, reqBody)
 	if err != nil {
 		return nil, err
@@ -170,7 +166,7 @@ func (c *AllQuietAPIClient) UpdateTeamEscalationsResource(ctx context.Context, i
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamEscalationsResponse
@@ -183,7 +179,7 @@ func (c *AllQuietAPIClient) UpdateTeamEscalationsResource(ctx context.Context, i
 }
 
 func (c *AllQuietAPIClient) GetTeamEscalationsResource(ctx context.Context, id string) (*teamEscalationsResponse, error) {
-	url := fmt.Sprintf("/teamEscalations/%s", url.PathEscape(id))
+	url := fmt.Sprintf("/team-escalations/%s", url.PathEscape(id))
 	httpResp, err := c.get(ctx, url)
 	if err != nil {
 		return nil, err
@@ -191,7 +187,7 @@ func (c *AllQuietAPIClient) GetTeamEscalationsResource(ctx context.Context, id s
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamEscalationsResponse

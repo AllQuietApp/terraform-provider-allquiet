@@ -46,7 +46,7 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, data 
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result integrationResponse
@@ -67,7 +67,7 @@ func (c *AllQuietAPIClient) DeleteIntegrationResource(ctx context.Context, id st
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -84,7 +84,7 @@ func (c *AllQuietAPIClient) UpdateIntegrationResource(ctx context.Context, id st
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result integrationResponse
@@ -105,7 +105,7 @@ func (c *AllQuietAPIClient) GetIntegrationResource(ctx context.Context, id strin
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result integrationResponse

@@ -54,7 +54,7 @@ func (c *AllQuietAPIClient) CreateTeamResource(ctx context.Context, data *TeamMo
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamResponse
@@ -75,7 +75,7 @@ func (c *AllQuietAPIClient) DeleteTeamResource(ctx context.Context, id string) e
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -92,7 +92,7 @@ func (c *AllQuietAPIClient) UpdateTeamResource(ctx context.Context, id string, d
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamResponse
@@ -113,7 +113,7 @@ func (c *AllQuietAPIClient) GetTeamResource(ctx context.Context, id string) (*te
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamResponse

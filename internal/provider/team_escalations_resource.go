@@ -50,7 +50,7 @@ type TeamEscalationsRotationModel struct {
 }
 
 type TeamEscalationsRotationMemberModel struct {
-	TeamMembershipId types.String `tfsdk:"teamMembershipId"`
+	TeamMembershipId types.String `tfsdk:"team_membership_id"`
 }
 
 type TeamEscalationsScheduleSettingsModel struct {
@@ -120,7 +120,7 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 													Required: true,
 													NestedObject: schema.NestedAttributeObject{
 														Attributes: map[string]schema.Attribute{
-															"teamMembershipId": schema.StringAttribute{
+															"team_membership_id": schema.StringAttribute{
 																Required:            true,
 																MarkdownDescription: "Id of the team membership",
 															},
@@ -334,9 +334,9 @@ func (r *TeamEscalations) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func mapTeamEscalationsResponseToModel(ctx context.Context, response *teamEscalationsResponse, data *TeamEscalationsModel) {
-	//data.Id = types.StringValue(response.Id)
+	data.Id = types.StringValue(response.Id)
+	data.TeamId = types.StringValue(response.TeamId)
 	data.EscalationTiers = mapTeamEscalationsTiersResponseToData(ctx, response.EscalationTiers)
-
 }
 
 func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscalationsTier) []TeamEscalationsTierModel {

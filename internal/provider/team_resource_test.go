@@ -71,8 +71,8 @@ func TestAccTeamExample(t *testing.T) {
 				Config: testAccTeamResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "display_name", "My Team"),
-					resource.TestCheckResourceAttr("allquiet_team.my_team", "time_zone_id", "America/Los Angeles"),
-					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.day_of_week", "tue"),
+					resource.TestCheckResourceAttr("allquiet_team.my_team", "time_zone_id", "America/Los_Angeles"),
+					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.day_of_week", "mon"),
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.time", "09:00"),
 				),
 			},

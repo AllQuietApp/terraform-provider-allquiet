@@ -42,7 +42,7 @@ func (c *AllQuietAPIClient) CreateTeamMembershipResource(ctx context.Context, da
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamMembershipResponse
@@ -63,7 +63,7 @@ func (c *AllQuietAPIClient) DeleteTeamMembershipResource(ctx context.Context, id
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -80,7 +80,7 @@ func (c *AllQuietAPIClient) UpdateTeamMembershipResource(ctx context.Context, id
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamMembershipResponse
@@ -101,7 +101,7 @@ func (c *AllQuietAPIClient) GetTeamMembershipResource(ctx context.Context, id st
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamMembershipResponse
