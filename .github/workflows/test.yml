@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        max-parallel: 1
+        max-parallel: 2
         # list whatever Terraform versions here you would like to support
         terraform:
           - '1.0.*'
