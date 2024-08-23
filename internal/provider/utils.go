@@ -136,6 +136,8 @@ func handleBadRequestResultResponse(data []byte) (error, error) {
 	return nil, err
 }
 
+var logErrorRequest = false
+
 func logErrorResponse(resp *http.Response, req interface{}) error {
 
 	err := fmt.Errorf("%s %s: %d", resp.Request.Method, resp.Request.URL.RequestURI(), resp.StatusCode)
@@ -157,7 +159,7 @@ func logErrorResponse(resp *http.Response, req interface{}) error {
 		}
 	}
 
-	if req != nil {
+	if logErrorRequest && req != nil {
 		b, _ := json.Marshal(req)
 		err = fmt.Errorf("%s\nrequest: %s", err, string(b))
 	}

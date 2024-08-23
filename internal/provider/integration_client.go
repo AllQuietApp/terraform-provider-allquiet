@@ -46,7 +46,7 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, data 
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+		return nil, logErrorResponse(httpResp, reqBody)
 	}
 
 	var result integrationResponse
@@ -84,7 +84,7 @@ func (c *AllQuietAPIClient) UpdateIntegrationResource(ctx context.Context, id st
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+		return nil, logErrorResponse(httpResp, reqBody)
 	}
 
 	var result integrationResponse
