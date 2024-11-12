@@ -16,6 +16,7 @@ The user resource represents a user in All Quiet. Users can be members of users 
 resource "allquiet_user" "millie_brown" {
   display_name = "Millie Bobby Brown"
   email        = "millie@acme.com"
+  phone_number = "+12035479055"
 }
 
 resource "allquiet_user" "taylor" {
@@ -52,6 +53,7 @@ resource "allquiet_user" "taylor" {
 ### Optional
 
 - `incident_notification_settings` (Attributes) Settings which channels to use for incident notifications (see [below for nested schema](#nestedatt--incident_notification_settings))
+- `phone_number` (String) The phone number of the user
 - `time_zone_id` (String) The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)
 
 ### Read-Only
@@ -67,6 +69,9 @@ Required:
 - `delay_in_min_push` (Number) Delay in minutes for Push notifications
 - `delay_in_min_sms` (Number) Delay in minutes for SMS notifications
 - `delay_in_min_voice` (Number) Delay in minutes for Voice Call notifications
+- `severities_email` (List of String) Severities for Email notifications
+- `severities_push` (List of String) Severities for Push notifications
+- `severities_voice` (List of String) Severities for Voice Call notifications
 - `should_call_voice` (Boolean) Should send Voice Call notifications
 - `should_send_email` (Boolean) Should send Email notifications
 - `should_send_push` (Boolean) Should send Push notifications
@@ -74,7 +79,4 @@ Required:
 
 Optional:
 
-- `severities_email` (List of String) Severities for Email notifications
-- `severities_push` (List of String) Severities for Push notifications
 - `severities_sms` (List of String) Severities for SMS notifications
-- `severities_voice` (List of String) Severities for Voice Call notifications

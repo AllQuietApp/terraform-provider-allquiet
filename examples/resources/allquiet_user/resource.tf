@@ -1,6 +1,7 @@
 resource "allquiet_user" "millie_brown" {
   display_name = "Millie Bobby Brown"
   email        = "millie@acme.com"
+  phone_number = "+12035479055"
 }
 
 resource "allquiet_user" "taylor" {

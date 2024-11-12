@@ -12,6 +12,7 @@ type userResponse struct {
 	Id                           string                                `json:"id"`
 	DisplayName                  string                                `json:"displayName"`
 	Email                        string                                `json:"email"`
+	PhoneNumber                  *string                               `json:"phoneNumber"`
 	TimeZoneId                   string                                `json:"timeZoneId"`
 	IncidentNotificationSettings *incidentNotificationSettingsResponse `json:"incidentNotificationSettings"`
 }
@@ -37,6 +38,7 @@ type incidentNotificationSettingsResponse struct {
 type userCreateRequest struct {
 	DisplayName                  string                                `json:"displayName"`
 	Email                        string                                `json:"email"`
+	PhoneNumber                  *string                               `json:"phoneNumber"`
 	TimeZoneId                   string                                `json:"timeZoneId"`
 	IncidentNotificationSettings *incidentNotificationSettingsResponse `json:"incidentNotificationSettings"`
 }
@@ -46,6 +48,7 @@ func mapUserCreateRequest(plan *UserModel) *userCreateRequest {
 
 	req.DisplayName = plan.DisplayName.ValueString()
 	req.Email = plan.Email.ValueString()
+	req.PhoneNumber = plan.PhoneNumber.ValueStringPointer()
 	req.TimeZoneId = plan.TimeZoneId.ValueString()
 
 	if plan.IncidentNotificationSettings != nil {

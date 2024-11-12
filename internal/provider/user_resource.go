@@ -38,6 +38,7 @@ type UserModel struct {
 	Id                           types.String                       `tfsdk:"id"`
 	DisplayName                  types.String                       `tfsdk:"display_name"`
 	Email                        types.String                       `tfsdk:"email"`
+	PhoneNumber                  types.String                       `tfsdk:"phone_number"`
 	TimeZoneId                   types.String                       `tfsdk:"time_zone_id"`
 	IncidentNotificationSettings *IncidentNotificationSettingsModel `tfsdk:"incident_notification_settings"`
 }
@@ -89,6 +90,14 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					"must contain email matching the pattern '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'",
 				)},
 			},
+			"phone_number": schema.StringAttribute{
+				MarkdownDescription: "The phone number of the user",
+				Optional:            true,
+				Validators: []validator.String{stringvalidator.RegexMatches(
+					regexp.MustCompile(`^\+\d+$`),
+					"must contain phone number in internatiol format matching the pattern '^\\+\\d+$'",
+				)},
+			},
 			"time_zone_id": schema.StringAttribute{
 				MarkdownDescription: "The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)",
 				Optional:            true,
@@ -127,7 +136,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 						Validators:          []validator.Int64{int64validator.Between(0, 60)},
 					},
 					"severities_voice": schema.ListAttribute{
-						Optional:            true,
+						Required:            true,
 						MarkdownDescription: "Severities for Voice Call notifications",
 						ElementType:         types.StringType,
 						Validators: []validator.List{
@@ -145,7 +154,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 						Validators:          []validator.Int64{int64validator.Between(0, 60)},
 					},
 					"severities_push": schema.ListAttribute{
-						Optional:            true,
+						Required:            true,
 						MarkdownDescription: "Severities for Push notifications",
 						ElementType:         types.StringType,
 						Validators: []validator.List{
@@ -163,7 +172,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 						Validators:          []validator.Int64{int64validator.Between(0, 60)},
 					},
 					"severities_email": schema.ListAttribute{
-						Optional:            true,
+						Required:            true,
 						MarkdownDescription: "Severities for Email notifications",
 						ElementType:         types.StringType,
 						Validators: []validator.List{
@@ -296,6 +305,7 @@ func mapUserResponseToModel(ctx context.Context, response *userResponse, data *U
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.Email = types.StringValue(response.Email)
+	data.PhoneNumber = types.StringPointerValue(response.PhoneNumber)
 	data.TimeZoneId = types.StringValue(response.TimeZoneId)
 
 	if response.IncidentNotificationSettings != nil {

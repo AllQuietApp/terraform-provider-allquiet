@@ -77,6 +77,7 @@ func testAccUserResourceConfig(display_name string) string {
 resource "allquiet_user" "test" {
   display_name =  %[1]q
   email = "millie@acme.com"
+  phone_number = "+12035479055"
 }
 
 `, display_name)
