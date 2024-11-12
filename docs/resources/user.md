@@ -71,12 +71,9 @@ Required:
 - `delay_in_min_voice` (Number) Delay in minutes for Voice Call notifications
 - `severities_email` (List of String) Severities for Email notifications
 - `severities_push` (List of String) Severities for Push notifications
+- `severities_sms` (List of String) Severities for SMS notifications
 - `severities_voice` (List of String) Severities for Voice Call notifications
 - `should_call_voice` (Boolean) Should send Voice Call notifications
 - `should_send_email` (Boolean) Should send Email notifications
 - `should_send_push` (Boolean) Should send Push notifications
 - `should_send_sms` (Boolean) Should send SMS notifications
-
-Optional:
-
-- `severities_sms` (List of String) Severities for SMS notifications
