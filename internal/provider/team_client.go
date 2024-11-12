@@ -13,8 +13,6 @@ type teamResponse struct {
 	DisplayName                      string
 	TimeZoneId                       string
 	IncidentEngagementReportSettings *incidentEngagementReportSettings
-	Members                          []teamMember
-	Tiers                            []teamTier
 }
 
 type incidentEngagementReportSettings struct {
@@ -25,56 +23,10 @@ type incidentEngagementReportSettings struct {
 type teamCreateRequest struct {
 	DisplayName                      string                            `json:"displayName"`
 	TimeZoneId                       string                            `json:"timeZoneId"`
-	Members                          []teamMember                      `json:"members"`
 	IncidentEngagementReportSettings *incidentEngagementReportSettings `json:"incidentEngagementReportSettings"`
-	Tiers                            []teamTier                        `json:"tiers"`
-}
-
-type teamMember struct {
-	Email string `json:"email"`
-	Role  string `json:"role"`
-}
-
-type teamTier struct {
-	AutoEscalationAfterMinutes *int64         `json:"autoEscalationAfterMinutes"`
-	Schedules                  []teamSchedule `json:"schedules"`
-}
-
-type teamSchedule struct {
-	ScheduleSettings *scheduleSettings `json:"scheduleSettings"`
-	RotationSettings *rotationSettings `json:"rotationSettings"`
-	Rotations        []teamRotation    `json:"rotations"`
-}
-
-type teamRotation struct {
-	Members []rotationMember `json:"members"`
-}
-
-type rotationMember struct {
-	Email string `json:"email"`
-}
-
-type scheduleSettings struct {
-	Start        *string  `json:"start"`
-	End          *string  `json:"end"`
-	SelectedDays []string `json:"selectedDays"`
-}
-
-type rotationSettings struct {
-	Repeats             *string `json:"repeats"`
-	StartsOnDayOfWeek   *string `json:"startsOnDayOfWeek"`
-	StartsOnDateOfMonth *int64  `json:"startsOnDateOfMonth"`
 }
 
 func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
-	members := make([]teamMember, len(plan.Members))
-	for i, member := range plan.Members {
-		members[i] = teamMember{
-			Email: member.Email.ValueString(),
-			Role:  member.Role.ValueString(),
-		}
-	}
-
 	var settings *incidentEngagementReportSettings
 
 	if plan.IncidentEngagementReportSettings != nil {
@@ -84,64 +36,10 @@ func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
 		}
 	}
 
-	tiers := make([]teamTier, len(plan.Tiers))
-	for i, tier := range plan.Tiers {
-		mappedTier := mapTier(tier)
-		tiers[i] = *mappedTier
-	}
-
 	return &teamCreateRequest{
 		DisplayName:                      plan.DisplayName.ValueString(),
 		TimeZoneId:                       plan.TimeZoneId.ValueString(),
-		Members:                          members,
 		IncidentEngagementReportSettings: settings,
-		Tiers:                            tiers,
-	}
-}
-
-func mapTier(tier TeamTierModel) *teamTier {
-
-	schedules := make([]teamSchedule, len(tier.Schedules))
-	for i, schedule := range tier.Schedules {
-
-		schedules[i] = teamSchedule{}
-
-		if schedule.ScheduleSettings != nil {
-			selectedDays := NonNullableArrayToStringArray(ListToStringArray(schedule.ScheduleSettings.SelectedDays))
-
-			schedules[i].ScheduleSettings = &scheduleSettings{
-				Start:        schedule.ScheduleSettings.Start.ValueStringPointer(),
-				End:          schedule.ScheduleSettings.End.ValueStringPointer(),
-				SelectedDays: selectedDays,
-			}
-		}
-
-		if schedule.RotationSettings != nil {
-			schedules[i].RotationSettings = &rotationSettings{
-				Repeats:             schedule.RotationSettings.Repeats.ValueStringPointer(),
-				StartsOnDayOfWeek:   schedule.RotationSettings.StartsOnDayOfWeek.ValueStringPointer(),
-				StartsOnDateOfMonth: schedule.RotationSettings.StartsOnDateOfMonth.ValueInt64Pointer(),
-			}
-		}
-
-		rotations := make([]teamRotation, len(schedule.Rotations))
-		for j, rotation := range schedule.Rotations {
-			members := make([]rotationMember, len(rotation.Members))
-			for k, member := range rotation.Members {
-				members[k] = rotationMember{
-					Email: member.Email.ValueString(),
-				}
-			}
-			rotations[j] = teamRotation{
-				Members: members,
-			}
-		}
-		schedules[i].Rotations = rotations
-	}
-
-	return &teamTier{
-		AutoEscalationAfterMinutes: tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
-		Schedules:                  schedules,
 	}
 }
 
@@ -156,7 +54,7 @@ func (c *AllQuietAPIClient) CreateTeamResource(ctx context.Context, data *TeamMo
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamResponse
@@ -177,7 +75,7 @@ func (c *AllQuietAPIClient) DeleteTeamResource(ctx context.Context, id string) e
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp)
+		return logErrorResponse(httpResp, nil)
 	}
 
 	return nil
@@ -194,7 +92,7 @@ func (c *AllQuietAPIClient) UpdateTeamResource(ctx context.Context, id string, d
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamResponse
@@ -215,7 +113,7 @@ func (c *AllQuietAPIClient) GetTeamResource(ctx context.Context, id string) (*te
 	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp)
+		return nil, logErrorResponse(httpResp, nil)
 	}
 
 	var result teamResponse
