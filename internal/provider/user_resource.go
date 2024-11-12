@@ -118,7 +118,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 						Validators:          []validator.Int64{int64validator.Between(0, 60)},
 					},
 					"severities_sms": schema.ListAttribute{
-						Optional:            true,
+						Required:            true,
 						MarkdownDescription: "Severities for SMS notifications",
 						ElementType:         types.StringType,
 						Validators: []validator.List{
