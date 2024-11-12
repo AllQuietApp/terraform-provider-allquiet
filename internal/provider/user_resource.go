@@ -95,7 +95,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 				Optional:            true,
 				Validators: []validator.String{stringvalidator.RegexMatches(
 					regexp.MustCompile(`^\+\d+$`),
-					"must contain phone number in internatiol format matching the pattern '^\\+\\d+$'",
+					"must contain phone number in international format matching the pattern '^\\+\\d+$'",
 				)},
 			},
 			"time_zone_id": schema.StringAttribute{
