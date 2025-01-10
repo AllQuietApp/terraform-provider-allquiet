@@ -44,7 +44,7 @@ resource "allquiet_routing" "example_1" {
         ]
       },
       actions = {
-        route_to_teams = [allquiet_team.pres_sales.id]
+        assign_to_teams = [allquiet_team.pres_sales.id]
       }
     },
 
@@ -59,7 +59,7 @@ resource "allquiet_routing" "example_1" {
         ]
       },
       actions = {
-        route_to_teams = [allquiet_team.after_sales.id]
+        assign_to_teams = [allquiet_team.after_sales.id]
       }
     }
   ]

@@ -62,7 +62,7 @@ type RoutingRuleConditionsAttributeModel struct {
 }
 
 type RoutingRuleActionsModel struct {
-	RouteToTeams    types.List   `tfsdk:"route_to_teams"`
+	AssignToTeams   types.List   `tfsdk:"assign_to_teams"`
 	Discard         types.Bool   `tfsdk:"discard"`
 	ChangeSeverity  types.String `tfsdk:"change_severity"`
 	AddInteraction  types.String `tfsdk:"add_interaction"`
@@ -167,9 +167,9 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 							MarkdownDescription: "Settings for the schedule",
 							Optional:            true,
 							Attributes: map[string]schema.Attribute{
-								"route_to_teams": schema.ListAttribute{
+								"assign_to_teams": schema.ListAttribute{
 									Optional:            true,
-									MarkdownDescription: "Will route the incident to the specified teams",
+									MarkdownDescription: "Will assign the incident to the specified teams",
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
@@ -411,7 +411,7 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 	}
 
 	return &RoutingRuleActionsModel{
-		RouteToTeams:    MapNullableList(ctx, actions.RouteToTeams),
+		AssignToTeams:   MapNullableList(ctx, actions.AssignToTeams),
 		Discard:         types.BoolValue(actions.Discard),
 		ChangeSeverity:  types.StringPointerValue(actions.ChangeSeverity),
 		AddInteraction:  types.StringPointerValue(actions.AddInteraction),

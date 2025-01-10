@@ -50,7 +50,7 @@ func (p *AllQuietProvider) Schema(ctx context.Context, req provider.SchemaReques
 			},
 			"api_region": schema.StringAttribute{
 				MarkdownDescription: "All Quiet's API key. US or EU.",
-				Required:            true,
+				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"us", "eu"}...),
 				},

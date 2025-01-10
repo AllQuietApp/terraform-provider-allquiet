@@ -59,7 +59,7 @@ resource "allquiet_routing" "example_1" {
         ]
       },
       actions = {
-        route_to_teams = [allquiet_team.pres_sales.id]
+        assign_to_teams = [allquiet_team.pres_sales.id]
       }
     },
 
@@ -74,7 +74,7 @@ resource "allquiet_routing" "example_1" {
         ]
       },
       actions = {
-        route_to_teams = [allquiet_team.after_sales.id]
+        assign_to_teams = [allquiet_team.after_sales.id]
       }
     }
   ]
@@ -172,9 +172,9 @@ Optional:
 Optional:
 
 - `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'
+- `assign_to_teams` (List of String) Will assign the incident to the specified teams
 - `change_severity` (String) Will change the severity of the incident
 - `discard` (Boolean) If true will discard and delete the incident
-- `route_to_teams` (List of String) Will route the incident to the specified teams
 - `rule_flow_control` (String) If 'Skip' will not evaluate further rules
 
 

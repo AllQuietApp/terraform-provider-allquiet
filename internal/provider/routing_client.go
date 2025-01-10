@@ -36,7 +36,7 @@ type routingRuleAttribute struct {
 }
 
 type routingRuleActions struct {
-	RouteToTeams    *[]string `json:"routeToTeams"`
+	AssignToTeams   *[]string `json:"assignToTeams"`
 	ChangeSeverity  *string   `json:"changeSeverity"`
 	AddInteraction  *string   `json:"addInteraction"`
 	RuleFlowControl *string   `json:"ruleFlowControl"`
@@ -108,7 +108,7 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 	}
 
 	return &routingRuleActions{
-		RouteToTeams:    ListToStringArray(actions.RouteToTeams),
+		AssignToTeams:   ListToStringArray(actions.AssignToTeams),
 		ChangeSeverity:  actions.ChangeSeverity.ValueStringPointer(),
 		AddInteraction:  actions.AddInteraction.ValueStringPointer(),
 		RuleFlowControl: actions.RuleFlowControl.ValueStringPointer(),

@@ -94,7 +94,7 @@ resource "allquiet_routing" "test" {
 	 channels = {
 	 },
 	 actions = {
-	   route_to_teams = [allquiet_team.test.id]
+	   assign_to_teams = [allquiet_team.test.id]
      }
     },
 	{
