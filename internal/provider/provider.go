@@ -7,12 +7,14 @@ import (
 	"context"
 	"os"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -31,6 +33,7 @@ type AllQuietProvider struct {
 // AllQuietProviderModel describes the provider data model.
 type AllQuietProviderModel struct {
 	ApiKey types.String `tfsdk:"api_key"`
+	Region types.String `tfsdk:"api_region"`
 }
 
 func (p *AllQuietProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -44,6 +47,13 @@ func (p *AllQuietProvider) Schema(ctx context.Context, req provider.SchemaReques
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "All Quiet's API key. If not provided explicitly, make sure to provide it via the `ALLQUIET_API_KEY` environment variable",
 				Optional:            true,
+			},
+			"api_region": schema.StringAttribute{
+				MarkdownDescription: "All Quiet's API key. US or EU.",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"us", "eu"}...),
+				},
 			},
 		},
 	}
@@ -88,7 +98,11 @@ func (p *AllQuietProvider) Configure(ctx context.Context, req provider.Configure
 	// errors with provider-specific guidance.
 
 	if endpoint == "" {
-		endpoint = "https://allquiet.app/api/public/v1"
+		if config.Region.ValueString() == "eu" {
+			endpoint = "https://allquiet.eu/api/public/v1"
+		} else {
+			endpoint = "https://allquiet.app/api/public/v1"
+		}
 	}
 
 	if apiKey == "" {

@@ -38,7 +38,7 @@ Then commit the changes to `go.mod` and `go.sum`.
 
 ## Using the provider
 
-Fill this in for each provider
+For an in-depth walk-through consult the  [All Quiet Terraform Docs](https://docs.allquiet.app/advanced/terraform).
 
 ## Developing the Provider
 
