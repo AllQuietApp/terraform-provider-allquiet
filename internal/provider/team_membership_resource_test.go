@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -80,21 +81,21 @@ resource "allquiet_team" "team" {
 
 resource "allquiet_user" "millie_brown" {
   display_name =  "Millie Bobby Brown"
-  email = "millie@acme.com"
+  email = "millie+%s@acme.com"
 }
 
 resource "allquiet_user" "taylor_swift" {
   display_name =  "Taylor Swift"
-  email = "taylor@acme.com"
+  email = "taylor+%s@acme.com"
 }
 
 resource "allquiet_team_membership" "test" {
-	user_id = allquiet_user.%[1]s.id
+	user_id = allquiet_user.%s.id
   	team_id = allquiet_team.team.id
 	role = "Member"
 }
 
-`, user_name)
+`, uuid.New().String(), uuid.New().String(), user_name)
 
 }
 

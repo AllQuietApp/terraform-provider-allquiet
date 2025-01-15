@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -76,11 +77,11 @@ func testAccUserResourceConfig(display_name string) string {
 	return fmt.Sprintf(`
 resource "allquiet_user" "test" {
   display_name =  %[1]q
-  email = "millie@acme.com"
+  email = "millie+%s@acme.com"
   phone_number = "+12035479055"
 }
 
-`, display_name)
+`, display_name, uuid.New().String())
 
 }
 

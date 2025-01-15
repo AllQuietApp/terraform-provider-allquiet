@@ -4,10 +4,12 @@
 package provider
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -42,15 +44,15 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 }
 
 func testAccTeamEscalationsResourceConfigCreate() string {
-	return `
+	return fmt.Sprintf(`
 	  resource "allquiet_user" "galois" {
 		display_name = "Galois"
-		email        = "galois@acme.com"
+		email        = "galois+%s@acme.com"
 	  }
 	  
 	  resource "allquiet_user" "kolmogorov" {
 		display_name = "Kolmogorov"
-		email        = "kolmogorov@acme.com"
+		email        = "kolmogorov+%s@acme.com"
 	  }
 
 	  resource "allquiet_team" "my_team" {
@@ -98,20 +100,20 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		]
 	  }
 	  
-`
+`, uuid.New().String(), uuid.New().String())
 }
 
 func testAccTeamEscalationsResourceConfigUpdate() string {
-	return `
+	return fmt.Sprintf(`
 	  
 	  resource "allquiet_user" "galois" {
 		display_name = "Galois"
-		email        = "galois@acme.com"
+		email        = "galois+%s@acme.com"
 	  }
 
       resource "allquiet_user" "gauss" {
 		display_name = "Gauss"
-		email        = "gauss@acme.com"
+		email        = "gauss+%s@acme.com"
 	  }
 	  
 	  resource "allquiet_team" "my_team" {
@@ -159,7 +161,7 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 		]
 	  }
 	  
-`
+`, uuid.New().String(), uuid.New().String())
 }
 
 func TestAccTeamEscalationsExample(t *testing.T) {

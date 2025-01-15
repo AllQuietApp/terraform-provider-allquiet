@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -135,7 +136,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 								},
 								"intents": schema.ListAttribute{
 									Optional:            true,
-									MarkdownDescription: "Intents. Possible values are: Investigated, Commented, Escalated, Resolved, Unresolved, Created, Deleted, Updated",
+									MarkdownDescription: "Intents. Possible values are: " + strings.Join(ValidIntents, ", "),
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(IntentValidator("Not a valid intent")),
@@ -188,7 +189,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 								},
 								"add_interaction": schema.StringAttribute{
 									Optional:            true,
-									MarkdownDescription: "Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'",
+									MarkdownDescription: "Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'. Possible values are: " + strings.Join(ValidIntents, ", "),
 									Validators:          []validator.String{IntentValidator("Not a valid intent")},
 								},
 								"rule_flow_control": schema.StringAttribute{

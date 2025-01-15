@@ -14,6 +14,23 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+// Array of valid intents that can be used in multiple places
+var ValidIntents = []string{
+	"Resolved",
+	"Investigated",
+	"Escalated",
+	"Commented",
+	"Unresolved",
+	"Assigned",
+	"Affects",
+	"Forwarded",
+	"Archived",
+	"Unarchived",
+	"Created",
+	"Deleted",
+	"Updated",
+}
+
 func NonNullableArrayToStringArray(array *[]string) []string {
 	if array == nil {
 		return []string{}
@@ -168,7 +185,7 @@ func logErrorResponse(resp *http.Response, req interface{}) error {
 }
 
 func IntentValidator(message string) validator.String {
-	return stringvalidator.OneOf([]string{"Investigated", "Commented", "Escalated", "Resolved", "Unresolved", "Created", "Deleted", "Updated"}...)
+	return stringvalidator.OneOf(ValidIntents...)
 }
 
 func SeverityValidator(message string) validator.String {
