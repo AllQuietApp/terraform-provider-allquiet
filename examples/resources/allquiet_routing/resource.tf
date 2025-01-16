@@ -118,7 +118,7 @@ resource "allquiet_routing" "example_4" {
         integrations = [allquiet_integration.custom_webhook.id]
       },
       actions = {
-        add_interaction = "Resolved"
+        add_interaction          = "Resolved"
         delay_actions_in_minutes = 10
       }
     },
@@ -131,9 +131,9 @@ resource "allquiet_routing" "example_5" {
   rules = [
     {
       conditions = {
-        severities   = ["Minor", "Warning"],
+        severities = ["Minor", "Warning"],
         date_restriction = {
-          from = "2025-01-16T22:07:03Z",
+          from  = "2025-01-16T22:07:03Z",
           until = "2025-01-19T00:00:00Z"
         }
       },
@@ -152,8 +152,8 @@ resource "allquiet_routing" "example_6" {
       conditions = {
         schedule = {
           days_of_week = ["mon"],
-          after = "08:00",
-          before = "10:00"
+          after        = "08:00",
+          before       = "10:00"
         }
       },
       actions = {
@@ -172,7 +172,7 @@ resource "allquiet_routing" "example_7" {
         severities = ["Critical"]
       },
       actions = {
-        add_interaction = "Forwarded"
+        add_interaction                  = "Forwarded"
         forward_to_outbound_integrations = [allquiet_outbound_integration.notion.id]
       }
     }
@@ -194,7 +194,7 @@ resource "allquiet_routing" "example_8" {
         ]
       },
       actions = {
-        add_interaction = "Affects"
+        add_interaction  = "Affects"
         affects_services = [allquiet_service.pre_sales.id]
       }
     }
