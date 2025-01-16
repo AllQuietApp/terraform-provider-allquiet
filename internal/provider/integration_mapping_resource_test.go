@@ -124,5 +124,5 @@ func testAccIntegrationMappingResourceExample() string {
 		panic(err)
 	}
 
-	return string(dat)
+	return RandomizeExample(string(dat))
 }

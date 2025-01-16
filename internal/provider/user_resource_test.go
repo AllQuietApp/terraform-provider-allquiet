@@ -93,5 +93,7 @@ func testAccUserResourceExample() string {
 		panic(err)
 	}
 
-	return string(dat)
+	result := RandomizeExample(string(dat))
+
+	return result
 }

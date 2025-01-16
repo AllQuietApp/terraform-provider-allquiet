@@ -36,11 +36,12 @@ type routingRuleAttribute struct {
 }
 
 type routingRuleActions struct {
-	AssignToTeams   *[]string `json:"assignToTeams"`
-	ChangeSeverity  *string   `json:"changeSeverity"`
-	AddInteraction  *string   `json:"addInteraction"`
-	RuleFlowControl *string   `json:"ruleFlowControl"`
-	Discard         bool      `json:"discard"`
+	AssignToTeams         *[]string `json:"assignToTeams"`
+	ChangeSeverity        *string   `json:"changeSeverity"`
+	AddInteraction        *string   `json:"addInteraction"`
+	RuleFlowControl       *string   `json:"ruleFlowControl"`
+	Discard               bool      `json:"discard"`
+	DelayActionsInMinutes *int64    `json:"delayActionsInMinutes"`
 }
 
 type routingRuleChannels struct {
@@ -108,11 +109,12 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 	}
 
 	return &routingRuleActions{
-		AssignToTeams:   ListToStringArray(actions.AssignToTeams),
-		ChangeSeverity:  actions.ChangeSeverity.ValueStringPointer(),
-		AddInteraction:  actions.AddInteraction.ValueStringPointer(),
-		RuleFlowControl: actions.RuleFlowControl.ValueStringPointer(),
-		Discard:         actions.Discard.ValueBool(),
+		AssignToTeams:         ListToStringArray(actions.AssignToTeams),
+		ChangeSeverity:        actions.ChangeSeverity.ValueStringPointer(),
+		AddInteraction:        actions.AddInteraction.ValueStringPointer(),
+		RuleFlowControl:       actions.RuleFlowControl.ValueStringPointer(),
+		Discard:               actions.Discard.ValueBool(),
+		DelayActionsInMinutes: actions.DelayActionsInMinutes.ValueInt64Pointer(),
 	}
 }
 

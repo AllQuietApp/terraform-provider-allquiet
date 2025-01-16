@@ -206,6 +206,6 @@ func testAccTeamEscalationsResourceExample() string {
 		panic(err)
 	}
 
-	return string(dat)
+	return RandomizeExample(string(dat))
 
 }

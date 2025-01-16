@@ -63,11 +63,12 @@ type RoutingRuleConditionsAttributeModel struct {
 }
 
 type RoutingRuleActionsModel struct {
-	AssignToTeams   types.List   `tfsdk:"assign_to_teams"`
-	Discard         types.Bool   `tfsdk:"discard"`
-	ChangeSeverity  types.String `tfsdk:"change_severity"`
-	AddInteraction  types.String `tfsdk:"add_interaction"`
-	RuleFlowControl types.String `tfsdk:"rule_flow_control"`
+	AssignToTeams         types.List   `tfsdk:"assign_to_teams"`
+	Discard               types.Bool   `tfsdk:"discard"`
+	ChangeSeverity        types.String `tfsdk:"change_severity"`
+	AddInteraction        types.String `tfsdk:"add_interaction"`
+	RuleFlowControl       types.String `tfsdk:"rule_flow_control"`
+	DelayActionsInMinutes types.Int64  `tfsdk:"delay_actions_in_minutes"`
 }
 
 type RoutingRuleChannelsModel struct {
@@ -198,6 +199,10 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									Computed:            true,
 									MarkdownDescription: "If 'Skip' will not evaluate further rules",
 									Validators:          []validator.String{RuleFlowValidator("Not a valid rule flow value")},
+								},
+								"delay_actions_in_minutes": schema.Int64Attribute{
+									Optional:            true,
+									MarkdownDescription: "Delay actions in minutes",
 								},
 							},
 						},

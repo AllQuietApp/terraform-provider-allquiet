@@ -8,7 +8,9 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -210,4 +212,8 @@ func OperatorValidator(message string) validator.String {
 
 func GuidValidator(message string) validator.String {
 	return stringvalidator.RegexMatches(regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`), message)
+}
+
+func RandomizeExample(example string) string {
+	return strings.Replace(example, "@acme.com", "@acme"+uuid.New().String()+".com", -1)
 }

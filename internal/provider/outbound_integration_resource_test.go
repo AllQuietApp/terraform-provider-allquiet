@@ -95,5 +95,5 @@ func testAccOutboundIntegrationResourceExample() string {
 		panic(err)
 	}
 
-	return string(dat)
+	return RandomizeExample(string(dat))
 }
