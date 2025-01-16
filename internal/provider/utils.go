@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Array of valid intents that can be used in multiple places
 var ValidIntents = []string{
 	"Resolved",
 	"Investigated",
