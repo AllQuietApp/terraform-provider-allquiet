@@ -38,6 +38,7 @@ type IntegrationModel struct {
 	IsMuted         types.Bool   `tfsdk:"is_muted"`
 	IsInMaintenance types.Bool   `tfsdk:"is_in_maintenance"`
 	Type            types.String `tfsdk:"type"`
+	WebhookUrl      types.String `tfsdk:"webhook_url"`
 }
 
 func (r *Integration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -80,6 +81,10 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 			"type": schema.StringAttribute{
 				MarkdownDescription: "The type of the integration. See all types here: https://allquiet.app/api/public/v1/inbound-integration/types",
 				Required:            true,
+			},
+			"webhook_url": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "The webhook url of the integration if it is a webhook-like integration e.g. Amazon CloudWatch",
 			},
 		},
 	}
@@ -209,4 +214,5 @@ func mapIntegrationResponseToModel(response *integrationResponse, data *Integrat
 	data.IsMuted = types.BoolValue(response.IsMuted)
 	data.IsInMaintenance = types.BoolValue(response.IsInMaintenance)
 	data.Type = types.StringValue(response.Type)
+	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 }

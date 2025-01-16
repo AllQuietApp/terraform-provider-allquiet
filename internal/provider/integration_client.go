@@ -9,12 +9,13 @@ import (
 )
 
 type integrationResponse struct {
-	Id              string `json:"id"`
-	DisplayName     string `json:"displayName"`
-	TeamId          string `json:"teamId"`
-	IsMuted         bool   `json:"isMuted"`
-	IsInMaintenance bool   `json:"isInMaintenance"`
-	Type            string `json:"type"`
+	Id              string  `json:"id"`
+	DisplayName     string  `json:"displayName"`
+	TeamId          string  `json:"teamId"`
+	IsMuted         bool    `json:"isMuted"`
+	IsInMaintenance bool    `json:"isInMaintenance"`
+	Type            string  `json:"type"`
+	WebhookUrl      *string `json:"webhookUrl"`
 }
 
 type integrationCreateRequest struct {

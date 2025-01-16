@@ -22,6 +22,7 @@ func TestAccIntegrationResource(t *testing.T) {
 				Config: testAccIntegrationResourceConfig("Integration One"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration One"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.test", "webhook_url"),
 				),
 			},
 			// ImportState testing
@@ -35,6 +36,7 @@ func TestAccIntegrationResource(t *testing.T) {
 				Config: testAccIntegrationResourceConfig("Integration Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration Two"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.test", "webhook_url"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -52,6 +54,8 @@ func TestAccIntegrationResourceExample(t *testing.T) {
 				Config: testAccIntegrationResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.datadog", "display_name", "My Datadog Integration"),
+					resource.TestCheckResourceAttr("allquiet_integration.amazon_cloudwatch", "display_name", "My Amazon CloudWatch Integration"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.amazon_cloudwatch", "webhook_url"),
 				),
 			},
 			// ImportState testing
@@ -65,6 +69,8 @@ func TestAccIntegrationResourceExample(t *testing.T) {
 				Config: testAccIntegrationResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.datadog", "display_name", "My Datadog Integration"),
+					resource.TestCheckResourceAttr("allquiet_integration.amazon_cloudwatch", "display_name", "My Amazon CloudWatch Integration"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.amazon_cloudwatch", "webhook_url"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
