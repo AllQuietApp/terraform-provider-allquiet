@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -136,23 +137,17 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 										Attributes: map[string]schema.Attribute{
 											"start": schema.StringAttribute{
 												Optional:            true,
-												MarkdownDescription: "Start time of the schedule",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
-													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
-												)},
+												MarkdownDescription: "Start time of the schedule. Format: HH:mm",
+												Validators:          []validator.String{TimeValidator("Not a valid time")},
 											},
 											"end": schema.StringAttribute{
 												Optional:            true,
-												MarkdownDescription: "End time of the schedule",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
-													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
-												)},
+												MarkdownDescription: "End time of the schedule. Format: HH:mm",
+												Validators:          []validator.String{TimeValidator("Not a valid time")},
 											},
 											"selected_days": schema.ListAttribute{
 												Optional:            true,
-												MarkdownDescription: "Selected days of the week",
+												MarkdownDescription: "Selected days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
 												ElementType:         types.StringType,
 												Validators: []validator.List{
 													listvalidator.ValueStringsAre(stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)),
@@ -171,7 +166,7 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 											},
 											"starts_on_day_of_week": schema.StringAttribute{
 												Optional:            true,
-												MarkdownDescription: "Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'",
+												MarkdownDescription: "Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
 												Validators:          []validator.String{stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)},
 											},
 											"starts_on_date_of_month": schema.Int64Attribute{
@@ -181,11 +176,8 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 											},
 											"starts_on_time": schema.StringAttribute{
 												Optional:            true,
-												MarkdownDescription: "If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'",
-												Validators: []validator.String{stringvalidator.RegexMatches(
-													regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
-													"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
-												)},
+												MarkdownDescription: "If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'. Format: HH:mm",
+												Validators:          []validator.String{TimeValidator("Not a valid time")},
 											},
 											"custom_repeat_unit": schema.StringAttribute{
 												Optional:            true,

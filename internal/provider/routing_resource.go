@@ -208,7 +208,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 										"days_of_week": schema.ListAttribute{
 											Optional:    true,
 											ElementType: types.StringType,
-											Description: "Days of the week when the rule is active",
+											Description: "Days of the week when the rule is active. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
 											Validators: []validator.List{
 												listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
 											},
@@ -223,7 +223,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 							Attributes: map[string]schema.Attribute{
 								"assign_to_teams": schema.ListAttribute{
 									Optional:            true,
-									MarkdownDescription: "Will assign the incident to the specified teams. Only with add_interaction 'Assigned'.",
+									MarkdownDescription: "Will assign the incident to the specified teams.",
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),

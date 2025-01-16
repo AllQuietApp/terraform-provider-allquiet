@@ -287,7 +287,7 @@ Optional:
 
 - `after` (String) Time after which the rule is active (HH:mm format)
 - `before` (String) Time before which the rule is active (HH:mm format)
-- `days_of_week` (List of String) Days of the week when the rule is active
+- `days_of_week` (List of String) Days of the week when the rule is active. Possible values are: sun, mon, tue, wed, thu, fri, sat
 
 
 
@@ -298,7 +298,7 @@ Optional:
 
 - `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
 - `affects_services` (List of String) Will affect the specified services. Only with add_interaction 'Affects'.
-- `assign_to_teams` (List of String) Will assign the incident to the specified teams. Only with add_interaction 'Assigned'.
+- `assign_to_teams` (List of String) Will assign the incident to the specified teams.
 - `change_severity` (String) Will change the severity of the incident
 - `delay_actions_in_minutes` (Number) Delay actions in minutes
 - `discard` (Boolean) If true will discard and delete the incident

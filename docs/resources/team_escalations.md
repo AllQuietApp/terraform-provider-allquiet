@@ -344,8 +344,8 @@ Optional:
 - `custom_repeat_value` (Number) How often the rotation should repeat. Needs to be set if 'repeats' is 'custom'
 - `effective_from` (String) If sets, the rotation will be effective from the given date in ISO 8601 format
 - `starts_on_date_of_month` (Number) If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'
-- `starts_on_day_of_week` (String) Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'
-- `starts_on_time` (String) If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'
+- `starts_on_day_of_week` (String) Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'. Possible values are: sun, mon, tue, wed, thu, fri, sat
+- `starts_on_time` (String) If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'. Format: HH:mm
 
 
 <a id="nestedatt--escalation_tiers--schedules--schedule_settings"></a>
@@ -353,6 +353,6 @@ Optional:
 
 Optional:
 
-- `end` (String) End time of the schedule
-- `selected_days` (List of String) Selected days of the week
-- `start` (String) Start time of the schedule
+- `end` (String) End time of the schedule. Format: HH:mm
+- `selected_days` (List of String) Selected days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
+- `start` (String) Start time of the schedule. Format: HH:mm
