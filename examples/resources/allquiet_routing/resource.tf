@@ -29,6 +29,17 @@ resource "allquiet_outbound_integration" "slack" {
   type         = "Slack"
 }
 
+resource "allquiet_outbound_integration" "notion" {
+  team_id      = allquiet_team.root.id
+  display_name = "Notion"
+  type         = "Notion"
+}
+
+resource "allquiet_service" "pre_sales" {
+  display_name = "Pre Sales"
+  public_title = "Pre Sales"
+}
+
 resource "allquiet_routing" "example_1" {
   team_id      = allquiet_team.root.id
   display_name = "Route to specific team based on attribute"
@@ -94,5 +105,98 @@ resource "allquiet_routing" "example_3" {
         add_interaction = "Resolved"
       }
     },
+  ]
+}
+
+resource "allquiet_routing" "example_4" {
+  team_id      = allquiet_team.root.id
+  display_name = "Auto Resolve non Critical incidents from Custom Webhook after 10 minutes"
+  rules = [
+    {
+      conditions = {
+        severities   = ["Minor", "Warning"]
+        integrations = [allquiet_integration.custom_webhook.id]
+      },
+      actions = {
+        add_interaction = "Resolved"
+        delay_actions_in_minutes = 10
+      }
+    },
+  ]
+}
+
+resource "allquiet_routing" "example_5" {
+  team_id      = allquiet_team.root.id
+  display_name = "Auto Resolve non Critical incidents from Custom Webhook but only in the period from 2025-01-16T22:07:03Z to 2025-01-19T00:00:00Z"
+  rules = [
+    {
+      conditions = {
+        severities   = ["Minor", "Warning"],
+        date_restriction = {
+          from = "2025-01-16T22:07:03Z",
+          until = "2025-01-19T00:00:00Z"
+        }
+      },
+      actions = {
+        add_interaction = "Resolved"
+      }
+    },
+  ]
+}
+
+resource "allquiet_routing" "example_6" {
+  team_id      = allquiet_team.root.id
+  display_name = "Auto Archive incidents Monday Mornings from 08 until 10"
+  rules = [
+    {
+      conditions = {
+        schedule = {
+          days_of_week = ["mon"],
+          after = "08:00",
+          before = "10:00"
+        }
+      },
+      actions = {
+        add_interaction = "Archived"
+      }
+    },
+  ]
+}
+
+resource "allquiet_routing" "example_7" {
+  team_id      = allquiet_team.root.id
+  display_name = "Auto Forward Critical incidents to Notion"
+  rules = [
+    {
+      conditions = {
+        severities = ["Critical"]
+      },
+      actions = {
+        add_interaction = "Forwarded"
+        forward_to_outbound_integrations = [allquiet_outbound_integration.notion.id]
+      }
+    }
+  ]
+}
+
+resource "allquiet_routing" "example_8" {
+  team_id      = allquiet_team.root.id
+  display_name = "Auto Affect incidents with 'Project' attribute 'Pre Sales' to service 'Pre Sales'"
+  rules = [
+    {
+      conditions = {
+        attributes = [
+          {
+            name     = "Project",
+            operator = "=",
+            value    = "Pre Sales"
+          }
+        ]
+      },
+      actions = {
+        add_interaction = "Affects"
+        affects_services = [allquiet_service.pre_sales.id]
+      }
+    }
   ]
 }

@@ -49,11 +49,13 @@ type RoutingRuleModel struct {
 }
 
 type RoutingRuleConditionsModel struct {
-	Statuses     types.List                            `tfsdk:"statuses"`
-	Severities   types.List                            `tfsdk:"severities"`
-	Integrations types.List                            `tfsdk:"integrations"`
-	Intents      types.List                            `tfsdk:"intents"`
-	Attributes   []RoutingRuleConditionsAttributeModel `tfsdk:"attributes"`
+	Statuses        types.List                            `tfsdk:"statuses"`
+	Severities      types.List                            `tfsdk:"severities"`
+	Integrations    types.List                            `tfsdk:"integrations"`
+	Intents         types.List                            `tfsdk:"intents"`
+	Attributes      []RoutingRuleConditionsAttributeModel `tfsdk:"attributes"`
+	DateRestriction *DateRestrictionModel                 `tfsdk:"date_restriction"`
+	Schedule        *ScheduleModel                        `tfsdk:"schedule"`
 }
 
 type RoutingRuleConditionsAttributeModel struct {
@@ -63,12 +65,14 @@ type RoutingRuleConditionsAttributeModel struct {
 }
 
 type RoutingRuleActionsModel struct {
-	AssignToTeams         types.List   `tfsdk:"assign_to_teams"`
-	Discard               types.Bool   `tfsdk:"discard"`
-	ChangeSeverity        types.String `tfsdk:"change_severity"`
-	AddInteraction        types.String `tfsdk:"add_interaction"`
-	RuleFlowControl       types.String `tfsdk:"rule_flow_control"`
-	DelayActionsInMinutes types.Int64  `tfsdk:"delay_actions_in_minutes"`
+	AssignToTeams                 types.List   `tfsdk:"assign_to_teams"`
+	Discard                       types.Bool   `tfsdk:"discard"`
+	ChangeSeverity                types.String `tfsdk:"change_severity"`
+	AddInteraction                types.String `tfsdk:"add_interaction"`
+	RuleFlowControl               types.String `tfsdk:"rule_flow_control"`
+	DelayActionsInMinutes         types.Int64  `tfsdk:"delay_actions_in_minutes"`
+	AffectsServices               types.List   `tfsdk:"affects_services"`
+	ForwardToOutboundIntegrations types.List   `tfsdk:"forward_to_outbound_integrations"`
 }
 
 type RoutingRuleChannelsModel struct {
@@ -76,6 +80,17 @@ type RoutingRuleChannelsModel struct {
 	OutboundIntegrationsMuted types.Bool `tfsdk:"outbound_integrations_muted"`
 	NotificationChannels      types.List `tfsdk:"notification_channels"`
 	NotificationChannelsMuted types.Bool `tfsdk:"notification_channels_muted"`
+}
+
+type DateRestrictionModel struct {
+	From  types.String `tfsdk:"from"`
+	Until types.String `tfsdk:"until"`
+}
+
+type ScheduleModel struct {
+	After      types.String `tfsdk:"after"`
+	Before     types.String `tfsdk:"before"`
+	DaysOfWeek types.List   `tfsdk:"days_of_week"`
 }
 
 func (r *Routing) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -163,6 +178,43 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 										},
 									},
 								},
+								"date_restriction": schema.SingleNestedAttribute{
+									Optional: true,
+									Attributes: map[string]schema.Attribute{
+										"from": schema.StringAttribute{
+											Optional:    true,
+											Description: "Start date for the routing rule (RFC3339 format)",
+											Validators:  []validator.String{DateTimeValidator("Not a valid date")},
+										},
+										"until": schema.StringAttribute{
+											Optional:    true,
+											Description: "End date for the routing rule (RFC3339 format)",
+											Validators:  []validator.String{DateTimeValidator("Not a valid date")},
+										},
+									},
+								}, "schedule": schema.SingleNestedAttribute{
+									Optional: true,
+									Attributes: map[string]schema.Attribute{
+										"after": schema.StringAttribute{
+											Optional:    true,
+											Description: "Time after which the rule is active (HH:mm format)",
+											Validators:  []validator.String{TimeValidator("Not a valid time")},
+										},
+										"before": schema.StringAttribute{
+											Optional:    true,
+											Description: "Time before which the rule is active (HH:mm format)",
+											Validators:  []validator.String{TimeValidator("Not a valid time")},
+										},
+										"days_of_week": schema.ListAttribute{
+											Optional:    true,
+											ElementType: types.StringType,
+											Description: "Days of the week when the rule is active",
+											Validators: []validator.List{
+												listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
+											},
+										},
+									},
+								},
 							},
 						},
 						"actions": schema.SingleNestedAttribute{
@@ -171,7 +223,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 							Attributes: map[string]schema.Attribute{
 								"assign_to_teams": schema.ListAttribute{
 									Optional:            true,
-									MarkdownDescription: "Will assign the incident to the specified teams",
+									MarkdownDescription: "Will assign the incident to the specified teams. Only with add_interaction 'Assigned'.",
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
@@ -203,6 +255,22 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 								"delay_actions_in_minutes": schema.Int64Attribute{
 									Optional:            true,
 									MarkdownDescription: "Delay actions in minutes",
+								},
+								"affects_services": schema.ListAttribute{
+									Optional:            true,
+									MarkdownDescription: "Will affect the specified services. Only with add_interaction 'Affects'.",
+									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+									},
+								},
+								"forward_to_outbound_integrations": schema.ListAttribute{
+									Optional:            true,
+									MarkdownDescription: "Will forward to the specified outbound integrations. Only with add_interaction 'Forwarded'.",
+									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+									},
 								},
 							},
 						},
@@ -388,11 +456,36 @@ func mapRoutingRuleConditionsResponseToModel(ctx context.Context, conditions *ro
 	}
 
 	return &RoutingRuleConditionsModel{
-		Statuses:     MapNullableList(ctx, conditions.Statuses),
-		Severities:   MapNullableList(ctx, conditions.Severities),
-		Integrations: MapNullableList(ctx, conditions.Integrations),
-		Intents:      MapNullableList(ctx, conditions.Intents),
-		Attributes:   mapRoutingRuleConditionsAttributeResponseToModel(conditions.Attributes),
+		Statuses:        MapNullableList(ctx, conditions.Statuses),
+		Severities:      MapNullableList(ctx, conditions.Severities),
+		Integrations:    MapNullableList(ctx, conditions.Integrations),
+		Intents:         MapNullableList(ctx, conditions.Intents),
+		Attributes:      mapRoutingRuleConditionsAttributeResponseToModel(conditions.Attributes),
+		DateRestriction: mapRoutingRuleDateRestrictionResponseToModel(conditions.DateRestriction),
+		Schedule:        mapRoutingRuleScheduleResponseToModel(ctx, conditions.Schedule),
+	}
+}
+
+func mapRoutingRuleDateRestrictionResponseToModel(dateRestriction *routingRuleDateRestriction) *DateRestrictionModel {
+	if dateRestriction == nil {
+		return nil
+	}
+
+	return &DateRestrictionModel{
+		From:  types.StringPointerValue(dateRestriction.From),
+		Until: types.StringPointerValue(dateRestriction.Until),
+	}
+}
+
+func mapRoutingRuleScheduleResponseToModel(ctx context.Context, schedule *routingRuleSchedule) *ScheduleModel {
+	if schedule == nil {
+		return nil
+	}
+
+	return &ScheduleModel{
+		After:      types.StringPointerValue(schedule.After),
+		Before:     types.StringPointerValue(schedule.Before),
+		DaysOfWeek: MapNullableList(ctx, schedule.DaysOfWeek),
 	}
 }
 
@@ -417,11 +510,14 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 	}
 
 	return &RoutingRuleActionsModel{
-		AssignToTeams:   MapNullableList(ctx, actions.AssignToTeams),
-		Discard:         types.BoolValue(actions.Discard),
-		ChangeSeverity:  types.StringPointerValue(actions.ChangeSeverity),
-		AddInteraction:  types.StringPointerValue(actions.AddInteraction),
-		RuleFlowControl: types.StringPointerValue(actions.RuleFlowControl),
+		AssignToTeams:                 MapNullableList(ctx, actions.AssignToTeams),
+		Discard:                       types.BoolValue(actions.Discard),
+		ChangeSeverity:                types.StringPointerValue(actions.ChangeSeverity),
+		AddInteraction:                types.StringPointerValue(actions.AddInteraction),
+		RuleFlowControl:               types.StringPointerValue(actions.RuleFlowControl),
+		DelayActionsInMinutes:         types.Int64PointerValue(actions.DelayActionsInMinutes),
+		AffectsServices:               MapNullableList(ctx, actions.AffectsServices),
+		ForwardToOutboundIntegrations: MapNullableList(ctx, actions.ForwardToOutboundIntegrations),
 	}
 }
 

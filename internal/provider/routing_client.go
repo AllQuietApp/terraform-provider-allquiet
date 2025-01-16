@@ -22,11 +22,13 @@ type routingRule struct {
 }
 
 type routingRuleConditions struct {
-	Statuses     *[]string              `json:"statuses"`
-	Severities   *[]string              `json:"severities"`
-	Integrations *[]string              `json:"integrations"`
-	Intents      *[]string              `json:"intents"`
-	Attributes   []routingRuleAttribute `json:"attributes"`
+	Statuses        *[]string                   `json:"statuses"`
+	Severities      *[]string                   `json:"severities"`
+	Integrations    *[]string                   `json:"integrations"`
+	Intents         *[]string                   `json:"intents"`
+	Attributes      []routingRuleAttribute      `json:"attributes"`
+	DateRestriction *routingRuleDateRestriction `json:"dateRestriction"`
+	Schedule        *routingRuleSchedule        `json:"schedule"`
 }
 
 type routingRuleAttribute struct {
@@ -36,12 +38,14 @@ type routingRuleAttribute struct {
 }
 
 type routingRuleActions struct {
-	AssignToTeams         *[]string `json:"assignToTeams"`
-	ChangeSeverity        *string   `json:"changeSeverity"`
-	AddInteraction        *string   `json:"addInteraction"`
-	RuleFlowControl       *string   `json:"ruleFlowControl"`
-	Discard               bool      `json:"discard"`
-	DelayActionsInMinutes *int64    `json:"delayActionsInMinutes"`
+	AssignToTeams                 *[]string `json:"assignToTeams"`
+	ChangeSeverity                *string   `json:"changeSeverity"`
+	AddInteraction                *string   `json:"addInteraction"`
+	RuleFlowControl               *string   `json:"ruleFlowControl"`
+	Discard                       bool      `json:"discard"`
+	DelayActionsInMinutes         *int64    `json:"delayActionsInMinutes"`
+	AffectsServices               *[]string `json:"affectsServices"`
+	ForwardToOutboundIntegrations *[]string `json:"forwardToOutboundIntegrations"`
 }
 
 type routingRuleChannels struct {
@@ -55,6 +59,17 @@ type routingCreateRequest struct {
 	DisplayName string        `json:"displayName"`
 	TeamId      string        `json:"teamId"`
 	Rules       []routingRule `json:"rules"`
+}
+
+type routingRuleDateRestriction struct {
+	From  *string `json:"from"`
+	Until *string `json:"until"`
+}
+
+type routingRuleSchedule struct {
+	After      *string   `json:"after"`
+	Before     *string   `json:"before"`
+	DaysOfWeek *[]string `json:"daysOfWeek"`
 }
 
 func mapRoutingCreateRequest(plan *RoutingModel) *routingCreateRequest {
@@ -83,11 +98,36 @@ func mapRoutingRuleConditions(conditions *RoutingRuleConditionsModel) *routingRu
 	}
 
 	return &routingRuleConditions{
-		Statuses:     ListToStringArray(conditions.Statuses),
-		Severities:   ListToStringArray(conditions.Severities),
-		Integrations: ListToStringArray(conditions.Integrations),
-		Intents:      ListToStringArray(conditions.Intents),
-		Attributes:   mapRoutingRuleAttributes(conditions.Attributes),
+		Statuses:        ListToStringArray(conditions.Statuses),
+		Severities:      ListToStringArray(conditions.Severities),
+		Integrations:    ListToStringArray(conditions.Integrations),
+		Intents:         ListToStringArray(conditions.Intents),
+		Attributes:      mapRoutingRuleAttributes(conditions.Attributes),
+		DateRestriction: mapRoutingRuleDateRestriction(conditions.DateRestriction),
+		Schedule:        mapRoutingRuleSchedule(conditions.Schedule),
+	}
+}
+
+func mapRoutingRuleDateRestriction(dateRestriction *DateRestrictionModel) *routingRuleDateRestriction {
+	if dateRestriction == nil {
+		return nil
+	}
+
+	return &routingRuleDateRestriction{
+		From:  dateRestriction.From.ValueStringPointer(),
+		Until: dateRestriction.Until.ValueStringPointer(),
+	}
+}
+
+func mapRoutingRuleSchedule(schedule *ScheduleModel) *routingRuleSchedule {
+	if schedule == nil {
+		return nil
+	}
+
+	return &routingRuleSchedule{
+		After:      schedule.After.ValueStringPointer(),
+		Before:     schedule.Before.ValueStringPointer(),
+		DaysOfWeek: ListToStringArray(schedule.DaysOfWeek),
 	}
 }
 
@@ -109,12 +149,14 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 	}
 
 	return &routingRuleActions{
-		AssignToTeams:         ListToStringArray(actions.AssignToTeams),
-		ChangeSeverity:        actions.ChangeSeverity.ValueStringPointer(),
-		AddInteraction:        actions.AddInteraction.ValueStringPointer(),
-		RuleFlowControl:       actions.RuleFlowControl.ValueStringPointer(),
-		Discard:               actions.Discard.ValueBool(),
-		DelayActionsInMinutes: actions.DelayActionsInMinutes.ValueInt64Pointer(),
+		AssignToTeams:                 ListToStringArray(actions.AssignToTeams),
+		ChangeSeverity:                actions.ChangeSeverity.ValueStringPointer(),
+		AddInteraction:                actions.AddInteraction.ValueStringPointer(),
+		RuleFlowControl:               actions.RuleFlowControl.ValueStringPointer(),
+		Discard:                       actions.Discard.ValueBool(),
+		DelayActionsInMinutes:         actions.DelayActionsInMinutes.ValueInt64Pointer(),
+		AffectsServices:               ListToStringArray(actions.AffectsServices),
+		ForwardToOutboundIntegrations: ListToStringArray(actions.ForwardToOutboundIntegrations),
 	}
 }
 
