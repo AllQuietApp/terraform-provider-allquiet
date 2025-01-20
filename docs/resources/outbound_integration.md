@@ -24,17 +24,15 @@ resource "allquiet_outbound_integration" "slack" {
 }
 
 resource "allquiet_outbound_integration" "notion" {
-  display_name               = "My Notion Integration"
-  team_id                    = allquiet_team.root.id
-  type                       = "Notion"
-  triggers_only_on_forwarded = true
+  display_name = "My Notion Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Notion"
 }
 
 resource "allquiet_outbound_integration" "notion_directly" {
-  display_name               = "My Notion Integration (Directly)"
-  team_id                    = allquiet_team.root.id
-  type                       = "Notion"
-  triggers_only_on_forwarded = false
+  display_name = "My Notion Integration (Directly)"
+  team_id      = allquiet_team.root.id
+  type         = "Notion"
 }
 ```
 
@@ -46,10 +44,6 @@ resource "allquiet_outbound_integration" "notion_directly" {
 - `display_name` (String) The display name of the integration
 - `team_id` (String) The team id of the integration
 - `type` (String) The type of the integration. See all types here: https://allquiet.app/api/public/v1/outbound-integration/types
-
-### Optional
-
-- `triggers_only_on_forwarded` (Boolean) If true, the integration will only trigger when explicitly forwarded
 
 ### Read-Only
 

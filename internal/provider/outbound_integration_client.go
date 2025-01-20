@@ -25,10 +25,11 @@ type outboundIntegrationCreateRequest struct {
 
 func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outboundIntegrationCreateRequest {
 	return &outboundIntegrationCreateRequest{
-		DisplayName:             plan.DisplayName.ValueString(),
-		TeamId:                  plan.TeamId.ValueString(),
-		Type:                    plan.Type.ValueString(),
-		TriggersOnlyOnForwarded: plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
+		DisplayName: plan.DisplayName.ValueString(),
+		TeamId:      plan.TeamId.ValueString(),
+		Type:        plan.Type.ValueString(),
+		// TODO: Intermediate state is not supported yet
+		//TriggersOnlyOnForwarded: plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
 	}
 }
 
