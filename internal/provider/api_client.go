@@ -12,10 +12,21 @@ import (
 type AuthTransport struct {
 	APIKey    string
 	Transport http.RoundTripper
+	BasicAuth *BasicAuth
+}
+
+type BasicAuth struct {
+	Username string
+	Password string
 }
 
 func (t *AuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Set("Authorization", t.APIKey)
+
+	if t.BasicAuth != nil {
+		req.SetBasicAuth(t.BasicAuth.Username, t.BasicAuth.Password)
+	}
+
+	req.Header.Add("X-Authorization", t.APIKey)
 	return t.Transport.RoundTrip(req)
 }
 
@@ -25,7 +36,7 @@ type AllQuietAPIClient struct {
 	HTTPClient  *http.Client
 }
 
-func NewAllQuietAPIClient(apiKey, endpointURL string) *AllQuietAPIClient {
+func NewAllQuietAPIClient(apiKey, endpointURL string, basicAuth *BasicAuth) *AllQuietAPIClient {
 	return &AllQuietAPIClient{
 		APIKey:      apiKey,
 		EndpointURL: endpointURL,
@@ -33,6 +44,7 @@ func NewAllQuietAPIClient(apiKey, endpointURL string) *AllQuietAPIClient {
 			Transport: &AuthTransport{
 				APIKey:    apiKey,
 				Transport: http.DefaultTransport,
+				BasicAuth: basicAuth,
 			},
 		},
 	}

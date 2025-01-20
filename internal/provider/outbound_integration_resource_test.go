@@ -82,6 +82,7 @@ resource "allquiet_outbound_integration" "test" {
   display_name = %[1]q
   team_id = allquiet_team.test.id
   type = "Slack"
+  triggers_only_on_forwarded = true
 }
 `, display_name)
 

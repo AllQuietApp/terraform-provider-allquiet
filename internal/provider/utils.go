@@ -158,7 +158,6 @@ func handleBadRequestResultResponse(data []byte) (error, error) {
 var logErrorRequest = false
 
 func logErrorResponse(resp *http.Response, req interface{}) error {
-
 	err := fmt.Errorf("%s %s: %d", resp.Request.Method, resp.Request.URL.RequestURI(), resp.StatusCode)
 
 	if resp.StatusCode == 400 {

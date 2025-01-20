@@ -115,11 +115,22 @@ func (p *AllQuietProvider) Configure(ctx context.Context, req provider.Configure
 		)
 	}
 
+	basicAuthUsername := os.Getenv("ALLQUIET_BASIC_AUTH_USERNAME")
+	basicAuthPassword := os.Getenv("ALLQUIET_BASIC_AUTH_PASSWORD")
+
+	var basicAuth *BasicAuth
+	if basicAuthUsername != "" && basicAuthPassword != "" {
+		basicAuth = &BasicAuth{
+			Username: basicAuthUsername,
+			Password: basicAuthPassword,
+		}
+	}
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	client := NewAllQuietAPIClient(apiKey, endpoint)
+	client := NewAllQuietAPIClient(apiKey, endpoint, basicAuth)
 
 	resp.DataSourceData = client
 	resp.ResourceData = client

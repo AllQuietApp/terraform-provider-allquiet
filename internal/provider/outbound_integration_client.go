@@ -9,23 +9,26 @@ import (
 )
 
 type outboundIntegrationResponse struct {
-	Id          string
-	DisplayName string
-	TeamId      string
-	Type        string
+	Id                      string
+	DisplayName             string
+	TeamId                  string
+	Type                    string
+	TriggersOnlyOnForwarded *bool
 }
 
 type outboundIntegrationCreateRequest struct {
-	DisplayName string `json:"displayName"`
-	TeamId      string `json:"teamId"`
-	Type        string `json:"type"`
+	DisplayName             string `json:"displayName"`
+	TeamId                  string `json:"teamId"`
+	Type                    string `json:"type"`
+	TriggersOnlyOnForwarded *bool  `json:"triggersOnlyOnForwarded"`
 }
 
 func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outboundIntegrationCreateRequest {
 	return &outboundIntegrationCreateRequest{
-		DisplayName: plan.DisplayName.ValueString(),
-		TeamId:      plan.TeamId.ValueString(),
-		Type:        plan.Type.ValueString(),
+		DisplayName:             plan.DisplayName.ValueString(),
+		TeamId:                  plan.TeamId.ValueString(),
+		Type:                    plan.Type.ValueString(),
+		TriggersOnlyOnForwarded: plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
 	}
 }
 
