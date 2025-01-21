@@ -31,13 +31,11 @@ type OutboundIntegration struct {
 
 // OutboundIntegrationModel describes the resource data model.
 type OutboundIntegrationModel struct {
-	Id          types.String `tfsdk:"id"`
-	DisplayName types.String `tfsdk:"display_name"`
-	TeamId      types.String `tfsdk:"team_id"`
-	Type        types.String `tfsdk:"type"`
-
-	// TODO: Intermediate state is not supported yet
-	//TriggersOnlyOnForwarded types.Bool   `tfsdk:"triggers_only_on_forwarded"`
+	Id                      types.String `tfsdk:"id"`
+	DisplayName             types.String `tfsdk:"display_name"`
+	TeamId                  types.String `tfsdk:"team_id"`
+	Type                    types.String `tfsdk:"type"`
+	TriggersOnlyOnForwarded types.Bool   `tfsdk:"triggers_only_on_forwarded"`
 }
 
 func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -69,12 +67,11 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "The type of the integration. See all types here: https://allquiet.app/api/public/v1/outbound-integration/types",
 				Required:            true,
 			},
-			// TODO: Intermediate state is not supported yet
-			/*"triggers_only_on_forwarded": schema.BoolAttribute{
+			"triggers_only_on_forwarded": schema.BoolAttribute{
 				MarkdownDescription: "If true, the integration will only trigger when explicitly forwarded",
 				Optional:            true,
 				Computed:            true,
-			},*/
+			},
 		},
 	}
 }
@@ -201,6 +198,5 @@ func mapOutboundIntegrationResponseToModel(response *outboundIntegrationResponse
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.TeamId = types.StringValue(response.TeamId)
 	data.Type = types.StringValue(response.Type)
-	// TODO: Intermediate state is not supported yet
-	//data.TriggersOnlyOnForwarded = types.BoolPointerValue(response.TriggersOnlyOnForwarded)
+	data.TriggersOnlyOnForwarded = types.BoolPointerValue(response.TriggersOnlyOnForwarded)
 }
