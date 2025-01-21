@@ -1,12 +1,12 @@
 
 resource "allquiet_user" "millie_brown" {
   display_name = "Millie Bobby Brown"
-  email        = "millie@acme.com"
+  email        = "acceptance-tests+millie@allquiet.app"
 }
 
 resource "allquiet_user" "taylor" {
   display_name = "Taylor Swift"
-  email        = "taylor@acme.com"
+  email        = "acceptance-tests+taylor@allquiet.app"
 }
 
 resource "allquiet_organization_membership" "my_organization_millie_brown" {

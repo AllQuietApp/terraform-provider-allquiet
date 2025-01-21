@@ -3,22 +3,22 @@
 
 resource "allquiet_user" "riemann" {
   display_name = "Riemann"
-  email        = "riemann@acme.com"
+  email        = "acceptance-tests+riemann@allquiet.app"
 }
 
 resource "allquiet_user" "galois" {
   display_name = "Galois"
-  email        = "galois@acme.com"
+  email        = "acceptance-tests+galois@allquiet.app"
 }
 
 resource "allquiet_user" "gauss" {
   display_name = "Gauss"
-  email        = "galgaussois@acme.com"
+  email        = "acceptance-tests+gauss@allquiet.app"
 }
 
 resource "allquiet_user" "kolmogorov" {
   display_name = "Kolmogorov"
-  email        = "kolmogorov@acme.com"
+  email        = "acceptance-tests+kolmogorov@allquiet.app"
 }
 
 resource "allquiet_team" "my_team_with_weekend_rotation" {

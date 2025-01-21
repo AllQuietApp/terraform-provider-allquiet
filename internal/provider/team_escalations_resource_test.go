@@ -47,12 +47,12 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 	return fmt.Sprintf(`
 	  resource "allquiet_user" "galois" {
 		display_name = "Galois"
-		email        = "galois+%s@acme.com"
+		email        = "acceptance-tests+galois+%s@allquiet.app"
 	  }
 	  
 	  resource "allquiet_user" "kolmogorov" {
 		display_name = "Kolmogorov"
-		email        = "kolmogorov+%s@acme.com"
+		email        = "acceptance-tests+kolmogorov+%s@allquiet.app"
 	  }
 
 	  resource "allquiet_team" "my_team" {
@@ -108,12 +108,12 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 	  
 	  resource "allquiet_user" "galois" {
 		display_name = "Galois"
-		email        = "galois+%s@acme.com"
+		email        = "acceptance-tests+galois+%s@allquiet.app"
 	  }
 
       resource "allquiet_user" "gauss" {
 		display_name = "Gauss"
-		email        = "gauss+%s@acme.com"
+		email        = "acceptance-tests+gauss+%s@allquiet.app"
 	  }
 	  
 	  resource "allquiet_team" "my_team" {

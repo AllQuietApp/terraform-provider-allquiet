@@ -83,7 +83,7 @@ func testAccUserResourceConfig(display_name string) string {
 	return fmt.Sprintf(`
 resource "allquiet_user" "test" {
   display_name =  %[1]q
-  email = "millie+%s@acme.com"
+  email = "acceptance-tests+millie+%s@allquiet.app"
   phone_number = "+12035479055"
 }
 

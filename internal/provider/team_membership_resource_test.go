@@ -81,12 +81,12 @@ resource "allquiet_team" "team" {
 
 resource "allquiet_user" "millie_brown" {
   display_name =  "Millie Bobby Brown"
-  email = "millie+%s@acme.com"
+  email = "acceptance-tests+millie+%s@allquiet.app"
 }
 
 resource "allquiet_user" "taylor_swift" {
   display_name =  "Taylor Swift"
-  email = "taylor+%s@acme.com"
+  email = "acceptance-tests+taylor+%s@allquiet.app"
 }
 
 resource "allquiet_team_membership" "test" {

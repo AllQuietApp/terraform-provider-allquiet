@@ -1,12 +1,12 @@
 resource "allquiet_user" "millie_brown" {
   display_name = "Millie Bobby Brown"
-  email        = "millie@acme.com"
+  email        = "acceptance-tests+millie@allquiet.app"
   phone_number = "+12035479055"
 }
 
 resource "allquiet_user" "taylor" {
   display_name = "Taylor Swift"
-  email        = "taylor@acme.com"
+  email        = "acceptance-tests+taylor@allquiet.app"
   incident_notification_settings = {
     should_send_sms  = true
     delay_in_min_sms = 5
@@ -28,7 +28,7 @@ resource "allquiet_user" "taylor" {
 
 resource "allquiet_user" "billie_eilish" {
   display_name = "Billie Eilish"
-  email        = "billie@acme.com"
+  email        = "acceptance-tests+billie@allquiet.app"
   incident_notification_settings = {
     should_send_sms      = true
     delay_in_min_sms     = 5

@@ -263,5 +263,5 @@ func GuidValidator(message string) validator.String {
 }
 
 func RandomizeExample(example string) string {
-	return strings.Replace(example, "@acme.com", "@acme"+uuid.New().String()+".com", -1)
+	return strings.Replace(example, "@allquiet.app", "+"+uuid.New().String()+"@allquiet.app", -1)
 }
