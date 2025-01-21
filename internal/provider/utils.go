@@ -40,6 +40,27 @@ func NonNullableArrayToStringArray(array *[]string) []string {
 	return *array
 }
 
+func ListToNonNullableStringArray(list types.List) *[]string {
+	if list.IsNull() {
+		return &[]string{}
+	}
+
+	result := make([]string, len(list.Elements()))
+
+	for i, item := range list.Elements() {
+		if item.IsUnknown() || item.IsNull() {
+			continue
+		}
+		strValue, ok := item.(types.String)
+		if !ok { // type assertion failed
+			return nil
+		}
+
+		result[i] = strValue.ValueString()
+	}
+	return &result
+}
+
 func ListToStringArray(list types.List) *[]string {
 	if list.IsNull() {
 		return nil

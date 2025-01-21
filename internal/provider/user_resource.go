@@ -59,6 +59,11 @@ type IncidentNotificationSettingsModel struct {
 	ShouldSendEmail types.Bool  `tfsdk:"should_send_email"`
 	DelayInMinEmail types.Int64 `tfsdk:"delay_in_min_email"`
 	SeveritiesEmail types.List  `tfsdk:"severities_email"`
+
+	DisabledIntentsEmail types.List `tfsdk:"disabled_intents_email"`
+	DisabledIntentsVoice types.List `tfsdk:"disabled_intents_voice"`
+	DisabledIntentsPush  types.List `tfsdk:"disabled_intents_push"`
+	DisabledIntentsSMS   types.List `tfsdk:"disabled_intents_sms"`
 }
 
 func (r *User) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -178,6 +183,34 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
 						},
+					},
+					"disabled_intents_email": schema.ListAttribute{
+						Optional:            true,
+						Computed:            true,
+						MarkdownDescription: "Disabled intents for Email notifications",
+						ElementType:         types.StringType,
+						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
+					},
+					"disabled_intents_voice": schema.ListAttribute{
+						Optional:            true,
+						Computed:            true,
+						MarkdownDescription: "Disabled intents for Voice Call notifications",
+						ElementType:         types.StringType,
+						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
+					},
+					"disabled_intents_push": schema.ListAttribute{
+						Optional:            true,
+						Computed:            true,
+						MarkdownDescription: "Disabled intents for Push notifications",
+						ElementType:         types.StringType,
+						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
+					},
+					"disabled_intents_sms": schema.ListAttribute{
+						Optional:            true,
+						Computed:            true,
+						MarkdownDescription: "Disabled intents for SMS notifications",
+						ElementType:         types.StringType,
+						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
 					},
 				},
 			},
@@ -325,6 +358,11 @@ func mapUserResponseToModel(ctx context.Context, response *userResponse, data *U
 			ShouldSendEmail: types.BoolValue(response.IncidentNotificationSettings.ShouldSendEmail),
 			DelayInMinEmail: types.Int64Value(response.IncidentNotificationSettings.DelayInMinEmail),
 			SeveritiesEmail: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.SeveritiesEmail),
+
+			DisabledIntentsEmail: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsEmail),
+			DisabledIntentsVoice: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsVoice),
+			DisabledIntentsPush:  MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsPush),
+			DisabledIntentsSMS:   MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsSMS),
 		}
 	}
 

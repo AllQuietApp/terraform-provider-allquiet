@@ -53,6 +53,12 @@ func TestAccUserResourceExample(t *testing.T) {
 				Config: testAccUserResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_user.millie_brown", "display_name", "Millie Bobby Brown"),
+					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_sms.0", "Resolved"),
+					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_sms.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_voice.0", "Resolved"),
+					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_voice.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_push.#", "0"),
+					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_email.#", "0"),
 				),
 			},
 			// ImportState testing

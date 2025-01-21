@@ -25,3 +25,27 @@ resource "allquiet_user" "taylor" {
     severities_email   = ["Critical", "Warning", "Minor"]
   }
 }
+
+resource "allquiet_user" "billie_eilish" {
+  display_name = "Billie Eilish"
+  email        = "billie@acme.com"
+  incident_notification_settings = {
+    should_send_sms      = true
+    delay_in_min_sms     = 5
+    severities_sms       = ["Critical"]
+    disabled_intents_sms = ["Resolved"]
+
+    should_call_voice      = false
+    delay_in_min_voice     = 0
+    severities_voice       = []
+    disabled_intents_voice = ["Resolved"]
+
+    should_send_push  = true
+    delay_in_min_push = 0
+    severities_push   = ["Critical", "Warning"]
+
+    should_send_email  = true
+    delay_in_min_email = 0
+    severities_email   = ["Critical", "Warning", "Minor"]
+  }
+}

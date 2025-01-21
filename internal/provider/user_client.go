@@ -33,6 +33,11 @@ type incidentNotificationSettingsResponse struct {
 	ShouldSendEmail bool      `json:"shouldSendEmail"`
 	DelayInMinEmail int64     `json:"delayInMinEmail"`
 	SeveritiesEmail *[]string `json:"severitiesEmail"`
+
+	DisabledIntentsEmail *[]string `json:"disabledIntentsEmail"`
+	DisabledIntentsVoice *[]string `json:"disabledIntentsVoice"`
+	DisabledIntentsPush  *[]string `json:"disabledIntentsPush"`
+	DisabledIntentsSMS   *[]string `json:"disabledIntentsSMS"`
 }
 
 type userCreateRequest struct {
@@ -68,6 +73,11 @@ func mapUserCreateRequest(plan *UserModel) *userCreateRequest {
 			ShouldSendEmail: plan.IncidentNotificationSettings.ShouldSendEmail.ValueBool(),
 			DelayInMinEmail: plan.IncidentNotificationSettings.DelayInMinEmail.ValueInt64(),
 			SeveritiesEmail: ListToStringArray(plan.IncidentNotificationSettings.SeveritiesEmail),
+
+			DisabledIntentsEmail: ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsEmail),
+			DisabledIntentsVoice: ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsVoice),
+			DisabledIntentsPush:  ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsPush),
+			DisabledIntentsSMS:   ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsSMS),
 		}
 	}
 
