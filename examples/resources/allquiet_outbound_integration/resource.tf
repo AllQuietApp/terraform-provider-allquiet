@@ -15,8 +15,8 @@ resource "allquiet_outbound_integration" "notion" {
 }
 
 resource "allquiet_outbound_integration" "notion_directly" {
-  display_name = "My Notion Integration (Directly)"
-  team_id      = allquiet_team.root.id
-  type         = "Notion"
+  display_name               = "My Notion Integration (Directly)"
+  team_id                    = allquiet_team.root.id
+  type                       = "Notion"
   triggers_only_on_forwarded = false
 }
