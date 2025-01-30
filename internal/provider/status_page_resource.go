@@ -49,6 +49,10 @@ type StatusPageModel struct {
 	PublicSeverityMappingMinor    types.String `tfsdk:"public_severity_mapping_minor"`
 	PublicSeverityMappingWarning  types.String `tfsdk:"public_severity_mapping_warning"`
 	PublicSeverityMappingCritical types.String `tfsdk:"public_severity_mapping_critical"`
+	BannerBackgroundColor         types.String `tfsdk:"banner_background_color"`
+	BannerBackgroundColorDarkMode types.String `tfsdk:"banner_background_color_dark_mode"`
+	BannerTextColor               types.String `tfsdk:"banner_text_color"`
+	BannerTextColorDarkMode       types.String `tfsdk:"banner_text_color_dark_mode"`
 }
 
 func (r *StatusPage) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -131,6 +135,34 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 			"public_severity_mapping_critical": schema.StringAttribute{
 				MarkdownDescription: "The public severity mapping critical of the status page",
 				Optional:            true,
+			},
+			"banner_background_color": schema.StringAttribute{
+				MarkdownDescription: "The banner background color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"banner_background_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The banner background color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"banner_text_color": schema.StringAttribute{
+				MarkdownDescription: "The banner text color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"banner_text_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The banner text color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
 			},
 		},
 	}
@@ -270,4 +302,8 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.PublicSeverityMappingMinor = types.StringPointerValue(response.PublicSeverityMappingMinor)
 	data.PublicSeverityMappingWarning = types.StringPointerValue(response.PublicSeverityMappingWarning)
 	data.PublicSeverityMappingCritical = types.StringPointerValue(response.PublicSeverityMappingCritical)
+	data.BannerBackgroundColor = types.StringPointerValue(response.BannerBackgroundColor)
+	data.BannerBackgroundColorDarkMode = types.StringPointerValue(response.BannerBackgroundColorDarkMode)
+	data.BannerTextColor = types.StringPointerValue(response.BannerTextColor)
+	data.BannerTextColorDarkMode = types.StringPointerValue(response.BannerTextColorDarkMode)
 }

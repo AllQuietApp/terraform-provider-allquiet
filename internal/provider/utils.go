@@ -265,3 +265,7 @@ func GuidValidator(message string) validator.String {
 func RandomizeExample(example string) string {
 	return strings.Replace(example, "@allquiet.app", "+"+uuid.New().String()+"@allquiet.app", -1)
 }
+
+func HexColorValidator(message string) validator.String {
+	return stringvalidator.RegexMatches(regexp.MustCompile(`^#([0-9a-fA-F]{6})$`), message)
+}

@@ -18,6 +18,11 @@ resource "allquiet_status_page" "public_status_page" {
   public_severity_mapping_minor    = "Minor"
   public_severity_mapping_warning  = "Warning"
   public_severity_mapping_critical = "Critical"
+  banner_background_color = "#000000"
+  banner_background_color_dark_mode = "#447788"
+  banner_text_color = "#ffffff"
+  banner_text_color_dark_mode = "#ffffff"
+
   time_zone_id                     = "Europe/Amsterdam"
   services = [
     allquiet_service.payment_api.id

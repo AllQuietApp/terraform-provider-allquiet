@@ -25,6 +25,10 @@ type statusPageResponse struct {
 	PublicSeverityMappingMinor    *string
 	PublicSeverityMappingWarning  *string
 	PublicSeverityMappingCritical *string
+	BannerBackgroundColor         *string
+	BannerBackgroundColorDarkMode *string
+	BannerTextColor               *string
+	BannerTextColorDarkMode       *string
 }
 
 type statusPageCreateRequest struct {
@@ -43,6 +47,10 @@ type statusPageCreateRequest struct {
 	PublicSeverityMappingMinor    *string   `json:"publicSeverityMappingMinor"`
 	PublicSeverityMappingWarning  *string   `json:"publicSeverityMappingWarning"`
 	PublicSeverityMappingCritical *string   `json:"publicSeverityMappingCritical"`
+	BannerBackgroundColor         *string   `json:"bannerBackgroundColor"`
+	BannerBackgroundColorDarkMode *string   `json:"bannerBackgroundColorDarkMode"`
+	BannerTextColor               *string   `json:"bannerTextColor"`
+	BannerTextColorDarkMode       *string   `json:"bannerTextColorDarkMode"`
 }
 
 func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest {
@@ -62,6 +70,10 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		PublicSeverityMappingMinor:    plan.PublicSeverityMappingMinor.ValueStringPointer(),
 		PublicSeverityMappingWarning:  plan.PublicSeverityMappingWarning.ValueStringPointer(),
 		PublicSeverityMappingCritical: plan.PublicSeverityMappingCritical.ValueStringPointer(),
+		BannerBackgroundColor:         plan.BannerBackgroundColor.ValueStringPointer(),
+		BannerBackgroundColorDarkMode: plan.BannerBackgroundColorDarkMode.ValueStringPointer(),
+		BannerTextColor:               plan.BannerTextColor.ValueStringPointer(),
+		BannerTextColorDarkMode:       plan.BannerTextColorDarkMode.ValueStringPointer(),
 	}
 }
 

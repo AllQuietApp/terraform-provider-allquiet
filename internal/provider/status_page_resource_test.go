@@ -93,6 +93,10 @@ resource "allquiet_status_page" "test" {
   public_description = "Payment APIs and integrations"  
   history_in_days = 30
   disable_public_subscription = false
+  banner_background_color = "#000000"
+  banner_background_color_dark_mode = "#447788"
+  banner_text_color = "#ffffff"
+  banner_text_color_dark_mode = "#ffffff"
   slug = %[2]q
 }
 	`, display_name, slug)
