@@ -67,13 +67,13 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Required:            true,
 			},
 			"is_muted": schema.BoolAttribute{
-				MarkdownDescription: "If the integration is muted",
+				MarkdownDescription: "If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.",
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
 			},
 			"is_in_maintenance": schema.BoolAttribute{
-				MarkdownDescription: "If the integration is in maintenance mode",
+				MarkdownDescription: "If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.",
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),

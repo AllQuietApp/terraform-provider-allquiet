@@ -45,8 +45,8 @@ locals {
 
 ### Optional
 
-- `is_in_maintenance` (Boolean) If the integration is in maintenance mode
-- `is_muted` (Boolean) If the integration is muted
+- `is_in_maintenance` (Boolean) If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
+- `is_muted` (Boolean) If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 
 ### Read-Only
 
