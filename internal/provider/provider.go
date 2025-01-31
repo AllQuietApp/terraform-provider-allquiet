@@ -149,6 +149,7 @@ func (p *AllQuietProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewService,
 		NewStatusPage,
 		NewOrganizationMembership,
+		NewIntegrationMaintenanceWindow,
 	}
 }
 

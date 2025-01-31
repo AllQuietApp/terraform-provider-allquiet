@@ -254,6 +254,8 @@ func NotificationChannelValidator(message string) validator.String {
 	return stringvalidator.OneOf([]string{"Email", "VoiceCall", "SMS", "Push"}...)
 }
 
+var ValidMaintenanceWindowTypes = []string{"maintenance", "muted"}
+
 func OperatorValidator(message string) validator.String {
 	return stringvalidator.OneOf([]string{"=", "!=", "contains"}...)
 }
