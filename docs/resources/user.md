@@ -93,10 +93,10 @@ Required:
 - `delay_in_min_push` (Number) Delay in minutes for Push notifications
 - `delay_in_min_sms` (Number) Delay in minutes for SMS notifications
 - `delay_in_min_voice` (Number) Delay in minutes for Voice Call notifications
-- `severities_email` (List of String) Severities for Email notifications
-- `severities_push` (List of String) Severities for Push notifications
-- `severities_sms` (List of String) Severities for SMS notifications
-- `severities_voice` (List of String) Severities for Voice Call notifications
+- `severities_email` (List of String) Severities for Email notifications. Possible values are: Critical, Warning, Minor
+- `severities_push` (List of String) Severities for Push notifications. Possible values are: Critical, Warning, Minor
+- `severities_sms` (List of String) Severities for SMS notifications. Possible values are: Critical, Warning, Minor
+- `severities_voice` (List of String) Severities for Voice Call notifications. Possible values are: Critical, Warning, Minor
 - `should_call_voice` (Boolean) Should send Voice Call notifications
 - `should_send_email` (Boolean) Should send Email notifications
 - `should_send_push` (Boolean) Should send Push notifications
@@ -104,7 +104,7 @@ Required:
 
 Optional:
 
-- `disabled_intents_email` (List of String) Disabled intents for Email notifications
-- `disabled_intents_push` (List of String) Disabled intents for Push notifications
-- `disabled_intents_sms` (List of String) Disabled intents for SMS notifications
-- `disabled_intents_voice` (List of String) Disabled intents for Voice Call notifications
+- `disabled_intents_email` (List of String) Disabled intents for Email notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
+- `disabled_intents_push` (List of String) Disabled intents for Push notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
+- `disabled_intents_sms` (List of String) Disabled intents for SMS notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
+- `disabled_intents_voice` (List of String) Disabled intents for Voice Call notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated

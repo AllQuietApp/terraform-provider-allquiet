@@ -264,7 +264,7 @@ Optional:
 Required:
 
 - `name` (String) The name of the attribute
-- `operator` (String) The operator
+- `operator` (String) The operator. Possible values are: =, !=, contains, !contains
 
 Optional:
 
@@ -299,11 +299,11 @@ Optional:
 - `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
 - `affects_services` (List of String) Will affect the specified services. Only with add_interaction 'Affects'.
 - `assign_to_teams` (List of String) Will assign the incident to the specified teams.
-- `change_severity` (String) Will change the severity of the incident
+- `change_severity` (String) Will change the severity of the incident. Possible values are: Critical, Warning, Minor
 - `delay_actions_in_minutes` (Number) Delay actions in minutes
 - `discard` (Boolean) If true will discard and delete the incident
 - `forward_to_outbound_integrations` (List of String) Will forward to the specified outbound integrations. Only with add_interaction 'Forwarded'.
-- `rule_flow_control` (String) If 'Skip' will not evaluate further rules
+- `rule_flow_control` (String) If 'Skip' will not evaluate further rules. Possible values are: Continue, Skip
 
 
 <a id="nestedatt--rules--channels"></a>

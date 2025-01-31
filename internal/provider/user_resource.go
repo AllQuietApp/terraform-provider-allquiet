@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -124,7 +125,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 					"severities_sms": schema.ListAttribute{
 						Required:            true,
-						MarkdownDescription: "Severities for SMS notifications",
+						MarkdownDescription: "Severities for SMS notifications. Possible values are: " + strings.Join(ValidSeverities, ", "),
 						ElementType:         types.StringType,
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
@@ -142,7 +143,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 					"severities_voice": schema.ListAttribute{
 						Required:            true,
-						MarkdownDescription: "Severities for Voice Call notifications",
+						MarkdownDescription: "Severities for Voice Call notifications. Possible values are: " + strings.Join(ValidSeverities, ", "),
 						ElementType:         types.StringType,
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
@@ -160,7 +161,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 					"severities_push": schema.ListAttribute{
 						Required:            true,
-						MarkdownDescription: "Severities for Push notifications",
+						MarkdownDescription: "Severities for Push notifications. Possible values are: " + strings.Join(ValidSeverities, ", "),
 						ElementType:         types.StringType,
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
@@ -178,7 +179,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 					"severities_email": schema.ListAttribute{
 						Required:            true,
-						MarkdownDescription: "Severities for Email notifications",
+						MarkdownDescription: "Severities for Email notifications. Possible values are: " + strings.Join(ValidSeverities, ", "),
 						ElementType:         types.StringType,
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
@@ -187,28 +188,28 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					"disabled_intents_email": schema.ListAttribute{
 						Optional:            true,
 						Computed:            true,
-						MarkdownDescription: "Disabled intents for Email notifications",
+						MarkdownDescription: "Disabled intents for Email notifications. Possible values are: " + strings.Join(ValidIntents, ", "),
 						ElementType:         types.StringType,
 						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
 					},
 					"disabled_intents_voice": schema.ListAttribute{
 						Optional:            true,
 						Computed:            true,
-						MarkdownDescription: "Disabled intents for Voice Call notifications",
+						MarkdownDescription: "Disabled intents for Voice Call notifications. Possible values are: " + strings.Join(ValidIntents, ", "),
 						ElementType:         types.StringType,
 						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
 					},
 					"disabled_intents_push": schema.ListAttribute{
 						Optional:            true,
 						Computed:            true,
-						MarkdownDescription: "Disabled intents for Push notifications",
+						MarkdownDescription: "Disabled intents for Push notifications. Possible values are: " + strings.Join(ValidIntents, ", "),
 						ElementType:         types.StringType,
 						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
 					},
 					"disabled_intents_sms": schema.ListAttribute{
 						Optional:            true,
 						Computed:            true,
-						MarkdownDescription: "Disabled intents for SMS notifications",
+						MarkdownDescription: "Disabled intents for SMS notifications. Possible values are: " + strings.Join(ValidIntents, ", "),
 						ElementType:         types.StringType,
 						Validators:          []validator.List{listvalidator.ValueStringsAre(IntentValidator("Not a valid intent"))},
 					},

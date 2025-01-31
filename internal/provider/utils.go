@@ -238,26 +238,36 @@ func DaysOfWeekValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidDaysOfWeek...)
 }
 
+var ValidSeverities = []string{"Critical", "Warning", "Minor"}
+
 func SeverityValidator(message string) validator.String {
-	return stringvalidator.OneOf([]string{"Critical", "Warning", "Minor"}...)
+	return stringvalidator.OneOf(ValidSeverities...)
 }
+
+var ValidStatuses = []string{"Open", "Resolved"}
 
 func StatusValidator(message string) validator.String {
-	return stringvalidator.OneOf([]string{"Open", "Resolved"}...)
+	return stringvalidator.OneOf(ValidStatuses...)
 }
+
+var ValidRuleFlowControl = []string{"Continue", "Skip"}
 
 func RuleFlowValidator(message string) validator.String {
-	return stringvalidator.OneOf([]string{"Continue", "Skip"}...)
+	return stringvalidator.OneOf(ValidRuleFlowControl...)
 }
 
+var ValidNotificationChannels = []string{"Email", "VoiceCall", "SMS", "Push"}
+
 func NotificationChannelValidator(message string) validator.String {
-	return stringvalidator.OneOf([]string{"Email", "VoiceCall", "SMS", "Push"}...)
+	return stringvalidator.OneOf(ValidNotificationChannels...)
 }
 
 var ValidMaintenanceWindowTypes = []string{"maintenance", "muted"}
 
+var ValidOperators = []string{"=", "!=", "contains", "!contains"}
+
 func OperatorValidator(message string) validator.String {
-	return stringvalidator.OneOf([]string{"=", "!=", "contains"}...)
+	return stringvalidator.OneOf(ValidOperators...)
 }
 
 func GuidValidator(message string) validator.String {

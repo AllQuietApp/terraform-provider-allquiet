@@ -128,7 +128,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 							Attributes: map[string]schema.Attribute{
 								"statuses": schema.ListAttribute{
 									Optional:            true,
-									MarkdownDescription: "Statuses. Possible values are: Open, Resolved",
+									MarkdownDescription: "Statuses. Possible values are: " + strings.Join(ValidStatuses, ", "),
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(StatusValidator("Not a valid status")),
@@ -136,7 +136,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 								},
 								"severities": schema.ListAttribute{
 									Optional:            true,
-									MarkdownDescription: "Severeties. Possible values are: Critical, Warning, Minor",
+									MarkdownDescription: "Severeties. Possible values are: " + strings.Join(ValidSeverities, ", "),
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
@@ -167,7 +167,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 												Required:            true,
 											},
 											"operator": schema.StringAttribute{
-												MarkdownDescription: "The operator",
+												MarkdownDescription: "The operator. Possible values are: " + strings.Join(ValidOperators, ", "),
 												Required:            true,
 												Validators:          []validator.String{OperatorValidator("Not a valid operator")},
 											},
@@ -237,7 +237,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 								},
 								"change_severity": schema.StringAttribute{
 									Optional:            true,
-									MarkdownDescription: "Will change the severity of the incident",
+									MarkdownDescription: "Will change the severity of the incident. Possible values are: " + strings.Join(ValidSeverities, ", "),
 									Validators:          []validator.String{SeverityValidator("Not a valid severity")},
 								},
 								"add_interaction": schema.StringAttribute{
@@ -249,7 +249,7 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									Optional:            true,
 									Default:             stringdefault.StaticString("Continue"),
 									Computed:            true,
-									MarkdownDescription: "If 'Skip' will not evaluate further rules",
+									MarkdownDescription: "If 'Skip' will not evaluate further rules. Possible values are: " + strings.Join(ValidRuleFlowControl, ", "),
 									Validators:          []validator.String{RuleFlowValidator("Not a valid rule flow value")},
 								},
 								"delay_actions_in_minutes": schema.Int64Attribute{
