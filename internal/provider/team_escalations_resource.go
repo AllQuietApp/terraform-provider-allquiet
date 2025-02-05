@@ -68,6 +68,8 @@ type TeamEscalationsRotationSettingsModel struct {
 	CustomRepeatUnit    types.String `tfsdk:"custom_repeat_unit"`
 	CustomRepeatValue   types.Int64  `tfsdk:"custom_repeat_value"`
 	EffectiveFrom       types.String `tfsdk:"effective_from"`
+	RotationMode        types.String `tfsdk:"rotation_mode"`
+	AutoRotationSize    types.Int64  `tfsdk:"auto_rotation_size"`
 }
 
 // TeamEscalationsModel describes the resource data model.
@@ -150,7 +152,7 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 												MarkdownDescription: "Selected days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
 												ElementType:         types.StringType,
 												Validators: []validator.List{
-													listvalidator.ValueStringsAre(stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)),
+													listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
 												},
 											},
 										},
@@ -161,13 +163,13 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 										Attributes: map[string]schema.Attribute{
 											"repeats": schema.StringAttribute{
 												Required:            true,
-												MarkdownDescription: "The rotation will repeat on the given interval",
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"daily", "weekly", "biweekly", "monthly", "custom"}...)},
+												MarkdownDescription: "The rotation will repeat on the given interval. Possible values are: " + strings.Join(ValidRotationRepeats, ", "),
+												Validators:          []validator.String{stringvalidator.OneOf(ValidRotationRepeats...)},
 											},
 											"starts_on_day_of_week": schema.StringAttribute{
 												Optional:            true,
 												MarkdownDescription: "Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"sun", "mon", "tue", "wed", "thu", "fri", "sat"}...)},
+												Validators:          []validator.String{DaysOfWeekValidator("Not a valid day of week")},
 											},
 											"starts_on_date_of_month": schema.Int64Attribute{
 												Optional:            true,
@@ -181,8 +183,8 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 											},
 											"custom_repeat_unit": schema.StringAttribute{
 												Optional:            true,
-												MarkdownDescription: "In what interval unit the rotation should repeat. Needs to be set if 'repeats' is 'custom'",
-												Validators:          []validator.String{stringvalidator.OneOf([]string{"months", "weeks", "days", "hours"}...)},
+												MarkdownDescription: "In what interval unit the rotation should repeat. Needs to be set if 'repeats' is 'custom'. Possible values are: " + strings.Join(ValidCustomRepeatUnits, ", "),
+												Validators:          []validator.String{stringvalidator.OneOf(ValidCustomRepeatUnits...)},
 											},
 											"custom_repeat_value": schema.Int64Attribute{
 												Optional:            true,
@@ -196,6 +198,16 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 													regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`),
 													"must contain ISO date matching the pattern '^\\d{4}-\\d{2}-\\d{2}$'",
 												)},
+											},
+											"rotation_mode": schema.StringAttribute{
+												Optional:            true,
+												MarkdownDescription: "The mode of the rotation. Possible values are: " + strings.Join(ValidRotationModes, ", "),
+												Validators:          []validator.String{stringvalidator.OneOf(ValidRotationModes...)},
+											},
+											"auto_rotation_size": schema.Int64Attribute{
+												Optional:            true,
+												MarkdownDescription: "The size of the rotation",
+												Validators:          []validator.Int64{int64validator.Between(1, 500)},
 											},
 										},
 									},
@@ -394,6 +406,8 @@ func mapTeamEscalationsRotationSettingsResponseToData(rotationSettings *rotation
 		CustomRepeatUnit:    types.StringPointerValue(rotationSettings.CustomRepeatUnit),
 		CustomRepeatValue:   types.Int64PointerValue(rotationSettings.CustomRepeatValue),
 		EffectiveFrom:       types.StringPointerValue(rotationSettings.EffectiveFrom),
+		RotationMode:        types.StringPointerValue(rotationSettings.RotationMode),
+		AutoRotationSize:    types.Int64PointerValue(rotationSettings.AutoRotationSize),
 	}
 }
 

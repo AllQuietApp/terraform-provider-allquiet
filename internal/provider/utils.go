@@ -266,6 +266,12 @@ var ValidMaintenanceWindowTypes = []string{"maintenance", "muted"}
 
 var ValidOperators = []string{"=", "!=", "contains", "!contains"}
 
+var ValidRotationModes = []string{"explicit", "auto"}
+
+var ValidCustomRepeatUnits = []string{"months", "weeks", "days", "hours"}
+
+var ValidRotationRepeats = []string{"daily", "weekly", "biweekly", "monthly", "custom"}
+
 func OperatorValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidOperators...)
 }

@@ -1,5 +1,8 @@
 
 
+################################################################################
+# Create users
+################################################################################
 
 resource "allquiet_user" "riemann" {
   display_name = "Riemann"
@@ -20,6 +23,10 @@ resource "allquiet_user" "kolmogorov" {
   display_name = "Kolmogorov"
   email        = "acceptance-tests+kolmogorov@allquiet.app"
 }
+
+################################################################################
+# Example 1: My team with weekend rotation
+################################################################################
 
 resource "allquiet_team" "my_team_with_weekend_rotation" {
   display_name = "My team with weekend rotation"
@@ -115,6 +122,10 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
     }
   ]
 }
+
+################################################################################
+# Example 2: My team with day and night rotation
+################################################################################
 
 resource "allquiet_team" "my_team_with_day_and_night_rotation" {
   display_name = "My team with day and night rotation"
@@ -214,6 +225,10 @@ resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rot
 
 }
 
+################################################################################
+# Example 3: My team with hourly rotation
+################################################################################
+
 resource "allquiet_team" "my_team_with_hourly_rotation" {
   display_name = "My team with hourly rotation"
   time_zone_id = "America/Los_Angeles"
@@ -254,6 +269,76 @@ resource "allquiet_team_escalations" "my_team_escalations_with_hourly_rotation" 
                 },
                 {
                   team_membership_id = allquiet_team_membership.my_team_with_hourly_rotation_galois.id
+                },
+              ]
+            }
+          ]
+        },
+      ]
+    }
+  ]
+}
+
+################################################################################
+# Example 4: My team with auto rotation
+################################################################################
+
+resource "allquiet_team" "my_team_with_auto_rotation" {
+  display_name = "My team with auto rotation"
+  time_zone_id = "America/Los_Angeles"
+}
+
+
+resource "allquiet_team_membership" "my_team_with_auto_rotation_riemann" {
+  team_id = allquiet_team.my_team_with_auto_rotation.id
+  user_id = allquiet_user.riemann.id
+  role    = "Administrator"
+}
+
+resource "allquiet_team_membership" "my_team_with_auto_rotation_galois" {
+  team_id = allquiet_team.my_team_with_auto_rotation.id
+  user_id = allquiet_user.galois.id
+  role    = "Member"
+}
+
+resource "allquiet_team_membership" "my_team_with_auto_rotation_gauss" {
+  team_id = allquiet_team.my_team_with_auto_rotation.id
+  user_id = allquiet_user.gauss.id
+  role    = "Member"
+}
+
+resource "allquiet_team_membership" "my_team_with_auto_rotation_kolmogorov" {
+  team_id = allquiet_team.my_team_with_auto_rotation.id
+  user_id = allquiet_user.kolmogorov.id
+  role    = "Member"
+}
+
+resource "allquiet_team_escalations" "my_team_escalations_with_auto_rotation" {
+  team_id = allquiet_team.my_team_with_auto_rotation.id
+  escalation_tiers = [
+    {
+      schedules = [
+        {
+          rotation_settings = {
+            repeats               = "weekly"
+            starts_on_day_of_week = "sat"
+            rotation_mode         = "auto"
+            auto_rotation_size    = 3
+          }
+          rotations = [
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_auto_rotation_riemann.id
+                },
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_auto_rotation_galois.id
+                },
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_auto_rotation_gauss.id
+                },
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_auto_rotation_kolmogorov.id
                 },
               ]
             }

@@ -52,6 +52,8 @@ type rotationSettings struct {
 	CustomRepeatUnit    *string `json:"customRepeatUnit"`
 	CustomRepeatValue   *int64  `json:"customRepeatValue"`
 	EffectiveFrom       *string `json:"effectiveFrom"`
+	RotationMode        *string `json:"rotationMode"`
+	AutoRotationSize    *int64  `json:"autoRotationSize"`
 }
 
 func mapTeamEscalationsCreateRequest(plan *TeamEscalationsModel) *teamEscalationsCreateRequest {
@@ -93,6 +95,8 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 				CustomRepeatUnit:    schedule.RotationSettings.CustomRepeatUnit.ValueStringPointer(),
 				CustomRepeatValue:   schedule.RotationSettings.CustomRepeatValue.ValueInt64Pointer(),
 				EffectiveFrom:       schedule.RotationSettings.EffectiveFrom.ValueStringPointer(),
+				RotationMode:        schedule.RotationSettings.RotationMode.ValueStringPointer(),
+				AutoRotationSize:    schedule.RotationSettings.AutoRotationSize.ValueInt64Pointer(),
 			}
 		}
 
