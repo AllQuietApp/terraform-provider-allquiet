@@ -14,13 +14,20 @@ type outboundIntegrationResponse struct {
 	TeamId                  string
 	Type                    string
 	TriggersOnlyOnForwarded *bool
+	TeamConnectionSettings  *outboundIntegrationTeamConnectionSettings
 }
 
 type outboundIntegrationCreateRequest struct {
-	DisplayName             string `json:"displayName"`
-	TeamId                  string `json:"teamId"`
-	Type                    string `json:"type"`
-	TriggersOnlyOnForwarded *bool  `json:"triggersOnlyOnForwarded"`
+	DisplayName             string                                     `json:"displayName"`
+	TeamId                  string                                     `json:"teamId"`
+	Type                    string                                     `json:"type"`
+	TriggersOnlyOnForwarded *bool                                      `json:"triggersOnlyOnForwarded"`
+	TeamConnectionSettings  *outboundIntegrationTeamConnectionSettings `json:"teamConnectionSettings"`
+}
+
+type outboundIntegrationTeamConnectionSettings struct {
+	TeamConnectionMode string    `json:"teamConnectionMode"`
+	TeamIds            *[]string `json:"teamIds"`
 }
 
 func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outboundIntegrationCreateRequest {
@@ -29,9 +36,20 @@ func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outbou
 		TeamId:                  plan.TeamId.ValueString(),
 		Type:                    plan.Type.ValueString(),
 		TriggersOnlyOnForwarded: plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
+		TeamConnectionSettings:  mapOutboundIntegrationTeamConnectionSettings(plan.TeamConnectionSettings),
 	}
 }
 
+func mapOutboundIntegrationTeamConnectionSettings(settings *OutboundIntegrationTeamConnectionSettings) *outboundIntegrationTeamConnectionSettings {
+	if settings == nil {
+		return nil
+	}
+
+	return &outboundIntegrationTeamConnectionSettings{
+		TeamConnectionMode: settings.TeamConnectionMode.ValueString(),
+		TeamIds:            ListToStringArray(settings.TeamIds),
+	}
+}
 func (c *AllQuietAPIClient) CreateOutboundIntegrationResource(ctx context.Context, data *OutboundIntegrationModel) (*outboundIntegrationResponse, error) {
 	reqBody := mapOutboundIntegrationCreateRequest(data)
 

@@ -6,12 +6,16 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -36,6 +40,13 @@ type OutboundIntegrationModel struct {
 	TeamId                  types.String `tfsdk:"team_id"`
 	Type                    types.String `tfsdk:"type"`
 	TriggersOnlyOnForwarded types.Bool   `tfsdk:"triggers_only_on_forwarded"`
+
+	TeamConnectionSettings *OutboundIntegrationTeamConnectionSettings `tfsdk:"team_connection_settings"`
+}
+
+type OutboundIntegrationTeamConnectionSettings struct {
+	TeamConnectionMode types.String `tfsdk:"team_connection_mode"`
+	TeamIds            types.List   `tfsdk:"team_ids"`
 }
 
 func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -71,6 +82,25 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "If true, the integration will only trigger when explicitly forwarded",
 				Optional:            true,
 				Computed:            true,
+			},
+			"team_connection_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "The team connection settings for the integration",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"team_connection_mode": schema.StringAttribute{
+						Required:            true,
+						MarkdownDescription: "The team connection mode for the integration. Possible values are: " + strings.Join(ValidTeamConnectionModes, ", "),
+						Validators:          []validator.String{stringvalidator.OneOf(ValidTeamConnectionModes...)},
+					},
+					"team_ids": schema.ListAttribute{
+						MarkdownDescription: "The team ids for the integration",
+						Required:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+						},
+					},
+				},
 			},
 		},
 	}
@@ -111,7 +141,7 @@ func (r *OutboundIntegration) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	mapOutboundIntegrationResponseToModel(integrationResponse, &data)
+	mapOutboundIntegrationResponseToModel(ctx, integrationResponse, &data)
 
 	tflog.Trace(ctx, "created integration resource")
 
@@ -139,7 +169,7 @@ func (r *OutboundIntegration) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
-	mapOutboundIntegrationResponseToModel(integrationResponse, &data)
+	mapOutboundIntegrationResponseToModel(ctx, integrationResponse, &data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -160,7 +190,7 @@ func (r *OutboundIntegration) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	mapOutboundIntegrationResponseToModel(integrationResponse, &data)
+	mapOutboundIntegrationResponseToModel(ctx, integrationResponse, &data)
 
 	tflog.Trace(ctx, "updated integration resource")
 
@@ -192,11 +222,18 @@ func (r *OutboundIntegration) ImportState(ctx context.Context, req resource.Impo
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapOutboundIntegrationResponseToModel(response *outboundIntegrationResponse, data *OutboundIntegrationModel) {
+func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outboundIntegrationResponse, data *OutboundIntegrationModel) {
 
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.TeamId = types.StringValue(response.TeamId)
 	data.Type = types.StringValue(response.Type)
 	data.TriggersOnlyOnForwarded = types.BoolPointerValue(response.TriggersOnlyOnForwarded)
+
+	if response.TeamConnectionSettings != nil {
+		data.TeamConnectionSettings = &OutboundIntegrationTeamConnectionSettings{
+			TeamConnectionMode: types.StringValue(response.TeamConnectionSettings.TeamConnectionMode),
+			TeamIds:            MapNullableList(ctx, response.TeamConnectionSettings.TeamIds),
+		}
+	}
 }

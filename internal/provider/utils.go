@@ -272,6 +272,8 @@ var ValidCustomRepeatUnits = []string{"months", "weeks", "days", "hours"}
 
 var ValidRotationRepeats = []string{"daily", "weekly", "biweekly", "monthly", "custom"}
 
+var ValidTeamConnectionModes = []string{"OrganizationTeams", "SelectedTeams"}
+
 func OperatorValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidOperators...)
 }
