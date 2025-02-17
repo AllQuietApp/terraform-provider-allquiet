@@ -387,11 +387,11 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
   escalation_tiers = [
     {
       auto_escalation_after_minutes = 5
-      repeats = 2
-      repeats_after_minutes = 0
-      auto_escalation_severities = ["Critical"]
+      repeats                       = 2
+      repeats_after_minutes         = 0
+      auto_escalation_severities    = ["Critical"]
       schedules = [
-      {
+        {
           rotations = [
             {
               members = [
@@ -410,7 +410,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
     {
       schedules = [
         {
-          rotations = [ 
+          rotations = [
             {
               members = [
                 {
@@ -418,7 +418,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
                 },
               ]
             }
-          ] 
+          ]
         }
       ]
     }
