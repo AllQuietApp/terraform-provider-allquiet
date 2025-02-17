@@ -37,6 +37,9 @@ type TeamEscalations struct {
 
 type TeamEscalationsTierModel struct {
 	AutoEscalationAfterMinutes types.Int64                    `tfsdk:"auto_escalation_after_minutes"`
+	AutoEscalationSeverities   types.List                     `tfsdk:"auto_escalation_severities"`
+	Repeats                    types.Int64                    `tfsdk:"repeats"`
+	RepeatsAfterMinutes        types.Int64                    `tfsdk:"repeats_after_minutes"`
 	Schedules                  []TeamEscalationsScheduleModel `tfsdk:"schedules"`
 }
 
@@ -111,6 +114,29 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 								int64validator.Between(0, 60*24*30),
 							},
 						},
+						"auto_escalation_severities": schema.ListAttribute{
+							Optional:            true,
+							MarkdownDescription: "Severities that should trigger auto-escalation. Possible values are: " + strings.Join(ValidSeverities, ", "),
+							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
+							},
+						},
+						"repeats": schema.Int64Attribute{
+							Optional:            true,
+							MarkdownDescription: "How many times the rotation should repeat.",
+							Validators: []validator.Int64{
+								int64validator.Between(0, 16),
+							},
+						},
+						"repeats_after_minutes": schema.Int64Attribute{
+							Optional:            true,
+							MarkdownDescription: "How many minutes after the rotation should repeat.",
+							Validators: []validator.Int64{
+								int64validator.Between(0, OneMonthInSeconds),
+							},
+						},
+
 						"schedules": schema.ListNestedAttribute{
 							Required: true,
 							NestedObject: schema.NestedAttributeObject{
@@ -356,6 +382,9 @@ func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscal
 
 		tiers = append(tiers, TeamEscalationsTierModel{
 			AutoEscalationAfterMinutes: autoEscalationAfterMinutes,
+			AutoEscalationSeverities:   MapNullableList(ctx, tier.AutoEscalationSeverities),
+			Repeats:                    types.Int64PointerValue(tier.Repeats),
+			RepeatsAfterMinutes:        types.Int64PointerValue(tier.RepeatsAfterMinutes),
 			Schedules:                  mapTeamEscalationsSchedulesResponseToData(ctx, tier.Schedules),
 		})
 	}

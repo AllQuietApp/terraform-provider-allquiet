@@ -348,3 +348,89 @@ resource "allquiet_team_escalations" "my_team_escalations_with_auto_rotation" {
     }
   ]
 }
+
+################################################################################
+# Example 5: My team with repeating tier
+################################################################################
+
+resource "allquiet_team" "my_team_with_repeating_tier" {
+  display_name = "My team with repeating tier"
+  time_zone_id = "America/Los_Angeles"
+}
+
+resource "allquiet_team_membership" "my_team_with_repeating_tier_riemann" {
+  team_id = allquiet_team.my_team_with_repeating_tier.id
+  user_id = allquiet_user.riemann.id
+  role    = "Administrator"
+}
+
+resource "allquiet_team_membership" "my_team_with_repeating_tier_galois" {
+  team_id = allquiet_team.my_team_with_repeating_tier.id
+  user_id = allquiet_user.galois.id
+  role    = "Member"
+}
+
+resource "allquiet_team_membership" "my_team_with_repeating_tier_gauss" {
+  team_id = allquiet_team.my_team_with_repeating_tier.id
+  user_id = allquiet_user.gauss.id
+  role    = "Member"
+}
+
+resource "allquiet_team_membership" "my_team_with_repeating_tier_kolmogorov" {
+  team_id = allquiet_team.my_team_with_repeating_tier.id
+  user_id = allquiet_user.kolmogorov.id
+  role    = "Member"
+}
+
+resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
+  team_id = allquiet_team.my_team_with_repeating_tier.id
+  escalation_tiers = [
+    {
+      auto_escalation_after_minutes = 5
+      repeats = 2
+      repeats_after_minutes = 0
+      auto_escalation_severities = ["Critical"]
+      schedules = [
+      {
+          rotations = [
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_repeating_tier_riemann.id
+                },
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_repeating_tier_galois.id
+                },
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      schedules = [
+        {
+          rotations = [ 
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_repeating_tier_gauss.id
+                },
+              ]
+            }
+          ] 
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+

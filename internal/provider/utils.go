@@ -289,3 +289,5 @@ func RandomizeExample(example string) string {
 func HexColorValidator(message string) validator.String {
 	return stringvalidator.RegexMatches(regexp.MustCompile(`^#([0-9a-fA-F]{6})$`), message)
 }
+
+const OneMonthInSeconds = 2629746

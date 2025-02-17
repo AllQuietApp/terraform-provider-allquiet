@@ -21,6 +21,9 @@ type teamEscalationsCreateRequest struct {
 
 type teamEscalationsTier struct {
 	AutoEscalationAfterMinutes *int64                    `json:"autoEscalationAfterMinutes"`
+	AutoEscalationSeverities   *[]string                 `json:"autoEscalationSeverities"`
+	Repeats                    *int64                    `json:"repeats"`
+	RepeatsAfterMinutes        *int64                    `json:"repeatsAfterMinutes"`
 	Schedules                  []teamEscalationsSchedule `json:"schedules"`
 }
 
@@ -117,6 +120,9 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 
 	return &teamEscalationsTier{
 		AutoEscalationAfterMinutes: tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
+		AutoEscalationSeverities:   ListToNonNullableStringArray(tier.AutoEscalationSeverities),
+		Repeats:                    tier.Repeats.ValueInt64Pointer(),
+		RepeatsAfterMinutes:        tier.RepeatsAfterMinutes.ValueInt64Pointer(),
 		Schedules:                  schedules,
 	}
 }

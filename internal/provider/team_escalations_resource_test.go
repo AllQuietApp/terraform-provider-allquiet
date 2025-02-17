@@ -36,6 +36,10 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 				Config: testAccTeamEscalationsResourceConfigUpdate(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.schedules.0.rotations.0.members.0.team_membership_id"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.0"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.1"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats_after_minutes"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -77,6 +81,9 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		escalation_tiers = [
 		  {
 			auto_escalation_after_minutes = 5
+			auto_escalation_severities = ["Critical", "Warning"]
+			repeats = 1
+			repeats_after_minutes = 0
 			schedules = [
 			  {
 				schedule_settings = {
@@ -138,6 +145,9 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 		escalation_tiers = [
 		  {
 			auto_escalation_after_minutes = 5
+			auto_escalation_severities = ["Critical", "Warning"]
+			repeats = 1
+			repeats_after_minutes = 0
 			schedules = [
 			  {
 				schedule_settings = {
