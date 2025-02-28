@@ -13,6 +13,9 @@ on:
       - release/*
     paths-ignore:
       - 'README.md'
+    tags-ignore:
+      - '**'
+
 
 # Testing only needs permissions to read the repository contents.
 permissions:
