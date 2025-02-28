@@ -23,6 +23,16 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 				Config: testAccTeamEscalationsResourceConfigCreate(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.schedules.0.rotations.0.members.0.team_membership_id"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.0"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.1"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_time_filters.0.selected_days.0"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_time_filters.0.from"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_time_filters.0.until"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams.0"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_severities.0"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.selected_days.0"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.from"),
+					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.until"),
 				),
 			},
 			// ImportState testing
@@ -63,6 +73,11 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		display_name = "My team with weekend rotation"
 		time_zone_id = "America/Los_Angeles"
 	  }
+
+	  resource "allquiet_team" "engineering" {
+		display_name = "Engineering"
+		time_zone_id = "America/Los_Angeles"
+	  }
 	  
 	  resource "allquiet_team_membership" "my_team_galois" {
 		team_id = allquiet_team.my_team.id
@@ -80,8 +95,30 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		team_id = allquiet_team.my_team.id
 		escalation_tiers = [
 		  {
+			auto_escalation_enabled = true
 			auto_escalation_after_minutes = 5
 			auto_escalation_severities = ["Critical", "Warning"]
+			auto_escalation_time_filters = [
+				{
+					selected_days = ["mon", "tue", "wed", "thu", "fri"],
+					from = "06:00",
+					until = "18:00"
+				},
+				{
+					selected_days = ["sat", "sun"],
+					from = "10:00",
+					until = "16:00"
+				}
+			],
+			auto_assign_to_teams = [allquiet_team.engineering.id]
+			auto_assign_to_teams_severities = ["Critical", "Warning"]
+			auto_assign_to_teams_time_filters = [
+				{
+					selected_days = ["mon", "tue", "wed", "thu", "fri"],
+					from = "06:00",
+					until = "18:00"
+				}
+			]
 			repeats = 1
 			repeats_after_minutes = 0
 			schedules = [

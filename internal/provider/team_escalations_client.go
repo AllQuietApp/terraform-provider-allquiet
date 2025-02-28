@@ -20,11 +20,22 @@ type teamEscalationsCreateRequest struct {
 }
 
 type teamEscalationsTier struct {
-	AutoEscalationAfterMinutes *int64                    `json:"autoEscalationAfterMinutes"`
-	AutoEscalationSeverities   *[]string                 `json:"autoEscalationSeverities"`
-	Repeats                    *int64                    `json:"repeats"`
-	RepeatsAfterMinutes        *int64                    `json:"repeatsAfterMinutes"`
-	Schedules                  []teamEscalationsSchedule `json:"schedules"`
+	AutoEscalationEnabled        *bool                        `json:"autoEscalationEnabled"`
+	AutoEscalationAfterMinutes   *int64                       `json:"autoEscalationAfterMinutes"`
+	AutoEscalationSeverities     *[]string                    `json:"autoEscalationSeverities"`
+	AutoEscalationTimeFilters    *[]teamEscalationsTimeFilter `json:"autoEscalationTimeFilters"`
+	AutoAssignToTeams            *[]string                    `json:"autoAssignToTeams"`
+	AutoAssignToTeamsSeverities  *[]string                    `json:"autoAssignToTeamsSeverities"`
+	AutoAssignToTeamsTimeFilters *[]teamEscalationsTimeFilter `json:"autoAssignToTeamsTimeFilters"`
+	Repeats                      *int64                       `json:"repeats"`
+	RepeatsAfterMinutes          *int64                       `json:"repeatsAfterMinutes"`
+	Schedules                    []teamEscalationsSchedule    `json:"schedules"`
+}
+
+type teamEscalationsTimeFilter struct {
+	SelectedDays *[]string `json:"selectedDays"`
+	From         *string   `json:"from"`
+	Until        *string   `json:"until"`
 }
 
 type teamEscalationsSchedule struct {
@@ -119,12 +130,34 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 	}
 
 	return &teamEscalationsTier{
-		AutoEscalationAfterMinutes: tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
-		AutoEscalationSeverities:   ListToNonNullableStringArray(tier.AutoEscalationSeverities),
-		Repeats:                    tier.Repeats.ValueInt64Pointer(),
-		RepeatsAfterMinutes:        tier.RepeatsAfterMinutes.ValueInt64Pointer(),
-		Schedules:                  schedules,
+		AutoEscalationEnabled:        tier.AutoEscalationEnabled.ValueBoolPointer(),
+		AutoEscalationAfterMinutes:   tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
+		AutoEscalationSeverities:     ListToStringArray(tier.AutoEscalationSeverities),
+		AutoEscalationTimeFilters:    mapTeamEscalationsTimeFiltersToRequest(tier.AutoEscalationTimeFilters),
+		AutoAssignToTeams:            ListToStringArray(tier.AutoAssignToTeams),
+		AutoAssignToTeamsSeverities:  ListToStringArray(tier.AutoAssignToTeamsSeverities),
+		AutoAssignToTeamsTimeFilters: mapTeamEscalationsTimeFiltersToRequest(tier.AutoAssignToTeamsTimeFilters),
+		Repeats:                      tier.Repeats.ValueInt64Pointer(),
+		RepeatsAfterMinutes:          tier.RepeatsAfterMinutes.ValueInt64Pointer(),
+		Schedules:                    schedules,
 	}
+}
+
+func mapTeamEscalationsTimeFiltersToRequest(timeFilters *[]TeamEscalationsTimeFilterModel) *[]teamEscalationsTimeFilter {
+	if timeFilters == nil {
+		return nil
+	}
+
+	requestTimeFilters := make([]teamEscalationsTimeFilter, len(*timeFilters))
+	for i, timeFilter := range *timeFilters {
+		requestTimeFilters[i] = teamEscalationsTimeFilter{
+			SelectedDays: ListToStringArray(timeFilter.SelectedDays),
+			From:         timeFilter.From.ValueStringPointer(),
+			Until:        timeFilter.Until.ValueStringPointer(),
+		}
+	}
+
+	return &requestTimeFilters
 }
 
 func (c *AllQuietAPIClient) CreateTeamEscalationsResource(ctx context.Context, data *TeamEscalationsModel) (*teamEscalationsResponse, error) {

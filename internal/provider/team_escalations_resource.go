@@ -36,11 +36,22 @@ type TeamEscalations struct {
 }
 
 type TeamEscalationsTierModel struct {
-	AutoEscalationAfterMinutes types.Int64                    `tfsdk:"auto_escalation_after_minutes"`
-	AutoEscalationSeverities   types.List                     `tfsdk:"auto_escalation_severities"`
-	Repeats                    types.Int64                    `tfsdk:"repeats"`
-	RepeatsAfterMinutes        types.Int64                    `tfsdk:"repeats_after_minutes"`
-	Schedules                  []TeamEscalationsScheduleModel `tfsdk:"schedules"`
+	AutoEscalationEnabled        types.Bool                        `tfsdk:"auto_escalation_enabled"`
+	AutoEscalationAfterMinutes   types.Int64                       `tfsdk:"auto_escalation_after_minutes"`
+	AutoEscalationSeverities     types.List                        `tfsdk:"auto_escalation_severities"`
+	AutoEscalationTimeFilters    *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_escalation_time_filters"`
+	Repeats                      types.Int64                       `tfsdk:"repeats"`
+	RepeatsAfterMinutes          types.Int64                       `tfsdk:"repeats_after_minutes"`
+	AutoAssignToTeams            types.List                        `tfsdk:"auto_assign_to_teams"`
+	AutoAssignToTeamsSeverities  types.List                        `tfsdk:"auto_assign_to_teams_severities"`
+	AutoAssignToTeamsTimeFilters *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_assign_to_teams_time_filters"`
+	Schedules                    []TeamEscalationsScheduleModel    `tfsdk:"schedules"`
+}
+
+type TeamEscalationsTimeFilterModel struct {
+	SelectedDays types.List   `tfsdk:"selected_days"`
+	From         types.String `tfsdk:"from"`
+	Until        types.String `tfsdk:"until"`
 }
 
 type TeamEscalationsScheduleModel struct {
@@ -107,9 +118,13 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 				Optional: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"auto_escalation_enabled": schema.BoolAttribute{
+							Optional:            true,
+							MarkdownDescription: "Whether auto-escalation is enabled for this tier.",
+						},
 						"auto_escalation_after_minutes": schema.Int64Attribute{
 							Optional:            true,
-							MarkdownDescription: "After how many minutes the incident should be escalated to the next tier.",
+							MarkdownDescription: "Escalation cadence in minutes. After how many minutes the incident should be auto-escalated to the next tier or auto-assigned to teams.",
 							Validators: []validator.Int64{
 								int64validator.Between(0, 60*24*30),
 							},
@@ -120,6 +135,71 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 							ElementType:         types.StringType,
 							Validators: []validator.List{
 								listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
+							},
+						},
+						"auto_escalation_time_filters": schema.ListNestedAttribute{
+							Optional:            true,
+							MarkdownDescription: "Time filters in which auto-escalation should be triggered.",
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"selected_days": schema.ListAttribute{
+										Optional:            true,
+										MarkdownDescription: "Days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
+										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
+										},
+									},
+									"from": schema.StringAttribute{
+										Optional:            true,
+										MarkdownDescription: "From time of the time filter. Format: HH:mm",
+										Validators:          []validator.String{TimeValidator("Not a valid time")},
+									},
+									"until": schema.StringAttribute{
+										Optional:            true,
+										MarkdownDescription: "Until time of the time filter. Format: HH:mm",
+										Validators:          []validator.String{TimeValidator("Not a valid time")},
+									},
+								},
+							},
+						},
+						"auto_assign_to_teams": schema.ListAttribute{
+							Optional:            true,
+							MarkdownDescription: "Team IDs that should be auto-assigned to.",
+							ElementType:         types.StringType,
+						},
+						"auto_assign_to_teams_severities": schema.ListAttribute{
+							Optional:            true,
+							MarkdownDescription: "Severities that should trigger auto-assign to teams. Possible values are: " + strings.Join(ValidSeverities, ", "),
+							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.ValueStringsAre(SeverityValidator("Not a valid severity")),
+							},
+						},
+						"auto_assign_to_teams_time_filters": schema.ListNestedAttribute{
+							Optional:            true,
+							MarkdownDescription: "Time filters in which auto-assign to teams should be triggered.",
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"selected_days": schema.ListAttribute{
+										Optional:            true,
+										MarkdownDescription: "Days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
+										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
+										},
+									},
+									"from": schema.StringAttribute{
+										Optional:            true,
+										MarkdownDescription: "From time of the time filter. Format: HH:mm",
+										Validators:          []validator.String{TimeValidator("Not a valid time")},
+									},
+									"until": schema.StringAttribute{
+										Optional:            true,
+										MarkdownDescription: "Until time of the time filter. Format: HH:mm",
+										Validators:          []validator.String{TimeValidator("Not a valid time")},
+									},
+								},
 							},
 						},
 						"repeats": schema.Int64Attribute{
@@ -381,14 +461,34 @@ func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscal
 		}
 
 		tiers = append(tiers, TeamEscalationsTierModel{
-			AutoEscalationAfterMinutes: autoEscalationAfterMinutes,
-			AutoEscalationSeverities:   MapNullableList(ctx, tier.AutoEscalationSeverities),
-			Repeats:                    types.Int64PointerValue(tier.Repeats),
-			RepeatsAfterMinutes:        types.Int64PointerValue(tier.RepeatsAfterMinutes),
-			Schedules:                  mapTeamEscalationsSchedulesResponseToData(ctx, tier.Schedules),
+			AutoEscalationEnabled:        types.BoolPointerValue(tier.AutoEscalationEnabled),
+			AutoEscalationAfterMinutes:   autoEscalationAfterMinutes,
+			AutoEscalationSeverities:     MapNullableList(ctx, tier.AutoEscalationSeverities),
+			AutoEscalationTimeFilters:    mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoEscalationTimeFilters),
+			AutoAssignToTeams:            MapNullableList(ctx, tier.AutoAssignToTeams),
+			AutoAssignToTeamsSeverities:  MapNullableList(ctx, tier.AutoAssignToTeamsSeverities),
+			AutoAssignToTeamsTimeFilters: mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoAssignToTeamsTimeFilters),
+			Repeats:                      types.Int64PointerValue(tier.Repeats),
+			RepeatsAfterMinutes:          types.Int64PointerValue(tier.RepeatsAfterMinutes),
+			Schedules:                    mapTeamEscalationsSchedulesResponseToData(ctx, tier.Schedules),
 		})
 	}
 	return tiers
+}
+
+func mapTeamEscalationsTimeFiltersToData(ctx context.Context, timeFilters *[]teamEscalationsTimeFilter) *[]TeamEscalationsTimeFilterModel {
+	var timeFiltersData []TeamEscalationsTimeFilterModel
+	if timeFilters == nil {
+		return nil
+	}
+	for _, timeFilter := range *timeFilters {
+		timeFiltersData = append(timeFiltersData, TeamEscalationsTimeFilterModel{
+			SelectedDays: MapNullableList(ctx, timeFilter.SelectedDays),
+			From:         types.StringPointerValue(timeFilter.From),
+			Until:        types.StringPointerValue(timeFilter.Until),
+		})
+	}
+	return &timeFiltersData
 }
 
 func mapTeamEscalationsSchedulesResponseToData(ctx context.Context, teamEscalationsSchedule []teamEscalationsSchedule) []TeamEscalationsScheduleModel {
