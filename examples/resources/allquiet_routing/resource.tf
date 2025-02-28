@@ -200,3 +200,30 @@ resource "allquiet_routing" "example_8" {
     }
   ]
 }
+
+resource "allquiet_routing" "example_9" {
+  team_id      = allquiet_team.root.id
+  display_name = "Add Attributes to incidents"
+  rules = [
+    {
+      conditions = {
+        attributes = [
+          {
+            name     = "Project",
+            operator = "=",
+            value    = "Pre Sales"
+          }
+        ]
+      },
+      actions = {
+        set_attributes = [
+          {
+            name     = "Team",
+            value    = "Leads",
+            hide_in_previews = true
+          }
+        ]
+      }
+    }
+  ]
+}

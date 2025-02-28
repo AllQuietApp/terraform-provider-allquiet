@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -59,8 +60,8 @@ func (r *OrganizationMembership) Schema(ctx context.Context, req resource.Schema
 			},
 			"role": schema.StringAttribute{
 				Required:            true,
-				MarkdownDescription: "Role of the member (either 'Owner' or 'Administrator')",
-				Validators:          []validator.String{stringvalidator.OneOf([]string{"Owner", "Administrator"}...)},
+				MarkdownDescription: "Role of the member. Possible values are: " + strings.Join(ValidOrganizationMembershipRoles, ", "),
+				Validators:          []validator.String{stringvalidator.OneOf(ValidOrganizationMembershipRoles...)},
 			},
 		},
 	}

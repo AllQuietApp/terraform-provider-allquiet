@@ -65,14 +65,22 @@ type RoutingRuleConditionsAttributeModel struct {
 }
 
 type RoutingRuleActionsModel struct {
-	AssignToTeams                 types.List   `tfsdk:"assign_to_teams"`
-	Discard                       types.Bool   `tfsdk:"discard"`
-	ChangeSeverity                types.String `tfsdk:"change_severity"`
-	AddInteraction                types.String `tfsdk:"add_interaction"`
-	RuleFlowControl               types.String `tfsdk:"rule_flow_control"`
-	DelayActionsInMinutes         types.Int64  `tfsdk:"delay_actions_in_minutes"`
-	AffectsServices               types.List   `tfsdk:"affects_services"`
-	ForwardToOutboundIntegrations types.List   `tfsdk:"forward_to_outbound_integrations"`
+	AssignToTeams                 types.List                             `tfsdk:"assign_to_teams"`
+	Discard                       types.Bool                             `tfsdk:"discard"`
+	ChangeSeverity                types.String                           `tfsdk:"change_severity"`
+	AddInteraction                types.String                           `tfsdk:"add_interaction"`
+	RuleFlowControl               types.String                           `tfsdk:"rule_flow_control"`
+	DelayActionsInMinutes         types.Int64                            `tfsdk:"delay_actions_in_minutes"`
+	AffectsServices               types.List                             `tfsdk:"affects_services"`
+	ForwardToOutboundIntegrations types.List                             `tfsdk:"forward_to_outbound_integrations"`
+	SetAttributes                 []RoutingRuleActionsSetAttributesModel `tfsdk:"set_attributes"`
+}
+
+type RoutingRuleActionsSetAttributesModel struct {
+	Name           types.String `tfsdk:"name"`
+	Value          types.String `tfsdk:"value"`
+	IsImage        types.Bool   `tfsdk:"is_image"`
+	HideInPreviews types.Bool   `tfsdk:"hide_in_previews"`
 }
 
 type RoutingRuleChannelsModel struct {
@@ -270,6 +278,33 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									ElementType:         types.StringType,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+									},
+								},
+								"set_attributes": schema.ListNestedAttribute{
+									Optional: true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"name": schema.StringAttribute{
+												MarkdownDescription: "The name of the attribute",
+												Required:            true,
+											},
+											"value": schema.StringAttribute{
+												MarkdownDescription: "The value of the attribute",
+												Required:            true,
+											},
+											"is_image": schema.BoolAttribute{
+												Optional:            true,
+												Default:             booldefault.StaticBool(false),
+												Computed:            true,
+												MarkdownDescription: "If true will display the value as an image if it's a URL",
+											},
+											"hide_in_previews": schema.BoolAttribute{
+												Optional:            true,
+												Default:             booldefault.StaticBool(false),
+												Computed:            true,
+												MarkdownDescription: "If true will hide the value in previews",
+											},
+										},
 									},
 								},
 							},
@@ -518,7 +553,23 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 		DelayActionsInMinutes:         types.Int64PointerValue(actions.DelayActionsInMinutes),
 		AffectsServices:               MapNullableList(ctx, actions.AffectsServices),
 		ForwardToOutboundIntegrations: MapNullableList(ctx, actions.ForwardToOutboundIntegrations),
+		SetAttributes:                 mapRoutingRuleActionsSetAttributesResponseToModel(actions.SetAttributes),
 	}
+}
+
+func mapRoutingRuleActionsSetAttributesResponseToModel(attributes *[]routingRuleSetAttribute) []RoutingRuleActionsSetAttributesModel {
+	var result []RoutingRuleActionsSetAttributesModel
+
+	for _, attribute := range *attributes {
+		result = append(result, RoutingRuleActionsSetAttributesModel{
+			Name:           types.StringValue(attribute.Name),
+			Value:          types.StringValue(attribute.Value),
+			IsImage:        types.BoolValue(attribute.IsImage),
+			HideInPreviews: types.BoolValue(attribute.HideInPreviews),
+		})
+	}
+
+	return result
 }
 
 func mapRoutingRuleChannelsResponseToModel(ctx context.Context, channels *routingRuleChannels) *RoutingRuleChannelsModel {

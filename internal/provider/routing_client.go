@@ -38,16 +38,23 @@ type routingRuleAttribute struct {
 }
 
 type routingRuleActions struct {
-	AssignToTeams                 *[]string `json:"assignToTeams"`
-	ChangeSeverity                *string   `json:"changeSeverity"`
-	AddInteraction                *string   `json:"addInteraction"`
-	RuleFlowControl               *string   `json:"ruleFlowControl"`
-	Discard                       bool      `json:"discard"`
-	DelayActionsInMinutes         *int64    `json:"delayActionsInMinutes"`
-	AffectsServices               *[]string `json:"affectsServices"`
-	ForwardToOutboundIntegrations *[]string `json:"forwardToOutboundIntegrations"`
+	AssignToTeams                 *[]string                  `json:"assignToTeams"`
+	ChangeSeverity                *string                    `json:"changeSeverity"`
+	AddInteraction                *string                    `json:"addInteraction"`
+	RuleFlowControl               *string                    `json:"ruleFlowControl"`
+	Discard                       bool                       `json:"discard"`
+	DelayActionsInMinutes         *int64                     `json:"delayActionsInMinutes"`
+	AffectsServices               *[]string                  `json:"affectsServices"`
+	ForwardToOutboundIntegrations *[]string                  `json:"forwardToOutboundIntegrations"`
+	SetAttributes                 *[]routingRuleSetAttribute `json:"setAttributes"`
 }
 
+type routingRuleSetAttribute struct {
+	Name           string `json:"name"`
+	Value          string `json:"value"`
+	IsImage        bool   `json:"isImage"`
+	HideInPreviews bool   `json:"hideInPreviews"`
+}
 type routingRuleChannels struct {
 	OutboundIntegrations      *[]string `json:"outboundIntegrations"`
 	OutboundIntegrationsMuted bool      `json:"outboundIntegrationsMuted"`
@@ -157,7 +164,21 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 		DelayActionsInMinutes:         actions.DelayActionsInMinutes.ValueInt64Pointer(),
 		AffectsServices:               ListToStringArray(actions.AffectsServices),
 		ForwardToOutboundIntegrations: ListToStringArray(actions.ForwardToOutboundIntegrations),
+		SetAttributes:                 mapRoutingRuleSetAttributes(actions.SetAttributes),
 	}
+}
+
+func mapRoutingRuleSetAttributes(attributes []RoutingRuleActionsSetAttributesModel) *[]routingRuleSetAttribute {
+	result := make([]routingRuleSetAttribute, len(attributes))
+	for i, attribute := range attributes {
+		result[i] = routingRuleSetAttribute{
+			Name:           attribute.Name.ValueString(),
+			Value:          attribute.Value.ValueString(),
+			IsImage:        attribute.IsImage.ValueBool(),
+			HideInPreviews: attribute.HideInPreviews.ValueBool(),
+		}
+	}
+	return &result
 }
 
 func mapRoutingRuleChannels(channels *RoutingRuleChannelsModel) *routingRuleChannels {

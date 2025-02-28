@@ -274,6 +274,10 @@ var ValidRotationRepeats = []string{"daily", "weekly", "biweekly", "monthly", "c
 
 var ValidTeamConnectionModes = []string{"OrganizationTeams", "SelectedTeams"}
 
+var ValidTeamMembershipRoles = []string{"Member", "Administrator"}
+
+var ValidOrganizationMembershipRoles = []string{"Member", "Owner", "Administrator"}
+
 func OperatorValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidOperators...)
 }

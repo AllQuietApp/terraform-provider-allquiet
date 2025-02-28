@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -64,8 +65,8 @@ func (r *TeamMembership) Schema(ctx context.Context, req resource.SchemaRequest,
 			},
 			"role": schema.StringAttribute{
 				Required:            true,
-				MarkdownDescription: "Role of the member (either 'Member' or 'Administrator')",
-				Validators:          []validator.String{stringvalidator.OneOf([]string{"Member", "Administrator"}...)},
+				MarkdownDescription: "Role of the member. Possible values are: " + strings.Join(ValidTeamMembershipRoles, ", "),
+				Validators:          []validator.String{stringvalidator.OneOf(ValidTeamMembershipRoles...)},
 			},
 		},
 	}

@@ -22,6 +22,9 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing One"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing One"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.hide_in_previews", "true"),
 				),
 			},
 			// ImportState testing
@@ -35,6 +38,9 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing Two"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.hide_in_previews", "true"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -111,6 +117,13 @@ resource "allquiet_routing" "test" {
 	    notification_channels = ["VoiceCall"]
 	  },
 	  actions = {
+	  	set_attributes = [
+			{
+				name = "Team"
+				value = "Sales"
+				hide_in_previews = true
+			}
+		]
       }
 	}
   ]
