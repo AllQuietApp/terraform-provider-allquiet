@@ -46,7 +46,7 @@ resource "allquiet_team_membership" "my_team_taylor" {
 
 ### Required
 
-- `role` (String) Role of the member (either 'Member' or 'Administrator')
+- `role` (String) Role of the member. Possible values are: Member, Administrator
 - `team_id` (String) The team id that the user is a member of
 - `user_id` (String) The user id of the user
 

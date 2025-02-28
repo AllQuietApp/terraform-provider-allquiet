@@ -61,6 +61,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
   team_id = allquiet_team.my_team_with_weekend_rotation.id
   escalation_tiers = [
     {
+      auto_escalation_enabled       = true
       auto_escalation_after_minutes = 5
       schedules = [
         {
@@ -161,6 +162,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rot
   team_id = allquiet_team.my_team_with_day_and_night_rotation.id
   escalation_tiers = [
     {
+      auto_escalation_enabled       = true
       auto_escalation_after_minutes = 5
       schedules = [
         {
@@ -251,6 +253,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_hourly_rotation" 
   team_id = allquiet_team.my_team_with_hourly_rotation.id
   escalation_tiers = [
     {
+      auto_escalation_enabled       = true
       auto_escalation_after_minutes = 5
       schedules = [
         {
@@ -386,6 +389,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
   team_id = allquiet_team.my_team_with_repeating_tier.id
   escalation_tiers = [
     {
+      auto_escalation_enabled       = true
       auto_escalation_after_minutes = 5
       repeats                       = 2
       repeats_after_minutes         = 0
@@ -415,6 +419,70 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
               members = [
                 {
                   team_membership_id = allquiet_team_membership.my_team_with_repeating_tier_gauss.id
+                },
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+################################################################################
+# Example 6: Root Team with Auto Assign To Teams
+################################################################################
+
+resource "allquiet_team" "root_team" {
+  display_name = "Root team"
+  time_zone_id = "America/Los_Angeles"
+}
+
+resource "allquiet_team" "second_level_support_team" {
+  display_name = "2nd level support team"
+  time_zone_id = "America/Los_Angeles"
+}
+
+resource "allquiet_team_membership" "root_team_riemann" {
+  team_id = allquiet_team.root_team.id
+  user_id = allquiet_user.riemann.id
+  role    = "Member"
+}
+
+resource "allquiet_team_escalations" "root_team_escalations" {
+  team_id = allquiet_team.root_team.id
+  escalation_tiers = [
+    {
+      auto_escalation_enabled       = true
+      auto_escalation_after_minutes = 5
+      auto_escalation_severities    = ["Critical", "Warning"]
+      auto_escalation_time_filters = [
+        {
+          selected_days = ["mon", "tue", "wed", "thu", "fri"]
+          from          = "08:00"
+          until         = "17:00"
+        }
+      ]
+      auto_assign_to_teams            = [allquiet_team.second_level_support_team.id]
+      auto_assign_to_teams_severities = ["Critical"]
+      auto_assign_to_teams_time_filters = [
+        {
+          selected_days = ["mon", "tue", "wed", "thu", "fri"]
+          from          = "08:00"
+          until         = "17:00"
+        }
+      ]
+      schedules = [
+        {
+          rotations = [
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.root_team_riemann.id
                 },
               ]
             }

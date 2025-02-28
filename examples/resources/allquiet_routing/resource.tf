@@ -218,8 +218,8 @@ resource "allquiet_routing" "example_9" {
       actions = {
         set_attributes = [
           {
-            name     = "Team",
-            value    = "Leads",
+            name             = "Team",
+            value            = "Leads",
             hide_in_previews = true
           }
         ]
