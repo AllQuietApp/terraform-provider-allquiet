@@ -202,6 +202,31 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 					]
 				  }
 				]
+			  },
+			  {
+				schedule_settings = {
+				  weekly_schedules = [
+					{
+						selected_days = ["mon", "tue", "wed", "thu", "fri"]
+						from = "06:00"
+						until = "18:00"
+					},
+					{
+						selected_days = ["sat", "sun"]
+						from = "10:00"
+						until = "16:00"
+					}
+				  ]
+				}
+				rotations = [
+				  {
+					members = [
+					  {
+						team_membership_id = allquiet_team_membership.my_team_galois.id
+					  }
+					]
+				  }
+				]
 			  }
 			]
 		  }

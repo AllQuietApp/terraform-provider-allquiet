@@ -69,9 +69,16 @@ type TeamEscalationsRotationMemberModel struct {
 }
 
 type TeamEscalationsScheduleSettingsModel struct {
-	Start        types.String `tfsdk:"start"`
-	End          types.String `tfsdk:"end"`
+	Start           types.String                          `tfsdk:"start"`
+	End             types.String                          `tfsdk:"end"`
+	SelectedDays    types.List                            `tfsdk:"selected_days"`
+	WeeklySchedules *[]TeamEscalationsWeeklyScheduleModel `tfsdk:"weekly_schedules"`
+}
+
+type TeamEscalationsWeeklyScheduleModel struct {
 	SelectedDays types.List   `tfsdk:"selected_days"`
+	From         types.String `tfsdk:"from"`
+	Until        types.String `tfsdk:"until"`
 }
 
 type TeamEscalationsRotationSettingsModel struct {
@@ -246,19 +253,48 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 											"start": schema.StringAttribute{
 												Optional:            true,
 												MarkdownDescription: "Start time of the schedule. Format: HH:mm",
+												DeprecationMessage:  "Use weekly_schedules instead",
 												Validators:          []validator.String{TimeValidator("Not a valid time")},
 											},
 											"end": schema.StringAttribute{
 												Optional:            true,
 												MarkdownDescription: "End time of the schedule. Format: HH:mm",
+												DeprecationMessage:  "Use weekly_schedules instead",
 												Validators:          []validator.String{TimeValidator("Not a valid time")},
 											},
 											"selected_days": schema.ListAttribute{
 												Optional:            true,
+												DeprecationMessage:  "Use weekly_schedules instead",
 												MarkdownDescription: "Selected days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
 												ElementType:         types.StringType,
 												Validators: []validator.List{
 													listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
+												},
+											},
+											"weekly_schedules": schema.ListNestedAttribute{
+												Optional:            true,
+												MarkdownDescription: "Weekly schedules",
+												NestedObject: schema.NestedAttributeObject{
+													Attributes: map[string]schema.Attribute{
+														"selected_days": schema.ListAttribute{
+															Optional:            true,
+															MarkdownDescription: "Days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
+															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
+															},
+														},
+														"from": schema.StringAttribute{
+															Optional:            true,
+															MarkdownDescription: "From time of the time filter. Format: HH:mm",
+															Validators:          []validator.String{TimeValidator("Not a valid time")},
+														},
+														"until": schema.StringAttribute{
+															Optional:            true,
+															MarkdownDescription: "Until time of the time filter. Format: HH:mm",
+															Validators:          []validator.String{TimeValidator("Not a valid time")},
+														},
+													},
 												},
 											},
 										},
@@ -545,8 +581,24 @@ func mapTeamEscalationsScheduleSettingsResponseToData(ctx context.Context, sched
 		return nil
 	}
 	return &TeamEscalationsScheduleSettingsModel{
-		Start:        types.StringPointerValue(scheduleSettings.Start),
-		End:          types.StringPointerValue(scheduleSettings.End),
-		SelectedDays: MapNullableList(ctx, &scheduleSettings.SelectedDays),
+		Start:           types.StringPointerValue(scheduleSettings.Start),
+		End:             types.StringPointerValue(scheduleSettings.End),
+		SelectedDays:    MapNullableList(ctx, &scheduleSettings.SelectedDays),
+		WeeklySchedules: mapTeamEscalationsWeeklySchedulesResponseToData(ctx, scheduleSettings.WeeklySchedules),
 	}
+}
+
+func mapTeamEscalationsWeeklySchedulesResponseToData(ctx context.Context, weeklySchedules *[]weeklySchedule) *[]TeamEscalationsWeeklyScheduleModel {
+	if weeklySchedules == nil {
+		return nil
+	}
+	var weeklySchedulesData []TeamEscalationsWeeklyScheduleModel
+	for _, weeklySchedule := range *weeklySchedules {
+		weeklySchedulesData = append(weeklySchedulesData, TeamEscalationsWeeklyScheduleModel{
+			SelectedDays: MapNullableList(ctx, weeklySchedule.SelectedDays),
+			From:         types.StringPointerValue(weeklySchedule.From),
+			Until:        types.StringPointerValue(weeklySchedule.Until),
+		})
+	}
+	return &weeklySchedulesData
 }

@@ -53,9 +53,16 @@ type teamEscalationsRotationMember struct {
 }
 
 type scheduleSettings struct {
-	Start        *string  `json:"start"`
-	End          *string  `json:"end"`
-	SelectedDays []string `json:"selectedDays"`
+	Start           *string           `json:"start"`
+	End             *string           `json:"end"`
+	SelectedDays    []string          `json:"selectedDays"`
+	WeeklySchedules *[]weeklySchedule `json:"weeklySchedules"`
+}
+
+type weeklySchedule struct {
+	SelectedDays *[]string `json:"selectedDays"`
+	From         *string   `json:"from"`
+	Until        *string   `json:"until"`
 }
 
 type rotationSettings struct {
@@ -94,9 +101,10 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 			selectedDays := NonNullableArrayToStringArray(ListToStringArray(schedule.ScheduleSettings.SelectedDays))
 
 			schedules[i].ScheduleSettings = &scheduleSettings{
-				Start:        schedule.ScheduleSettings.Start.ValueStringPointer(),
-				End:          schedule.ScheduleSettings.End.ValueStringPointer(),
-				SelectedDays: selectedDays,
+				Start:           schedule.ScheduleSettings.Start.ValueStringPointer(),
+				End:             schedule.ScheduleSettings.End.ValueStringPointer(),
+				SelectedDays:    selectedDays,
+				WeeklySchedules: mapTeamEscalationsWeeklySchedulesToRequest(schedule.ScheduleSettings.WeeklySchedules),
 			}
 		}
 
@@ -158,6 +166,23 @@ func mapTeamEscalationsTimeFiltersToRequest(timeFilters *[]TeamEscalationsTimeFi
 	}
 
 	return &requestTimeFilters
+}
+
+func mapTeamEscalationsWeeklySchedulesToRequest(weeklySchedules *[]TeamEscalationsWeeklyScheduleModel) *[]weeklySchedule {
+	if weeklySchedules == nil {
+		return nil
+	}
+
+	requestWeeklySchedules := make([]weeklySchedule, len(*weeklySchedules))
+	for i, ws := range *weeklySchedules {
+		requestWeeklySchedules[i] = weeklySchedule{
+			SelectedDays: ListToStringArray(ws.SelectedDays),
+			From:         ws.From.ValueStringPointer(),
+			Until:        ws.Until.ValueStringPointer(),
+		}
+	}
+
+	return &requestWeeklySchedules
 }
 
 func (c *AllQuietAPIClient) CreateTeamEscalationsResource(ctx context.Context, data *TeamEscalationsModel) (*teamEscalationsResponse, error) {

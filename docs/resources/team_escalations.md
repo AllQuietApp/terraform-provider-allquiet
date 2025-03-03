@@ -274,7 +274,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_hourly_rotation" 
             repeats             = "custom"
             custom_repeat_unit  = "hours"
             custom_repeat_value = 6
-            starts_on_time      = "00:00"
+            starts_on_time      = "09:00"
             effective_from      = "2024-07-10"
           }
           rotations = [
@@ -442,10 +442,6 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
   ]
 }
 
-
-
-
-
 ################################################################################
 # Example 6: Root Team with Auto Assign To Teams
 ################################################################################
@@ -496,6 +492,57 @@ resource "allquiet_team_escalations" "root_team_escalations" {
               members = [
                 {
                   team_membership_id = allquiet_team_membership.root_team_riemann.id
+                },
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+################################################################################
+# Example 7: Team with weekly schedules
+################################################################################
+
+resource "allquiet_team" "my_team_with_weekly_schedules" {
+  display_name = "My team with weekly schedules"
+  time_zone_id = "America/Los_Angeles"
+}
+
+
+resource "allquiet_team_membership" "my_team_with_weekly_schedules_riemann" {
+  team_id = allquiet_team.my_team_with_weekly_schedules.id
+  user_id = allquiet_user.riemann.id
+  role    = "Member"
+}
+
+resource "allquiet_team_escalations" "my_team_escalations_with_weekly_schedules" {
+  team_id = allquiet_team.my_team_with_weekly_schedules.id
+  escalation_tiers = [
+    {
+      schedules = [
+        {
+          schedule_settings = {
+            weekly_schedules = [
+              {
+                selected_days = ["mon", "tue", "wed", "thu", "fri"]
+                from          = "06:00"
+                until         = "18:00"
+              },
+              {
+                selected_days = ["sat", "sun"]
+                from          = "10:00"
+                until         = "14:00"
+              }
+            ]
+          }
+          rotations = [
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_weekly_schedules_riemann.id
                 },
               ]
             }
@@ -593,9 +640,20 @@ Optional:
 
 Optional:
 
-- `end` (String) End time of the schedule. Format: HH:mm
-- `selected_days` (List of String) Selected days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
-- `start` (String) Start time of the schedule. Format: HH:mm
+- `end` (String, Deprecated) End time of the schedule. Format: HH:mm
+- `selected_days` (List of String, Deprecated) Selected days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
+- `start` (String, Deprecated) Start time of the schedule. Format: HH:mm
+- `weekly_schedules` (Attributes List) Weekly schedules (see [below for nested schema](#nestedatt--escalation_tiers--schedules--schedule_settings--weekly_schedules))
+
+<a id="nestedatt--escalation_tiers--schedules--schedule_settings--weekly_schedules"></a>
+### Nested Schema for `escalation_tiers.schedules.schedule_settings.weekly_schedules`
+
+Optional:
+
+- `from` (String) From time of the time filter. Format: HH:mm
+- `selected_days` (List of String) Days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
+- `until` (String) Until time of the time filter. Format: HH:mm
+
 
 
 
