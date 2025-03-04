@@ -583,7 +583,7 @@ func mapTeamEscalationsScheduleSettingsResponseToData(ctx context.Context, sched
 	return &TeamEscalationsScheduleSettingsModel{
 		Start:           types.StringPointerValue(scheduleSettings.Start),
 		End:             types.StringPointerValue(scheduleSettings.End),
-		SelectedDays:    MapNullableList(ctx, &scheduleSettings.SelectedDays),
+		SelectedDays:    MapNullableList(ctx, scheduleSettings.SelectedDays),
 		WeeklySchedules: mapTeamEscalationsWeeklySchedulesResponseToData(ctx, scheduleSettings.WeeklySchedules),
 	}
 }

@@ -55,7 +55,7 @@ type teamEscalationsRotationMember struct {
 type scheduleSettings struct {
 	Start           *string           `json:"start"`
 	End             *string           `json:"end"`
-	SelectedDays    []string          `json:"selectedDays"`
+	SelectedDays    *[]string         `json:"selectedDays"`
 	WeeklySchedules *[]weeklySchedule `json:"weeklySchedules"`
 }
 
@@ -98,7 +98,7 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 		schedules[i] = teamEscalationsSchedule{}
 
 		if schedule.ScheduleSettings != nil {
-			selectedDays := NonNullableArrayToStringArray(ListToStringArray(schedule.ScheduleSettings.SelectedDays))
+			selectedDays := ListToStringArray(schedule.ScheduleSettings.SelectedDays)
 
 			schedules[i].ScheduleSettings = &scheduleSettings{
 				Start:           schedule.ScheduleSettings.Start.ValueStringPointer(),
