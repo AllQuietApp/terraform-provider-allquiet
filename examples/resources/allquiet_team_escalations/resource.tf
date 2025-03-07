@@ -541,6 +541,64 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekly_schedules"
 }
 
 
+################################################################################
+# Example 8: Team with all tiers repeating
+################################################################################
+
+resource "allquiet_team" "my_team_with_all_tiers_repeating" {
+  display_name = "My team with all tiers repeating"
+  time_zone_id = "America/Los_Angeles"
+}
+
+resource "allquiet_team_membership" "my_team_with_all_tiers_repeating_riemann" {
+  team_id = allquiet_team.my_team_with_all_tiers_repeating.id
+  user_id = allquiet_user.riemann.id
+  role    = "Member"
+}
+
+resource "allquiet_team_membership" "my_team_with_all_tiers_repeating_galois" {
+  team_id = allquiet_team.my_team_with_all_tiers_repeating.id
+  user_id = allquiet_user.galois.id
+  role    = "Member"
+}
+
+resource "allquiet_team_escalations" "my_team_escalations_with_all_tiers_repeating" {
+  team_id = allquiet_team.my_team_with_all_tiers_repeating.id
+  tier_settings = {
+    repeats               = 2
+    repeats_after_minutes = 5
+    repeats_stop_mode     = "resolved"
+  }
+  escalation_tiers = [
+    {
+      auto_escalation_enabled       = true
+      auto_escalation_after_minutes = 5
+      auto_escalation_stop_mode     = "acknowledged"
+      repeats                       = 2
+      repeats_after_minutes         = 0
+      repeats_stop_mode             = "resolved"
+      schedules = [
+        {
+          rotations = [
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_all_tiers_repeating_riemann.id
+                },
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
 
 
 

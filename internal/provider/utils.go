@@ -278,6 +278,8 @@ var ValidTeamMembershipRoles = []string{"Member", "Administrator"}
 
 var ValidOrganizationMembershipRoles = []string{"Member", "Owner", "Administrator"}
 
+var ValidEscalationModes = []string{"resolved", "acknowledged"}
+
 func OperatorValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidOperators...)
 }

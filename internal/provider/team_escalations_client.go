@@ -17,11 +17,13 @@ type teamEscalationsResponse struct {
 type teamEscalationsCreateRequest struct {
 	TeamId          string                `json:"teamId"`
 	EscalationTiers []teamEscalationsTier `json:"escalationTiers"`
+	TierSettings    *tierSettings         `json:"tierSettings"`
 }
 
 type teamEscalationsTier struct {
 	AutoEscalationEnabled        *bool                        `json:"autoEscalationEnabled"`
 	AutoEscalationAfterMinutes   *int64                       `json:"autoEscalationAfterMinutes"`
+	AutoEscalationStopMode       *string                      `json:"autoEscalationMode"`
 	AutoEscalationSeverities     *[]string                    `json:"autoEscalationSeverities"`
 	AutoEscalationTimeFilters    *[]teamEscalationsTimeFilter `json:"autoEscalationTimeFilters"`
 	AutoAssignToTeams            *[]string                    `json:"autoAssignToTeams"`
@@ -29,7 +31,14 @@ type teamEscalationsTier struct {
 	AutoAssignToTeamsTimeFilters *[]teamEscalationsTimeFilter `json:"autoAssignToTeamsTimeFilters"`
 	Repeats                      *int64                       `json:"repeats"`
 	RepeatsAfterMinutes          *int64                       `json:"repeatsAfterMinutes"`
+	RepeatsStopMode              *string                      `json:"repeatsTierEscalationMode"`
 	Schedules                    []teamEscalationsSchedule    `json:"schedules"`
+}
+
+type tierSettings struct {
+	Repeats             *int64  `json:"repeats"`
+	RepeatsAfterMinutes *int64  `json:"repeatsAfterMinutes"`
+	RepeatsStopMode     *string `json:"repeatsTierEscalationMode"`
 }
 
 type teamEscalationsTimeFilter struct {
@@ -84,9 +93,24 @@ func mapTeamEscalationsCreateRequest(plan *TeamEscalationsModel) *teamEscalation
 		tiers[i] = *mappedTier
 	}
 
+	tierSettings := mapTierSettings(plan.TierSettings)
+
 	return &teamEscalationsCreateRequest{
 		TeamId:          plan.TeamId.ValueString(),
 		EscalationTiers: tiers,
+		TierSettings:    tierSettings,
+	}
+}
+
+func mapTierSettings(plan *TierSettingsModel) *tierSettings {
+	if plan == nil {
+		return nil
+	}
+
+	return &tierSettings{
+		Repeats:             plan.Repeats.ValueInt64Pointer(),
+		RepeatsAfterMinutes: plan.RepeatsAfterMinutes.ValueInt64Pointer(),
+		RepeatsStopMode:     plan.RepeatsStopMode.ValueStringPointer(),
 	}
 }
 
@@ -140,6 +164,7 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 	return &teamEscalationsTier{
 		AutoEscalationEnabled:        tier.AutoEscalationEnabled.ValueBoolPointer(),
 		AutoEscalationAfterMinutes:   tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
+		AutoEscalationStopMode:       tier.AutoEscalationStopMode.ValueStringPointer(),
 		AutoEscalationSeverities:     ListToStringArray(tier.AutoEscalationSeverities),
 		AutoEscalationTimeFilters:    mapTeamEscalationsTimeFiltersToRequest(tier.AutoEscalationTimeFilters),
 		AutoAssignToTeams:            ListToStringArray(tier.AutoAssignToTeams),
@@ -147,6 +172,7 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 		AutoAssignToTeamsTimeFilters: mapTeamEscalationsTimeFiltersToRequest(tier.AutoAssignToTeamsTimeFilters),
 		Repeats:                      tier.Repeats.ValueInt64Pointer(),
 		RepeatsAfterMinutes:          tier.RepeatsAfterMinutes.ValueInt64Pointer(),
+		RepeatsStopMode:              tier.RepeatsStopMode.ValueStringPointer(),
 		Schedules:                    schedules,
 	}
 }

@@ -38,10 +38,12 @@ type TeamEscalations struct {
 type TeamEscalationsTierModel struct {
 	AutoEscalationEnabled        types.Bool                        `tfsdk:"auto_escalation_enabled"`
 	AutoEscalationAfterMinutes   types.Int64                       `tfsdk:"auto_escalation_after_minutes"`
+	AutoEscalationStopMode       types.String                      `tfsdk:"auto_escalation_stop_mode"`
 	AutoEscalationSeverities     types.List                        `tfsdk:"auto_escalation_severities"`
 	AutoEscalationTimeFilters    *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_escalation_time_filters"`
 	Repeats                      types.Int64                       `tfsdk:"repeats"`
 	RepeatsAfterMinutes          types.Int64                       `tfsdk:"repeats_after_minutes"`
+	RepeatsStopMode              types.String                      `tfsdk:"repeats_stop_mode"`
 	AutoAssignToTeams            types.List                        `tfsdk:"auto_assign_to_teams"`
 	AutoAssignToTeamsSeverities  types.List                        `tfsdk:"auto_assign_to_teams_severities"`
 	AutoAssignToTeamsTimeFilters *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_assign_to_teams_time_filters"`
@@ -98,6 +100,13 @@ type TeamEscalationsModel struct {
 	Id              types.String               `tfsdk:"id"`
 	TeamId          types.String               `tfsdk:"team_id"`
 	EscalationTiers []TeamEscalationsTierModel `tfsdk:"escalation_tiers"`
+	TierSettings    *TierSettingsModel         `tfsdk:"tier_settings"`
+}
+
+type TierSettingsModel struct {
+	Repeats             types.Int64  `tfsdk:"repeats"`
+	RepeatsAfterMinutes types.Int64  `tfsdk:"repeats_after_minutes"`
+	RepeatsStopMode     types.String `tfsdk:"repeats_stop_mode"`
 }
 
 func (r *TeamEscalations) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -121,6 +130,30 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 				Required:            true,
 				MarkdownDescription: "Id of the associated team",
 			},
+			"tier_settings": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"repeats": schema.Int64Attribute{
+						Optional:            true,
+						MarkdownDescription: "How many times all tiers should repeat.",
+						Validators: []validator.Int64{
+							int64validator.Between(0, 16),
+						},
+					},
+					"repeats_after_minutes": schema.Int64Attribute{
+						Optional:            true,
+						MarkdownDescription: "How many minutes after the last tier all tiers should repeat.",
+						Validators: []validator.Int64{
+							int64validator.Between(0, OneMonthInSeconds),
+						},
+					},
+					"repeats_stop_mode": schema.StringAttribute{
+						Optional:            true,
+						MarkdownDescription: "When all tiers should stop repeating. Possible values are: " + strings.Join(ValidEscalationModes, ", "),
+						Validators:          []validator.String{stringvalidator.OneOf(ValidEscalationModes...)},
+					},
+				},
+			},
 			"escalation_tiers": schema.ListNestedAttribute{
 				Optional: true,
 				NestedObject: schema.NestedAttributeObject{
@@ -135,6 +168,11 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 							Validators: []validator.Int64{
 								int64validator.Between(0, 60*24*30),
 							},
+						},
+						"auto_escalation_stop_mode": schema.StringAttribute{
+							Optional:            true,
+							MarkdownDescription: "When the escalation should be stopped. Possible values are: " + strings.Join(ValidEscalationModes, ", "),
+							Validators:          []validator.String{stringvalidator.OneOf(ValidEscalationModes...)},
 						},
 						"auto_escalation_severities": schema.ListAttribute{
 							Optional:            true,
@@ -223,7 +261,11 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 								int64validator.Between(0, OneMonthInSeconds),
 							},
 						},
-
+						"repeats_stop_mode": schema.StringAttribute{
+							Optional:            true,
+							MarkdownDescription: "When this tier should stop being repeated. Possible values are: " + strings.Join(ValidEscalationModes, ", "),
+							Validators:          []validator.String{stringvalidator.OneOf(ValidEscalationModes...)},
+						},
 						"schedules": schema.ListNestedAttribute{
 							Required: true,
 							NestedObject: schema.NestedAttributeObject{
@@ -499,6 +541,7 @@ func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscal
 		tiers = append(tiers, TeamEscalationsTierModel{
 			AutoEscalationEnabled:        types.BoolPointerValue(tier.AutoEscalationEnabled),
 			AutoEscalationAfterMinutes:   autoEscalationAfterMinutes,
+			AutoEscalationStopMode:       types.StringPointerValue(tier.AutoEscalationStopMode),
 			AutoEscalationSeverities:     MapNullableList(ctx, tier.AutoEscalationSeverities),
 			AutoEscalationTimeFilters:    mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoEscalationTimeFilters),
 			AutoAssignToTeams:            MapNullableList(ctx, tier.AutoAssignToTeams),
@@ -506,6 +549,7 @@ func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscal
 			AutoAssignToTeamsTimeFilters: mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoAssignToTeamsTimeFilters),
 			Repeats:                      types.Int64PointerValue(tier.Repeats),
 			RepeatsAfterMinutes:          types.Int64PointerValue(tier.RepeatsAfterMinutes),
+			RepeatsStopMode:              types.StringPointerValue(tier.RepeatsStopMode),
 			Schedules:                    mapTeamEscalationsSchedulesResponseToData(ctx, tier.Schedules),
 		})
 	}

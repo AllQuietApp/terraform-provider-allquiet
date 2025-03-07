@@ -183,8 +183,10 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 		  {
 			auto_escalation_after_minutes = 5
 			auto_escalation_severities = ["Critical", "Warning"]
+			auto_escalation_stop_mode = "acknowledged"
 			repeats = 1
 			repeats_after_minutes = 0
+			repeats_stop_mode = "resolved"
 			schedules = [
 			  {
 				schedule_settings = {
