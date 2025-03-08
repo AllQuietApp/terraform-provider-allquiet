@@ -7,12 +7,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -32,13 +34,18 @@ type Integration struct {
 
 // IntegrationModel describes the resource data model.
 type IntegrationModel struct {
-	Id              types.String `tfsdk:"id"`
-	DisplayName     types.String `tfsdk:"display_name"`
-	TeamId          types.String `tfsdk:"team_id"`
-	IsMuted         types.Bool   `tfsdk:"is_muted"`
-	IsInMaintenance types.Bool   `tfsdk:"is_in_maintenance"`
-	Type            types.String `tfsdk:"type"`
-	WebhookUrl      types.String `tfsdk:"webhook_url"`
+	Id              types.String         `tfsdk:"id"`
+	DisplayName     types.String         `tfsdk:"display_name"`
+	TeamId          types.String         `tfsdk:"team_id"`
+	IsMuted         types.Bool           `tfsdk:"is_muted"`
+	IsInMaintenance types.Bool           `tfsdk:"is_in_maintenance"`
+	Type            types.String         `tfsdk:"type"`
+	WebhookUrl      types.String         `tfsdk:"webhook_url"`
+	SnoozeSettings  *SnoozeSettingsModel `tfsdk:"snooze_settings"`
+}
+
+type SnoozeSettingsModel struct {
+	SnoozeWindowInMinutes types.Int64 `tfsdk:"snooze_window_in_minutes"`
 }
 
 func (r *Integration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -77,6 +84,19 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
+			},
+			"snooze_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "The snooze settings of the integration",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"snooze_window_in_minutes": schema.Int64Attribute{
+						MarkdownDescription: "The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).",
+						Optional:            true,
+						Validators: []validator.Int64{
+							int64validator.Between(0, 1440),
+						},
+					},
+				},
 			},
 			"type": schema.StringAttribute{
 				MarkdownDescription: "The type of the integration. See all types here: https://allquiet.app/api/public/v1/inbound-integration/types",
@@ -215,4 +235,15 @@ func mapIntegrationResponseToModel(response *integrationResponse, data *Integrat
 	data.IsInMaintenance = types.BoolValue(response.IsInMaintenance)
 	data.Type = types.StringValue(response.Type)
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
+	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(response.SnoozeSettings)
+}
+
+func mapSnoozeSettingsResponseToModel(response *snoozeSettingsResponse) *SnoozeSettingsModel {
+	if response == nil {
+		return nil
+	}
+
+	return &SnoozeSettingsModel{
+		SnoozeWindowInMinutes: types.Int64PointerValue(response.SnoozeWindowInMinutes),
+	}
 }

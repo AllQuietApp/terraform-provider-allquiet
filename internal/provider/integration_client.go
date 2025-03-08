@@ -9,21 +9,27 @@ import (
 )
 
 type integrationResponse struct {
-	Id              string  `json:"id"`
-	DisplayName     string  `json:"displayName"`
-	TeamId          string  `json:"teamId"`
-	IsMuted         bool    `json:"isMuted"`
-	IsInMaintenance bool    `json:"isInMaintenance"`
-	Type            string  `json:"type"`
-	WebhookUrl      *string `json:"webhookUrl"`
+	Id              string                  `json:"id"`
+	DisplayName     string                  `json:"displayName"`
+	TeamId          string                  `json:"teamId"`
+	IsMuted         bool                    `json:"isMuted"`
+	IsInMaintenance bool                    `json:"isInMaintenance"`
+	Type            string                  `json:"type"`
+	WebhookUrl      *string                 `json:"webhookUrl"`
+	SnoozeSettings  *snoozeSettingsResponse `json:"snoozeSettings"`
 }
 
 type integrationCreateRequest struct {
-	DisplayName     string `json:"displayName"`
-	TeamId          string `json:"teamId"`
-	IsMuted         bool   `json:"isMuted"`
-	IsInMaintenance bool   `json:"isInMaintenance"`
-	Type            string `json:"type"`
+	DisplayName     string                  `json:"displayName"`
+	TeamId          string                  `json:"teamId"`
+	IsMuted         bool                    `json:"isMuted"`
+	IsInMaintenance bool                    `json:"isInMaintenance"`
+	Type            string                  `json:"type"`
+	SnoozeSettings  *snoozeSettingsResponse `json:"snoozeSettings"`
+}
+
+type snoozeSettingsResponse struct {
+	SnoozeWindowInMinutes *int64 `json:"snoozeWindowInMinutes"`
 }
 
 func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateRequest {
@@ -33,6 +39,17 @@ func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateReque
 		IsMuted:         plan.IsMuted.ValueBool(),
 		IsInMaintenance: plan.IsInMaintenance.ValueBool(),
 		Type:            plan.Type.ValueString(),
+		SnoozeSettings:  mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
+	}
+}
+
+func mapSnoozeSettingsCreateRequest(plan *SnoozeSettingsModel) *snoozeSettingsResponse {
+	if plan == nil {
+		return nil
+	}
+
+	return &snoozeSettingsResponse{
+		SnoozeWindowInMinutes: plan.SnoozeWindowInMinutes.ValueInt64Pointer(),
 	}
 }
 
