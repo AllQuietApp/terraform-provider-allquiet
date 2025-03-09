@@ -29,6 +29,15 @@ resource "allquiet_integration" "amazon_cloudwatch" {
   type         = "AmazonCloudWatch"
 }
 
+resource "allquiet_integration" "webhook" {
+  display_name = "My Webhook Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Webhook"
+  snooze_settings = {
+    snooze_window_in_minutes = 1440
+  }
+}
+
 locals {
   computed_amazon_cloudwatch_webhook_url = allquiet_integration.amazon_cloudwatch.webhook_url
 }
@@ -47,8 +56,16 @@ locals {
 
 - `is_in_maintenance` (Boolean) If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `is_muted` (Boolean) If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
+- `snooze_settings` (Attributes) The snooze settings of the integration (see [below for nested schema](#nestedatt--snooze_settings))
 
 ### Read-Only
 
 - `id` (String) Id
 - `webhook_url` (String) The webhook url of the integration if it is a webhook-like integration e.g. Amazon CloudWatch
+
+<a id="nestedatt--snooze_settings"></a>
+### Nested Schema for `snooze_settings`
+
+Optional:
+
+- `snooze_window_in_minutes` (Number) The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).
