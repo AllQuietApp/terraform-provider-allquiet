@@ -23,6 +23,18 @@ func TestAccIntegrationResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration One"),
 					resource.TestCheckResourceAttrSet("allquiet_integration.test", "webhook_url"),
+
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.0", "mon"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.1", "tue"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.2", "wed"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.3", "thu"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.4", "fri"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.from", "22:00"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.until", "07:00"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.snooze_until_absolute", "07:00"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.0", "sat"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.1", "sun"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.snooze_window_in_minutes", "10"),
 				),
 			},
 			// ImportState testing
@@ -37,6 +49,18 @@ func TestAccIntegrationResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration Two"),
 					resource.TestCheckResourceAttrSet("allquiet_integration.test", "webhook_url"),
+
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.0", "mon"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.1", "tue"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.2", "wed"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.3", "thu"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.4", "fri"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.from", "22:00"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.until", "07:00"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.snooze_until_absolute", "07:00"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.0", "sat"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.1", "sun"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.snooze_window_in_minutes", "10"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -89,6 +113,27 @@ resource "allquiet_integration" "test" {
   team_id = allquiet_team.test.id
   type = "Datadog"
 }
+
+resource "allquiet_integration" "webhook_snooze_absolute" {
+  display_name = "My Webhook Integration"
+  team_id = allquiet_team.test.id
+  type = "Webhook"
+  snooze_settings = {
+    filters = [
+		{
+			selected_days = ["mon", "tue", "wed", "thu", "fri"]
+			from = "22:00"
+			until = "07:00"
+			snooze_until_absolute = "07:00"
+		},
+		{
+			selected_days = ["sat", "sun"]
+			snooze_window_in_minutes = 10
+		}
+	]
+  }
+}
+
 `, display_name)
 
 }

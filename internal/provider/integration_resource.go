@@ -6,8 +6,10 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -45,7 +47,16 @@ type IntegrationModel struct {
 }
 
 type SnoozeSettingsModel struct {
-	SnoozeWindowInMinutes types.Int64 `tfsdk:"snooze_window_in_minutes"`
+	SnoozeWindowInMinutes types.Int64          `tfsdk:"snooze_window_in_minutes"`
+	Filters               *[]SnoozeFilterModel `tfsdk:"filters"`
+}
+
+type SnoozeFilterModel struct {
+	SelectedDays          types.List   `tfsdk:"selected_days"`
+	From                  types.String `tfsdk:"from"`
+	Until                 types.String `tfsdk:"until"`
+	SnoozeWindowInMinutes types.Int64  `tfsdk:"snooze_window_in_minutes"`
+	SnoozeUntilAbsolute   types.String `tfsdk:"snooze_until_absolute"`
 }
 
 func (r *Integration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -94,6 +105,44 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 						Optional:            true,
 						Validators: []validator.Int64{
 							int64validator.Between(0, 1440),
+						},
+					},
+					"filters": schema.ListNestedAttribute{
+						MarkdownDescription: "The snooze filters of the integration. Only the first matching filter will be applied. Filters are applied in the order they are defined.",
+						Optional:            true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"selected_days": schema.ListAttribute{
+									Optional:            true,
+									MarkdownDescription: "Days of the week. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
+									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(DaysOfWeekValidator("Not a valid day of week")),
+									},
+								},
+								"from": schema.StringAttribute{
+									Optional:            true,
+									MarkdownDescription: "From time of the time filter. Format: HH:mm",
+									Validators:          []validator.String{TimeValidator("Not a valid time")},
+								},
+								"until": schema.StringAttribute{
+									Optional:            true,
+									MarkdownDescription: "Until time of the time filter. Format: HH:mm",
+									Validators:          []validator.String{TimeValidator("Not a valid time")},
+								},
+								"snooze_window_in_minutes": schema.Int64Attribute{
+									MarkdownDescription: "The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).",
+									Optional:            true,
+									Validators: []validator.Int64{
+										int64validator.Between(0, 1440),
+									},
+								},
+								"snooze_until_absolute": schema.StringAttribute{
+									MarkdownDescription: "The absolute time to snooze the integration until. Format:HH:mm. Examples: When the incident happens at 01 am in the night, and the snooze until absolute is set to 07:00, the incident will be snoozed until 07:00 the same night. If the incident happens at 14:00, it will be snoozed until 07:00 the next day.",
+									Optional:            true,
+									Validators:          []validator.String{TimeValidator("Not a valid time")},
+								},
+							},
 						},
 					},
 				},
@@ -145,7 +194,7 @@ func (r *Integration) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	mapIntegrationResponseToModel(integrationResponse, &data)
+	mapIntegrationResponseToModel(ctx, integrationResponse, &data)
 
 	tflog.Trace(ctx, "created integration resource")
 
@@ -173,7 +222,7 @@ func (r *Integration) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	mapIntegrationResponseToModel(integrationResponse, &data)
+	mapIntegrationResponseToModel(ctx, integrationResponse, &data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -194,7 +243,7 @@ func (r *Integration) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	mapIntegrationResponseToModel(integrationResponse, &data)
+	mapIntegrationResponseToModel(ctx, integrationResponse, &data)
 
 	tflog.Trace(ctx, "updated integration resource")
 
@@ -226,7 +275,7 @@ func (r *Integration) ImportState(ctx context.Context, req resource.ImportStateR
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapIntegrationResponseToModel(response *integrationResponse, data *IntegrationModel) {
+func mapIntegrationResponseToModel(ctx context.Context, response *integrationResponse, data *IntegrationModel) {
 
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
@@ -235,15 +284,38 @@ func mapIntegrationResponseToModel(response *integrationResponse, data *Integrat
 	data.IsInMaintenance = types.BoolValue(response.IsInMaintenance)
 	data.Type = types.StringValue(response.Type)
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
-	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(response.SnoozeSettings)
+	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
 }
 
-func mapSnoozeSettingsResponseToModel(response *snoozeSettingsResponse) *SnoozeSettingsModel {
+func mapSnoozeSettingsResponseToModel(ctx context.Context, response *snoozeSettingsResponse) *SnoozeSettingsModel {
 	if response == nil {
 		return nil
 	}
 
 	return &SnoozeSettingsModel{
 		SnoozeWindowInMinutes: types.Int64PointerValue(response.SnoozeWindowInMinutes),
+		Filters:               mapSnoozeFiltersResponseToModel(ctx, response.Filters),
+	}
+}
+
+func mapSnoozeFiltersResponseToModel(ctx context.Context, response *[]snoozeFilterResponse) *[]SnoozeFilterModel {
+	if response == nil {
+		return nil
+	}
+
+	filters := make([]SnoozeFilterModel, len(*response))
+	for i, filter := range *response {
+		filters[i] = *mapSnoozeFilterResponseToModel(ctx, &filter)
+	}
+	return &filters
+}
+
+func mapSnoozeFilterResponseToModel(ctx context.Context, response *snoozeFilterResponse) *SnoozeFilterModel {
+	return &SnoozeFilterModel{
+		SelectedDays:          MapNullableList(ctx, response.SelectedDays),
+		From:                  types.StringPointerValue(response.From),
+		Until:                 types.StringPointerValue(response.Until),
+		SnoozeWindowInMinutes: types.Int64PointerValue(response.SnoozeWindowInMinutes),
+		SnoozeUntilAbsolute:   types.StringPointerValue(response.SnoozeUntilAbsolute),
 	}
 }

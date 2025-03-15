@@ -29,7 +29,16 @@ type integrationCreateRequest struct {
 }
 
 type snoozeSettingsResponse struct {
-	SnoozeWindowInMinutes *int64 `json:"snoozeWindowInMinutes"`
+	SnoozeWindowInMinutes *int64                  `json:"snoozeWindowInMinutes"`
+	Filters               *[]snoozeFilterResponse `json:"filters"`
+}
+
+type snoozeFilterResponse struct {
+	SelectedDays          *[]string `json:"selectedDays"`
+	From                  *string   `json:"from"`
+	Until                 *string   `json:"until"`
+	SnoozeWindowInMinutes *int64    `json:"snoozeWindowInMinutes"`
+	SnoozeUntilAbsolute   *string   `json:"snoozeUntilAbsolute"`
 }
 
 func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateRequest {
@@ -50,6 +59,33 @@ func mapSnoozeSettingsCreateRequest(plan *SnoozeSettingsModel) *snoozeSettingsRe
 
 	return &snoozeSettingsResponse{
 		SnoozeWindowInMinutes: plan.SnoozeWindowInMinutes.ValueInt64Pointer(),
+		Filters:               mapSnoozeFiltersCreateRequest(plan.Filters),
+	}
+}
+
+func mapSnoozeFiltersCreateRequest(plan *[]SnoozeFilterModel) *[]snoozeFilterResponse {
+	if plan == nil {
+		return nil
+	}
+
+	filters := make([]snoozeFilterResponse, len(*plan))
+	for i, filter := range *plan {
+		filters[i] = *mapSnoozeFilterCreateRequest(&filter)
+	}
+	return &filters
+}
+
+func mapSnoozeFilterCreateRequest(plan *SnoozeFilterModel) *snoozeFilterResponse {
+	if plan == nil {
+		return nil
+	}
+
+	return &snoozeFilterResponse{
+		SelectedDays:          ListToStringArray(plan.SelectedDays),
+		From:                  plan.From.ValueStringPointer(),
+		Until:                 plan.Until.ValueStringPointer(),
+		SnoozeWindowInMinutes: plan.SnoozeWindowInMinutes.ValueInt64Pointer(),
+		SnoozeUntilAbsolute:   plan.SnoozeUntilAbsolute.ValueStringPointer(),
 	}
 }
 
