@@ -51,6 +51,28 @@ resource "allquiet_integration_mapping" "datadog_custom_mapping" {
           { regex = "\\d+", replace = "$1" },
           { map = "->Open" },
         ]
+      },
+      {
+        name             = "Graph",
+        is_image         = true,
+        hide_in_previews = true,
+        mappings = [
+          { json_path = "$.jsonBody.status.graphUrl" }
+        ]
+      },
+      {
+        name            = "Project",
+        is_grouping_key = true,
+        mappings = [
+          { json_path = "$.jsonBody.project.name" }
+        ]
+      },
+      {
+        name            = "Environment",
+        is_grouping_key = true,
+        mappings = [
+          { json_path = "$.jsonBody.environment.id" }
+        ]
       }
     ]
   }
@@ -79,6 +101,10 @@ Required:
 
 - `attributes` (Attributes List) (see [below for nested schema](#nestedatt--attributes_mapping--attributes))
 
+Optional:
+
+- `grouping_window_in_seconds` (Number) The grouping window in seconds
+
 <a id="nestedatt--attributes_mapping--attributes"></a>
 ### Nested Schema for `attributes_mapping.attributes`
 
@@ -86,6 +112,12 @@ Required:
 
 - `mappings` (Attributes List) The attribute's mappings (see [below for nested schema](#nestedatt--attributes_mapping--attributes--mappings))
 - `name` (String) The name of the attribute
+
+Optional:
+
+- `hide_in_previews` (Boolean) Whether the attribute is hidden in previews
+- `is_grouping_key` (Boolean) Whether the attribute is a grouping key
+- `is_image` (Boolean) Whether the attribute is an image
 
 <a id="nestedatt--attributes_mapping--attributes--mappings"></a>
 ### Nested Schema for `attributes_mapping.attributes.mappings`

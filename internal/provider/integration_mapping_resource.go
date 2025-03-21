@@ -37,11 +37,17 @@ type IntegrationMappingModel struct {
 }
 
 type IntegrationMappingAttributesMappingModel struct {
-	Attributes []IntegrationMappingAttributeModel `tfsdk:"attributes"`
+	Attributes              []IntegrationMappingAttributeModel `tfsdk:"attributes"`
+	GroupingWindowInSeconds types.Int64                        `tfsdk:"grouping_window_in_seconds"`
 }
 
 type IntegrationMappingAttributeModel struct {
-	Name     types.String                     `tfsdk:"name"`
+	Name types.String `tfsdk:"name"`
+
+	IsImage        types.Bool `tfsdk:"is_image"`
+	HideInPreviews types.Bool `tfsdk:"hide_in_previews"`
+	IsGroupingKey  types.Bool `tfsdk:"is_grouping_key"`
+
 	Mappings []IntegrationMappingMappingModel `tfsdk:"mappings"`
 }
 
@@ -81,6 +87,10 @@ func (r *IntegrationMapping) Schema(ctx context.Context, req resource.SchemaRequ
 				Optional:            true,
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
+					"grouping_window_in_seconds": schema.Int64Attribute{
+						MarkdownDescription: "The grouping window in seconds",
+						Optional:            true,
+					},
 					"attributes": schema.ListNestedAttribute{
 						Required: true,
 						NestedObject: schema.NestedAttributeObject{
@@ -88,6 +98,18 @@ func (r *IntegrationMapping) Schema(ctx context.Context, req resource.SchemaRequ
 								"name": schema.StringAttribute{
 									MarkdownDescription: "The name of the attribute",
 									Required:            true,
+								},
+								"is_image": schema.BoolAttribute{
+									MarkdownDescription: "Whether the attribute is an image",
+									Optional:            true,
+								},
+								"hide_in_previews": schema.BoolAttribute{
+									MarkdownDescription: "Whether the attribute is hidden in previews",
+									Optional:            true,
+								},
+								"is_grouping_key": schema.BoolAttribute{
+									MarkdownDescription: "Whether the attribute is a grouping key",
+									Optional:            true,
 								},
 								"mappings": schema.ListNestedAttribute{
 									Required:            true,
@@ -249,11 +271,15 @@ func mapIntegrationMappingResponseToModel(response *integrationMappingResponse, 
 	data.Id = types.StringValue(response.Id)
 	data.IntegrationId = types.StringValue(response.IntegrationId)
 	data.AttributesMapping = &IntegrationMappingAttributesMappingModel{
-		Attributes: make([]IntegrationMappingAttributeModel, len(response.AttributesMapping.Attributes)),
+		GroupingWindowInSeconds: types.Int64PointerValue(response.AttributesMapping.GroupingWindowInSeconds),
+		Attributes:              make([]IntegrationMappingAttributeModel, len(response.AttributesMapping.Attributes)),
 	}
 
 	for i, attribute := range response.AttributesMapping.Attributes {
 		data.AttributesMapping.Attributes[i].Name = types.StringValue(attribute.Name)
+		data.AttributesMapping.Attributes[i].IsImage = types.BoolPointerValue(attribute.IsImage)
+		data.AttributesMapping.Attributes[i].HideInPreviews = types.BoolPointerValue(attribute.HideInPreviews)
+		data.AttributesMapping.Attributes[i].IsGroupingKey = types.BoolPointerValue(attribute.IsGroupingKey)
 
 		data.AttributesMapping.Attributes[i].Mappings = make([]IntegrationMappingMappingModel, len(attribute.Mappings))
 		for j, mapping := range attribute.Mappings {

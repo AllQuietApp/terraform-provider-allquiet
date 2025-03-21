@@ -30,9 +30,9 @@ resource "allquiet_integration" "webhook_snooze_absolute" {
   snooze_settings = {
     filters = [
       {
-        selected_days = ["mon", "tue", "wed", "thu", "fri"]
-        from          = "22:00"
-        until         = "07:00"
+        selected_days         = ["mon", "tue", "wed", "thu", "fri"]
+        from                  = "22:00"
+        until                 = "07:00"
         snooze_until_absolute = "07:00"
       }
     ]

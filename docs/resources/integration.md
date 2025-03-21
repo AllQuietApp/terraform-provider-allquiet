@@ -38,6 +38,23 @@ resource "allquiet_integration" "webhook" {
   }
 }
 
+resource "allquiet_integration" "webhook_snooze_absolute" {
+  display_name = "My Webhook Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Webhook"
+  snooze_settings = {
+    filters = [
+      {
+        selected_days         = ["mon", "tue", "wed", "thu", "fri"]
+        from                  = "22:00"
+        until                 = "07:00"
+        snooze_until_absolute = "07:00"
+      }
+    ]
+  }
+}
+
+
 locals {
   computed_amazon_cloudwatch_webhook_url = allquiet_integration.amazon_cloudwatch.webhook_url
 }
@@ -68,4 +85,16 @@ locals {
 
 Optional:
 
+- `filters` (Attributes List) The snooze filters of the integration. Only the first matching filter will be applied. Filters are applied in the order they are defined. (see [below for nested schema](#nestedatt--snooze_settings--filters))
 - `snooze_window_in_minutes` (Number) The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).
+
+<a id="nestedatt--snooze_settings--filters"></a>
+### Nested Schema for `snooze_settings.filters`
+
+Optional:
+
+- `from` (String) From time of the time filter. Format: HH:mm
+- `selected_days` (List of String) Days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
+- `snooze_until_absolute` (String) The absolute time to snooze the integration until. Format:HH:mm. Examples: When the incident happens at 01 am in the night, and the snooze until absolute is set to 07:00, the incident will be snoozed until 07:00 the same night. If the incident happens at 14:00, it will be snoozed until 07:00 the next day.
+- `snooze_window_in_minutes` (Number) The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).
+- `until` (String) Until time of the time filter. Format: HH:mm

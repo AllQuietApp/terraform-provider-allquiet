@@ -33,6 +33,28 @@ resource "allquiet_integration_mapping" "datadog_custom_mapping" {
           { regex = "\\d+", replace = "$1" },
           { map = "->Open" },
         ]
+      },
+      {
+        name             = "Graph",
+        is_image         = true,
+        hide_in_previews = true,
+        mappings = [
+          { json_path = "$.jsonBody.status.graphUrl" }
+        ]
+      },
+      {
+        name            = "Project",
+        is_grouping_key = true,
+        mappings = [
+          { json_path = "$.jsonBody.project.name" }
+        ]
+      },
+      {
+        name            = "Environment",
+        is_grouping_key = true,
+        mappings = [
+          { json_path = "$.jsonBody.environment.id" }
+        ]
       }
     ]
   }

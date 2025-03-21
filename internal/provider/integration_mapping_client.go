@@ -19,12 +19,16 @@ type integrationMappingCreateRequest struct {
 }
 
 type integrationAttributeMapping struct {
-	Attributes []attribute `json:"attributes"`
+	Attributes              []attribute `json:"attributes"`
+	GroupingWindowInSeconds *int64      `json:"groupingWindowInSeconds"`
 }
 
 type attribute struct {
-	Name     string    `json:"name"`
-	Mappings []mapping `json:"mappings"`
+	Name           string    `json:"name"`
+	IsImage        *bool     `json:"isImage"`
+	HideInPreviews *bool     `json:"hideInPreviews"`
+	IsGroupingKey  *bool     `json:"isGroupingKey"`
+	Mappings       []mapping `json:"mappings"`
 }
 
 type mapping struct {
@@ -61,10 +65,14 @@ func (c *AllQuietAPIClient) CreateIntegrationMappingResource(ctx context.Context
 
 func mapIntegrationMappingCreateRequest(plan *IntegrationMappingModel) *integrationMappingCreateRequest {
 	var req integrationMappingCreateRequest
+	req.AttributesMapping.GroupingWindowInSeconds = plan.AttributesMapping.GroupingWindowInSeconds.ValueInt64Pointer()
 	req.AttributesMapping.Attributes = make([]attribute, len(plan.AttributesMapping.Attributes))
 
 	for i, attribute := range plan.AttributesMapping.Attributes {
 		req.AttributesMapping.Attributes[i].Name = attribute.Name.ValueString()
+		req.AttributesMapping.Attributes[i].IsImage = attribute.IsImage.ValueBoolPointer()
+		req.AttributesMapping.Attributes[i].HideInPreviews = attribute.HideInPreviews.ValueBoolPointer()
+		req.AttributesMapping.Attributes[i].IsGroupingKey = attribute.IsGroupingKey.ValueBoolPointer()
 		req.AttributesMapping.Attributes[i].Mappings = make([]mapping, len(attribute.Mappings))
 
 		for j, m := range attribute.Mappings {
