@@ -69,3 +69,9 @@ Run integration tests
 make testacc
 ```
 
+Run specific tests
+
+```shell
+make testacc TESTARGS='-run=TestAccUserDataSource -count=1'
+```
+

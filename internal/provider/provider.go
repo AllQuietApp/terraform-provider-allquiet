@@ -154,7 +154,10 @@ func (p *AllQuietProvider) Resources(ctx context.Context) []func() resource.Reso
 }
 
 func (p *AllQuietProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		NewUserDataSource,
+		NewTeamDataSource,
+	}
 }
 
 func (p *AllQuietProvider) Functions(ctx context.Context) []func() function.Function {
