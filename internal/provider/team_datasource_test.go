@@ -5,6 +5,8 @@ package provider
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/uuid"
@@ -21,7 +23,23 @@ func TestAccTeamDataSource(t *testing.T) {
 			{
 				Config: testAccTeamDataSourceConfig(teamName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.allquiet_team.test_by_display_name", "display_name", teamName),
+					resource.TestCheckResourceAttr("data.allquiet_team.test", "display_name", teamName),
+				),
+			},
+		},
+	})
+}
+
+func TestAccTeamDataSourceExample(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccTeamDataSourceExample(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.allquiet_team.test", "display_name", "Test Team"),
 				),
 			},
 		},
@@ -35,10 +53,21 @@ func testAccTeamDataSourceConfig(teamName string) string {
 			display_name = %[1]q
 		}
 
-		data "allquiet_team" "test_by_display_name" {
+		data "allquiet_team" "test" {
 			display_name = %[1]q
 			depends_on = [allquiet_team.test]
 		}
 
 	`, teamName)
+}
+
+func testAccTeamDataSourceExample() string {
+	absPath, _ := filepath.Abs("../../examples/data-sources/allquiet_team/data-source.tf")
+
+	dat, err := os.ReadFile(absPath)
+	if err != nil {
+		panic(err)
+	}
+
+	return RandomizeExample(string(dat))
 }

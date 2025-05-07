@@ -36,6 +36,12 @@ resource "allquiet_integration" "webhook" {
   snooze_settings = {
     snooze_window_in_minutes = 1440
   }
+  webhook_authentication = {
+    type = "bearer"
+    bearer = {
+      token = "your_secret_token"
+    }
+  }
 }
 
 resource "allquiet_integration" "webhook_snooze_absolute" {
@@ -74,6 +80,7 @@ locals {
 - `is_in_maintenance` (Boolean) If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `is_muted` (Boolean) If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `snooze_settings` (Attributes) The snooze settings of the integration (see [below for nested schema](#nestedatt--snooze_settings))
+- `webhook_authentication` (Attributes) The webhook authentication of the integration (see [below for nested schema](#nestedatt--webhook_authentication))
 
 ### Read-Only
 
@@ -98,3 +105,23 @@ Optional:
 - `snooze_until_absolute` (String) The absolute time to snooze the integration until. Format:HH:mm. Examples: When the incident happens at 01 am in the night, and the snooze until absolute is set to 07:00, the incident will be snoozed until 07:00 the same night. If the incident happens at 14:00, it will be snoozed until 07:00 the next day.
 - `snooze_window_in_minutes` (Number) The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).
 - `until` (String) Until time of the time filter. Format: HH:mm
+
+
+
+<a id="nestedatt--webhook_authentication"></a>
+### Nested Schema for `webhook_authentication`
+
+Required:
+
+- `type` (String) The type of the webhook authentication. Possible values are: bearer
+
+Optional:
+
+- `bearer` (Attributes) The bearer token of the webhook authentication (see [below for nested schema](#nestedatt--webhook_authentication--bearer))
+
+<a id="nestedatt--webhook_authentication--bearer"></a>
+### Nested Schema for `webhook_authentication.bearer`
+
+Required:
+
+- `token` (String, Sensitive) The token of the webhook authentication

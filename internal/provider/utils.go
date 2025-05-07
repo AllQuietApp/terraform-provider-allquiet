@@ -297,3 +297,9 @@ func HexColorValidator(message string) validator.String {
 }
 
 const OneMonthInSeconds = 2629746
+
+var ValidWebhookAuthenticationTypes = []string{"bearer"}
+
+func WebhookAuthenticationTypeValidator(message string) validator.String {
+	return stringvalidator.OneOf(ValidWebhookAuthenticationTypes...)
+}

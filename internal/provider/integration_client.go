@@ -9,23 +9,34 @@ import (
 )
 
 type integrationResponse struct {
-	Id              string                  `json:"id"`
-	DisplayName     string                  `json:"displayName"`
-	TeamId          string                  `json:"teamId"`
-	IsMuted         bool                    `json:"isMuted"`
-	IsInMaintenance bool                    `json:"isInMaintenance"`
-	Type            string                  `json:"type"`
-	WebhookUrl      *string                 `json:"webhookUrl"`
-	SnoozeSettings  *snoozeSettingsResponse `json:"snoozeSettings"`
+	Id                    string                         `json:"id"`
+	DisplayName           string                         `json:"displayName"`
+	TeamId                string                         `json:"teamId"`
+	IsMuted               bool                           `json:"isMuted"`
+	IsInMaintenance       bool                           `json:"isInMaintenance"`
+	Type                  string                         `json:"type"`
+	WebhookUrl            *string                        `json:"webhookUrl"`
+	SnoozeSettings        *snoozeSettingsResponse        `json:"snoozeSettings"`
+	WebhookAuthentication *webhookAuthenticationResponse `json:"webhookAuthentication"`
 }
 
 type integrationCreateRequest struct {
-	DisplayName     string                  `json:"displayName"`
-	TeamId          string                  `json:"teamId"`
-	IsMuted         bool                    `json:"isMuted"`
-	IsInMaintenance bool                    `json:"isInMaintenance"`
-	Type            string                  `json:"type"`
-	SnoozeSettings  *snoozeSettingsResponse `json:"snoozeSettings"`
+	DisplayName           string                         `json:"displayName"`
+	TeamId                string                         `json:"teamId"`
+	IsMuted               bool                           `json:"isMuted"`
+	IsInMaintenance       bool                           `json:"isInMaintenance"`
+	Type                  string                         `json:"type"`
+	SnoozeSettings        *snoozeSettingsResponse        `json:"snoozeSettings"`
+	WebhookAuthentication *webhookAuthenticationResponse `json:"webhookAuthentication"`
+}
+
+type webhookAuthenticationResponse struct {
+	Type   string                               `json:"type"`
+	Bearer *webhookAuthenticationBearerResponse `json:"bearer"`
+}
+
+type webhookAuthenticationBearerResponse struct {
+	Token string `json:"token"`
 }
 
 type snoozeSettingsResponse struct {
@@ -43,12 +54,34 @@ type snoozeFilterResponse struct {
 
 func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateRequest {
 	return &integrationCreateRequest{
-		DisplayName:     plan.DisplayName.ValueString(),
-		TeamId:          plan.TeamId.ValueString(),
-		IsMuted:         plan.IsMuted.ValueBool(),
-		IsInMaintenance: plan.IsInMaintenance.ValueBool(),
-		Type:            plan.Type.ValueString(),
-		SnoozeSettings:  mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
+		DisplayName:           plan.DisplayName.ValueString(),
+		TeamId:                plan.TeamId.ValueString(),
+		IsMuted:               plan.IsMuted.ValueBool(),
+		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
+		Type:                  plan.Type.ValueString(),
+		SnoozeSettings:        mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
+		WebhookAuthentication: mapWebhookAuthenticationCreateRequest(plan.WebhookAuthentication),
+	}
+}
+
+func mapWebhookAuthenticationCreateRequest(plan *WebhookAuthenticationModel) *webhookAuthenticationResponse {
+	if plan == nil {
+		return nil
+	}
+
+	return &webhookAuthenticationResponse{
+		Type:   plan.Type.ValueString(),
+		Bearer: mapWebhookAuthenticationBearerCreateRequest(plan.Bearer),
+	}
+}
+
+func mapWebhookAuthenticationBearerCreateRequest(plan *BearerModel) *webhookAuthenticationBearerResponse {
+	if plan == nil {
+		return nil
+	}
+
+	return &webhookAuthenticationBearerResponse{
+		Token: plan.Token.ValueString(),
 	}
 }
 

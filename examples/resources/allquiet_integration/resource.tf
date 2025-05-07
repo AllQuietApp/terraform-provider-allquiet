@@ -21,6 +21,12 @@ resource "allquiet_integration" "webhook" {
   snooze_settings = {
     snooze_window_in_minutes = 1440
   }
+  webhook_authentication = {
+    type = "bearer"
+    bearer = {
+      token = "your_secret_token"
+    }
+  }
 }
 
 resource "allquiet_integration" "webhook_snooze_absolute" {

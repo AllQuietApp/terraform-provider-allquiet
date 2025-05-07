@@ -61,6 +61,8 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.0", "sat"),
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.1", "sun"),
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.snooze_window_in_minutes", "10"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "webhook_authentication.type", "bearer"),
+					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "webhook_authentication.bearer.token", "my-token"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -115,23 +117,29 @@ resource "allquiet_integration" "test" {
 }
 
 resource "allquiet_integration" "webhook_snooze_absolute" {
-  display_name = "My Webhook Integration"
-  team_id = allquiet_team.test.id
-  type = "Webhook"
-  snooze_settings = {
-    filters = [
-		{
-			selected_days = ["mon", "tue", "wed", "thu", "fri"]
-			from = "22:00"
-			until = "07:00"
-			snooze_until_absolute = "07:00"
-		},
-		{
-			selected_days = ["sat", "sun"]
-			snooze_window_in_minutes = 10
+	display_name = "My Webhook Integration"
+	team_id = allquiet_team.test.id
+	type = "Webhook"
+	snooze_settings = {
+		filters = [
+			{
+				selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				from = "22:00"
+				until = "07:00"
+				snooze_until_absolute = "07:00"
+			},
+			{
+				selected_days = ["sat", "sun"]
+				snooze_window_in_minutes = 10
+			}
+		]
+	}
+	webhook_authentication = {
+		type = "bearer"
+		bearer = {
+			token = "my-token"
 		}
-	]
-  }
+	}
 }
 
 `, display_name)

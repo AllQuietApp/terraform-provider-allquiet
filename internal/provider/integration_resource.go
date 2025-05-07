@@ -36,14 +36,24 @@ type Integration struct {
 
 // IntegrationModel describes the resource data model.
 type IntegrationModel struct {
-	Id              types.String         `tfsdk:"id"`
-	DisplayName     types.String         `tfsdk:"display_name"`
-	TeamId          types.String         `tfsdk:"team_id"`
-	IsMuted         types.Bool           `tfsdk:"is_muted"`
-	IsInMaintenance types.Bool           `tfsdk:"is_in_maintenance"`
-	Type            types.String         `tfsdk:"type"`
-	WebhookUrl      types.String         `tfsdk:"webhook_url"`
-	SnoozeSettings  *SnoozeSettingsModel `tfsdk:"snooze_settings"`
+	Id                    types.String                `tfsdk:"id"`
+	DisplayName           types.String                `tfsdk:"display_name"`
+	TeamId                types.String                `tfsdk:"team_id"`
+	IsMuted               types.Bool                  `tfsdk:"is_muted"`
+	IsInMaintenance       types.Bool                  `tfsdk:"is_in_maintenance"`
+	Type                  types.String                `tfsdk:"type"`
+	WebhookUrl            types.String                `tfsdk:"webhook_url"`
+	SnoozeSettings        *SnoozeSettingsModel        `tfsdk:"snooze_settings"`
+	WebhookAuthentication *WebhookAuthenticationModel `tfsdk:"webhook_authentication"`
+}
+
+type WebhookAuthenticationModel struct {
+	Type   types.String `tfsdk:"type"`
+	Bearer *BearerModel `tfsdk:"bearer"`
+}
+
+type BearerModel struct {
+	Token types.String `tfsdk:"token"`
 }
 
 type SnoozeSettingsModel struct {
@@ -154,6 +164,28 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 			"webhook_url": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "The webhook url of the integration if it is a webhook-like integration e.g. Amazon CloudWatch",
+			},
+			"webhook_authentication": schema.SingleNestedAttribute{
+				MarkdownDescription: "The webhook authentication of the integration",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"type": schema.StringAttribute{
+						MarkdownDescription: "The type of the webhook authentication. Possible values are: " + strings.Join(ValidWebhookAuthenticationTypes, ", "),
+						Required:            true,
+						Validators:          []validator.String{WebhookAuthenticationTypeValidator("Not a valid webhook authentication type")},
+					},
+					"bearer": schema.SingleNestedAttribute{
+						MarkdownDescription: "The bearer token of the webhook authentication",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"token": schema.StringAttribute{
+								MarkdownDescription: "The token of the webhook authentication",
+								Required:            true,
+								Sensitive:           true,
+							},
+						},
+					},
+				},
 			},
 		},
 	}

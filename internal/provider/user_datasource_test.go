@@ -5,6 +5,8 @@ package provider
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/uuid"
@@ -23,6 +25,23 @@ func TestAccUserDataSource(t *testing.T) {
 				Config: testAccUserDataSourceConfig("Millie Bobby Brown", email),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.allquiet_user.test_by_email", "email", email),
+					resource.TestCheckResourceAttr("data.allquiet_user.test_by_display_name", "display_name", "Millie Bobby Brown"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccUserDataSourceExample(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccUserDataSourceExample(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.allquiet_user.test_by_email", "display_name", "Millie Bobby Brown"),
 					resource.TestCheckResourceAttr("data.allquiet_user.test_by_display_name", "display_name", "Millie Bobby Brown"),
 				),
 			},
@@ -50,4 +69,15 @@ func testAccUserDataSourceConfig(displayName, email string) string {
 		}
 
 	`, displayName, email)
+}
+
+func testAccUserDataSourceExample() string {
+	absPath, _ := filepath.Abs("../../examples/data-sources/allquiet_user/data-source.tf")
+
+	dat, err := os.ReadFile(absPath)
+	if err != nil {
+		panic(err)
+	}
+
+	return RandomizeExample(string(dat))
 }
