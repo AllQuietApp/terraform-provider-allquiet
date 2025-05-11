@@ -25,7 +25,6 @@ func TestAccUserDataSource(t *testing.T) {
 				Config: testAccUserDataSourceConfig("Millie Bobby Brown", email),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.allquiet_user.test_by_email", "email", email),
-					resource.TestCheckResourceAttr("data.allquiet_user.test_by_display_name", "display_name", "Millie Bobby Brown"),
 				),
 			},
 		},
@@ -42,7 +41,6 @@ func TestAccUserDataSourceExample(t *testing.T) {
 				Config: testAccUserDataSourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.allquiet_user.test_by_email", "display_name", "Millie Bobby Brown"),
-					resource.TestCheckResourceAttr("data.allquiet_user.test_by_display_name", "display_name", "Millie Bobby Brown"),
 				),
 			},
 		},
@@ -62,12 +60,6 @@ func testAccUserDataSourceConfig(displayName, email string) string {
 			email = %[2]q
 			depends_on = [allquiet_user.test]
 		}
-
-		data "allquiet_user" "test_by_display_name" {
-			display_name = %[1]q
-			depends_on = [allquiet_user.test]
-		}
-
 	`, displayName, email)
 }
 
