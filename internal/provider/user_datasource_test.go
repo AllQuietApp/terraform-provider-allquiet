@@ -79,5 +79,5 @@ func testAccUserDataSourceExample() string {
 		panic(err)
 	}
 
-	return RandomizeExample(string(dat))
+	return string(dat)
 }

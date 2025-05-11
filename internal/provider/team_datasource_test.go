@@ -39,7 +39,7 @@ func TestAccTeamDataSourceExample(t *testing.T) {
 			{
 				Config: testAccTeamDataSourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.allquiet_team.test", "display_name", "Test Team"),
+					resource.TestCheckResourceAttr("data.allquiet_team.test", "display_name", "(TF Acceptance Test) Team"),
 				),
 			},
 		},
