@@ -1,7 +1,7 @@
 
 # Read a user by email
 data "allquiet_user" "test_by_email" {
-  email      = "acceptance-tests+millie@allquiet.app"
+  email = "acceptance-tests+millie@allquiet.app"
 }
 
 # Read a user by display name

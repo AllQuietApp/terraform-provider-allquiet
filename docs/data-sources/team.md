@@ -13,13 +13,9 @@ Team data source
 ## Example Usage
 
 ```terraform
-resource "allquiet_team" "test" {
-  display_name = "Test Team"
-}
-
+# Read a team by display name
 data "allquiet_team" "test" {
-  display_name = "Test Team"
-  depends_on   = [allquiet_team.test]
+  display_name = "(TF Acceptance Test) Team"
 }
 ```
 
