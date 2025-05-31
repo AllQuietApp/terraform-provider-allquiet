@@ -35,6 +35,13 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.0", "sat"),
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.selected_days.1", "sun"),
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.snooze_window_in_minutes", "10"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.url", "https://example.com"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.method", "GET"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.timeout_in_milliseconds", "1000"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.interval_in_seconds", "60"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.headers.Content-Type", "application/json"),
 				),
 			},
 			// ImportState testing
@@ -63,6 +70,12 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.1.snooze_window_in_minutes", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "webhook_authentication.type", "bearer"),
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "webhook_authentication.bearer.token", "my-token"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.url", "https://example.com"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.method", "GET"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.timeout_in_milliseconds", "1000"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.interval_in_seconds", "60"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -138,6 +151,33 @@ resource "allquiet_integration" "webhook_snooze_absolute" {
 		type = "bearer"
 		bearer = {
 			token = "my-token"
+		}
+	}
+}
+
+	
+resource "allquiet_integration" "http_monitoring" {
+	display_name = "My HTTP Monitoring Integration"
+	team_id = allquiet_team.test.id
+	type = "HttpMonitoring"
+	integration_settings = {
+		http_monitoring = {
+			url = "https://example.com"
+			method = "GET"
+			timeout_in_milliseconds = 1000
+			interval_in_seconds = 60
+			authentication_type = "Bearer"
+			bearer_authentication_token = "my-token"
+			headers = {
+				"Content-Type" = "application/json"
+			}
+			body = "{\"message\": \"Hello, world!\"}"
+			is_paused = false
+			content_test = "Hello, world!"
+			ssl_certificate_max_age_in_days_degraded = 30
+			ssl_certificate_max_age_in_days_down = 10
+			severity_degraded = "Warning"
+			severity_down = "Critical"
 		}
 	}
 }

@@ -157,6 +157,8 @@ func (p *AllQuietProvider) DataSources(ctx context.Context) []func() datasource.
 	return []func() datasource.DataSource{
 		NewUserDataSource,
 		NewTeamDataSource,
+		NewTeamMembershipDataSource,
+		NewTeamMembershipsDataSource,
 	}
 }
 

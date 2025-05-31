@@ -8,10 +8,12 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/AllQuietApp/terraform-provider-internal/internal/provider/validators"
 	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -302,4 +304,38 @@ var ValidWebhookAuthenticationTypes = []string{"bearer"}
 
 func WebhookAuthenticationTypeValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidWebhookAuthenticationTypes...)
+}
+
+var ValidIntervalsInSeconds = []int64{30 * 1, 60 * 1, 60 * 2, 60 * 5, 60 * 10, 60 * 15, 60 * 30, 60 * 60, 60 * 1440}
+var ValidIntervalsInSecondsAsString = convertInt64ArrayToStringArray(ValidIntervalsInSeconds)
+
+func convertInt64ArrayToStringArray(array []int64) []string {
+	result := make([]string, len(array))
+	for i, value := range array {
+		result[i] = strconv.FormatInt(value, 10)
+	}
+	return result
+}
+
+func IntervalInSecondsValidator(message string) validator.Int64 {
+	return int64validator.OneOf(ValidIntervalsInSeconds...)
+}
+
+var ValidHttpMonitoringAuthenticationTypes = []string{"Basic", "Bearer", "None"}
+
+func HttpMonitoringAuthenticationTypeValidator(message string) validator.String {
+	return stringvalidator.OneOf(ValidHttpMonitoringAuthenticationTypes...)
+}
+
+var ValidHttpMonitoringMethods = []string{"HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"}
+
+func HttpMonitoringMethodValidator(message string) validator.String {
+	return stringvalidator.OneOf(ValidHttpMonitoringMethods...)
+}
+
+func AddQueryParam(url string, key string, value string) string {
+	if strings.Contains(url, "?") {
+		return fmt.Sprintf("%s&%s=%s", url, key, value)
+	}
+	return fmt.Sprintf("%s?%s=%s", url, key, value)
 }

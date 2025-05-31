@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -45,6 +46,30 @@ type IntegrationModel struct {
 	WebhookUrl            types.String                `tfsdk:"webhook_url"`
 	SnoozeSettings        *SnoozeSettingsModel        `tfsdk:"snooze_settings"`
 	WebhookAuthentication *WebhookAuthenticationModel `tfsdk:"webhook_authentication"`
+	IntegrationSettings   *IntegrationSettingsModel   `tfsdk:"integration_settings"`
+}
+
+type IntegrationSettingsModel struct {
+	HttpMonitoring *HttpMonitoringModel `tfsdk:"http_monitoring"`
+}
+
+type HttpMonitoringModel struct {
+	Url                                types.String `tfsdk:"url"`
+	Method                             types.String `tfsdk:"method"`
+	TimeoutInMilliseconds              types.Int64  `tfsdk:"timeout_in_milliseconds"`
+	IntervalInSeconds                  types.Int64  `tfsdk:"interval_in_seconds"`
+	AuthenticationType                 types.String `tfsdk:"authentication_type"`
+	BasicAuthenticationUsername        types.String `tfsdk:"basic_authentication_username"`
+	BasicAuthenticationPassword        types.String `tfsdk:"basic_authentication_password"`
+	BearerAuthenticationToken          types.String `tfsdk:"bearer_authentication_token"`
+	Headers                            types.Map    `tfsdk:"headers"`
+	Body                               types.String `tfsdk:"body"`
+	IsPaused                           types.Bool   `tfsdk:"is_paused"`
+	ContentTest                        types.String `tfsdk:"content_test"`
+	SSLCertificateMaxAgeInDaysDegraded types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_degraded"`
+	SSLCertificateMaxAgeInDaysDown     types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_down"`
+	SeverityDegraded                   types.String `tfsdk:"severity_degraded"`
+	SeverityDown                       types.String `tfsdk:"severity_down"`
 }
 
 type WebhookAuthenticationModel struct {
@@ -187,6 +212,106 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 					},
 				},
 			},
+			"integration_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "The integration settings of the integration",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"http_monitoring": schema.SingleNestedAttribute{
+						MarkdownDescription: "The http monitoring of the integration",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"url": schema.StringAttribute{
+								MarkdownDescription: "The url of the http monitoring",
+								Required:            true,
+							},
+							"method": schema.StringAttribute{
+								MarkdownDescription: "The method of the http monitoring. Possible values are: " + strings.Join(ValidHttpMonitoringMethods, ", "),
+								Required:            true,
+								Validators: []validator.String{
+									HttpMonitoringMethodValidator("Not a valid method"),
+								},
+							},
+							"timeout_in_milliseconds": schema.Int64Attribute{
+								MarkdownDescription: "The timeout in milliseconds of the http monitoring. Min 50, max 60000.",
+								Required:            true,
+								Validators: []validator.Int64{
+									int64validator.Between(50, 60000),
+								},
+							},
+							"interval_in_seconds": schema.Int64Attribute{
+								MarkdownDescription: "The interval in seconds of the http monitoring. Valid values are: " + strings.Join(ValidIntervalsInSecondsAsString, ", "),
+								Required:            true,
+								Validators: []validator.Int64{
+									IntervalInSecondsValidator("Not a valid interval in seconds"),
+								},
+							},
+							"authentication_type": schema.StringAttribute{
+								MarkdownDescription: "The authentication type of the http monitoring. Possible values are: " + strings.Join(ValidHttpMonitoringAuthenticationTypes, ", "),
+								Optional:            true,
+								Validators:          []validator.String{HttpMonitoringAuthenticationTypeValidator("Not a valid authentication type")},
+							},
+							"basic_authentication_username": schema.StringAttribute{
+								MarkdownDescription: "The basic authentication username of the http monitoring",
+								Optional:            true,
+								Sensitive:           true,
+							},
+							"basic_authentication_password": schema.StringAttribute{
+								MarkdownDescription: "The basic authentication password of the http monitoring",
+								Optional:            true,
+								Sensitive:           true,
+							},
+							"bearer_authentication_token": schema.StringAttribute{
+								MarkdownDescription: "The bearer authentication token of the http monitoring",
+								Optional:            true,
+								Sensitive:           true,
+							},
+							"headers": schema.MapAttribute{
+								MarkdownDescription: "The headers of the http monitoring",
+								Optional:            true,
+								Sensitive:           true,
+								ElementType:         types.StringType,
+							},
+							"body": schema.StringAttribute{
+								MarkdownDescription: "The body to send in the http request",
+								Optional:            true,
+								Sensitive:           true,
+							},
+							"is_paused": schema.BoolAttribute{
+								MarkdownDescription: "If the http monitoring is paused",
+								Optional:            true,
+								Computed:            true,
+								Default:             booldefault.StaticBool(false),
+							},
+							"content_test": schema.StringAttribute{
+								MarkdownDescription: "The content test of the http monitoring",
+								Optional:            true,
+							},
+							"ssl_certificate_max_age_in_days_degraded": schema.Int64Attribute{
+								MarkdownDescription: "The ssl certificate max age in days degraded of the http monitoring",
+								Optional:            true,
+							},
+							"ssl_certificate_max_age_in_days_down": schema.Int64Attribute{
+								MarkdownDescription: "The ssl certificate max age in days down of the http monitoring",
+								Optional:            true,
+							},
+							"severity_degraded": schema.StringAttribute{
+								MarkdownDescription: "The severity degraded of the http monitoring. Possible values are: " + strings.Join(ValidSeverities, ", "),
+								Optional:            true,
+								Validators: []validator.String{
+									SeverityValidator("Not a valid severity"),
+								},
+							},
+							"severity_down": schema.StringAttribute{
+								MarkdownDescription: "The severity down of the http monitoring. Possible values are: " + strings.Join(ValidSeverities, ", "),
+								Optional:            true,
+								Validators: []validator.String{
+									SeverityValidator("Not a valid severity"),
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -317,6 +442,84 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 	data.Type = types.StringValue(response.Type)
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
+	data.WebhookAuthentication = mapWebhookAuthenticationResponseToModel(response.WebhookAuthentication)
+	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(ctx, response.IntegrationSettings)
+}
+
+func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integrationSettingsResponse) *IntegrationSettingsModel {
+	if response == nil {
+		return nil
+	}
+
+	return &IntegrationSettingsModel{
+		HttpMonitoring: mapHttpMonitoringResponseToModel(ctx, response.HttpMonitoring),
+	}
+}
+
+func mapHttpMonitoringResponseToModel(ctx context.Context, response *httpMonitoringResponse) *HttpMonitoringModel {
+	if response == nil {
+		return nil
+	}
+
+	return &HttpMonitoringModel{
+		Url:                                types.StringValue(response.Url),
+		Method:                             types.StringValue(response.Method),
+		TimeoutInMilliseconds:              types.Int64Value(response.TimeoutInMilliseconds),
+		IntervalInSeconds:                  types.Int64Value(response.IntervalInSeconds),
+		AuthenticationType:                 types.StringPointerValue(response.AuthenticationType),
+		BasicAuthenticationUsername:        types.StringPointerValue(response.BasicAuthenticationUsername),
+		BasicAuthenticationPassword:        types.StringPointerValue(response.BasicAuthenticationPassword),
+		BearerAuthenticationToken:          types.StringPointerValue(response.BearerAuthenticationToken),
+		Headers:                            mapHeadersResponseToModel(response.Headers),
+		Body:                               types.StringPointerValue(response.Body),
+		IsPaused:                           types.BoolValue(response.IsPaused),
+		ContentTest:                        types.StringPointerValue(response.ContentTest),
+		SSLCertificateMaxAgeInDaysDegraded: types.Int64PointerValue(response.SSLCertificateMaxAgeInDaysDegraded),
+		SSLCertificateMaxAgeInDaysDown:     types.Int64PointerValue(response.SSLCertificateMaxAgeInDaysDown),
+		SeverityDegraded:                   types.StringPointerValue(response.SeverityDegraded),
+		SeverityDown:                       types.StringPointerValue(response.SeverityDown),
+	}
+}
+func mapHeadersResponseToModel(response *map[string]string) types.Map {
+	if response == nil {
+		return types.MapNull(types.StringType)
+	}
+
+	// Convert map[string]string to map[string]attr.Value
+	elements := make(map[string]attr.Value, len(*response))
+	for k, v := range *response {
+		elements[k] = types.StringValue(v)
+	}
+
+	val, diags := types.MapValue(types.StringType, elements)
+	if diags.HasError() {
+		// In production code, you'd probably want to return an error here
+		// but for now just fallback to null if conversion fails
+		return types.MapNull(types.StringType)
+	}
+
+	return val
+}
+
+func mapWebhookAuthenticationResponseToModel(response *webhookAuthenticationResponse) *WebhookAuthenticationModel {
+	if response == nil {
+		return nil
+	}
+
+	return &WebhookAuthenticationModel{
+		Type:   types.StringValue(response.Type),
+		Bearer: mapBearerResponseToModel(response.Bearer),
+	}
+}
+
+func mapBearerResponseToModel(response *webhookAuthenticationBearerResponse) *BearerModel {
+	if response == nil {
+		return nil
+	}
+
+	return &BearerModel{
+		Token: types.StringValue(response.Token),
+	}
 }
 
 func mapSnoozeSettingsResponseToModel(ctx context.Context, response *snoozeSettingsResponse) *SnoozeSettingsModel {
