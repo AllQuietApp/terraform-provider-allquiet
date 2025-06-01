@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -333,9 +334,10 @@ func HttpMonitoringMethodValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidHttpMonitoringMethods...)
 }
 
-func AddQueryParam(url string, key string, value string) string {
-	if strings.Contains(url, "?") {
-		return fmt.Sprintf("%s&%s=%s", url, key, value)
+func AddQueryParam(currentUrl string, key string, value string) string {
+
+	if strings.Contains(currentUrl, "?") {
+		return fmt.Sprintf("%s&%s=%s", currentUrl, key, url.QueryEscape(value))
 	}
-	return fmt.Sprintf("%s?%s=%s", url, key, value)
+	return fmt.Sprintf("%s?%s=%s", currentUrl, key, url.QueryEscape(value))
 }

@@ -5,6 +5,8 @@ package provider
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/uuid"
@@ -38,25 +40,6 @@ func TestAccTeamMembershipsDataSource(t *testing.T) {
 		},
 	})
 }
-
-/*
-func TestAccTeamMembershipsDataSourceExample(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
-		Steps: []resource.TestStep{
-			// Create and Read testing
-			{
-				Config: testAccTeamMembershipDataSourceExample(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.allquiet_team_membership.test", "user_id"),
-					resource.TestCheckResourceAttrSet("data.allquiet_team_membership.test", "team_id"),
-					resource.TestCheckResourceAttr("data.allquiet_team_membership.test", "role", "Member"),
-				),
-			},
-		},
-	})
-}*/
 
 func testAccTeamMembershipsDataSourceConfig(displayName, email, displayName2, email2 string) string {
 	return fmt.Sprintf(`
@@ -95,7 +78,21 @@ func testAccTeamMembershipsDataSourceConfig(displayName, email, displayName2, em
 	`, displayName, email, displayName2, email2)
 }
 
-/*
+func TestAccTeamMembershipsDataSourceExample(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccTeamMembershipsDataSourceExample(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.allquiet_team_memberships.memberships_by_team", "team_memberships.#"),
+				),
+			},
+		},
+	})
+}
 
 func testAccTeamMembershipsDataSourceExample() string {
 	absPath, _ := filepath.Abs("../../examples/data-sources/allquiet_team_memberships/data-source.tf")
@@ -107,4 +104,3 @@ func testAccTeamMembershipsDataSourceExample() string {
 
 	return string(dat)
 }
-*/
