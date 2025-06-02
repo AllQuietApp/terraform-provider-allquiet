@@ -11,7 +11,7 @@ resource "allquiet_user" "test2" {
 
 ## Data sources
 data "allquiet_users" "users_by_email" {
-  email = "acceptance-tests+ds"
+  email      = "acceptance-tests+ds"
   depends_on = [allquiet_user.test1, allquiet_user.test2]
 }
 

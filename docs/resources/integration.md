@@ -77,6 +77,7 @@ locals {
 
 ### Optional
 
+- `integration_settings` (Attributes) The integration settings of the integration (see [below for nested schema](#nestedatt--integration_settings))
 - `is_in_maintenance` (Boolean) If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `is_muted` (Boolean) If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `snooze_settings` (Attributes) The snooze settings of the integration (see [below for nested schema](#nestedatt--snooze_settings))
@@ -86,6 +87,40 @@ locals {
 
 - `id` (String) Id
 - `webhook_url` (String) The webhook url of the integration if it is a webhook-like integration e.g. Amazon CloudWatch
+
+<a id="nestedatt--integration_settings"></a>
+### Nested Schema for `integration_settings`
+
+Optional:
+
+- `http_monitoring` (Attributes) The http monitoring of the integration (see [below for nested schema](#nestedatt--integration_settings--http_monitoring))
+
+<a id="nestedatt--integration_settings--http_monitoring"></a>
+### Nested Schema for `integration_settings.http_monitoring`
+
+Required:
+
+- `interval_in_seconds` (Number) The interval in seconds of the http monitoring. Valid values are: 30, 60, 120, 300, 600, 900, 1800, 3600, 86400
+- `method` (String) The method of the http monitoring. Possible values are: HEAD, GET, POST, PUT, PATCH, DELETE
+- `timeout_in_milliseconds` (Number) The timeout in milliseconds of the http monitoring. Min 50, max 60000.
+- `url` (String) The url of the http monitoring
+
+Optional:
+
+- `authentication_type` (String) The authentication type of the http monitoring. Possible values are: Basic, Bearer, None
+- `basic_authentication_password` (String, Sensitive) The basic authentication password of the http monitoring
+- `basic_authentication_username` (String, Sensitive) The basic authentication username of the http monitoring
+- `bearer_authentication_token` (String, Sensitive) The bearer authentication token of the http monitoring
+- `body` (String, Sensitive) The body to send in the http request
+- `content_test` (String) The content test of the http monitoring
+- `headers` (Map of String, Sensitive) The headers of the http monitoring
+- `is_paused` (Boolean) If the http monitoring is paused
+- `severity_degraded` (String) The severity degraded of the http monitoring. Possible values are: Critical, Warning, Minor
+- `severity_down` (String) The severity down of the http monitoring. Possible values are: Critical, Warning, Minor
+- `ssl_certificate_max_age_in_days_degraded` (Number) The ssl certificate max age in days degraded of the http monitoring
+- `ssl_certificate_max_age_in_days_down` (Number) The ssl certificate max age in days down of the http monitoring
+
+
 
 <a id="nestedatt--snooze_settings"></a>
 ### Nested Schema for `snooze_settings`
