@@ -122,7 +122,6 @@ resource "allquiet_status_page" "test_custom_host_settings" {
     host = %[3]q
   }
 }
-
 	`, display_name, slug, host)
 }
 
