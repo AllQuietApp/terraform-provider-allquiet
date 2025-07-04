@@ -79,7 +79,7 @@ type snoozeFilterResponse struct {
 	SnoozeUntilAbsolute   *string   `json:"snoozeUntilAbsolute"`
 }
 
-func mapIntegrationCreateRequest(ctx context.Context, plan *IntegrationModel) *integrationCreateRequest {
+func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateRequest {
 	return &integrationCreateRequest{
 		DisplayName:           plan.DisplayName.ValueString(),
 		TeamId:                plan.TeamId.ValueString(),
@@ -253,7 +253,7 @@ func (c *AllQuietAPIClient) DeleteIntegrationResource(ctx context.Context, id st
 }
 
 func (c *AllQuietAPIClient) UpdateIntegrationResource(ctx context.Context, id string, data *IntegrationModel) (*integrationResponse, error) {
-	reqBody := mapIntegrationCreateRequest(ctx, data)
+	reqBody := mapIntegrationCreateRequest(data)
 
 	url := fmt.Sprintf("/inbound-integration/%s", url.PathEscape(id))
 	httpResp, err := c.put(ctx, url, reqBody)
