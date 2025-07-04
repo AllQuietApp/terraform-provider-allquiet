@@ -14,7 +14,7 @@ type teamMembershipsDataSourceResponse struct {
 
 func (c *AllQuietAPIClient) GetTeamMembershipsDataSource(ctx context.Context, teamMembershipsDataSource *TeamMembershipsDataSourceModel, diagnostics *diag.Diagnostics) (*teamMembershipsDataSourceResponse, error) {
 
-	url := getTeamMembershipsUrl(teamMembershipsDataSource, diagnostics)
+	url := getTeamMembershipsUrl(teamMembershipsDataSource)
 	if url == nil {
 		return nil, nil
 	}
@@ -42,7 +42,7 @@ func (c *AllQuietAPIClient) GetTeamMembershipsDataSource(ctx context.Context, te
 	return &result, nil
 }
 
-func getTeamMembershipsUrl(teamMembershipsDataSource *TeamMembershipsDataSourceModel, diagnostics *diag.Diagnostics) *string {
+func getTeamMembershipsUrl(teamMembershipsDataSource *TeamMembershipsDataSourceModel) *string {
 
 	url := "/team-membership/search/list"
 	if teamMembershipsDataSource.UserId.ValueStringPointer() != nil {
