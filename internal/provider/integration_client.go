@@ -86,23 +86,23 @@ func mapIntegrationCreateRequest(ctx context.Context, plan *IntegrationModel) *i
 		IsMuted:               plan.IsMuted.ValueBool(),
 		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
 		Type:                  plan.Type.ValueString(),
-		SnoozeSettings:        mapSnoozeSettingsCreateRequest(ctx, plan.SnoozeSettings),
+		SnoozeSettings:        mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
 		WebhookAuthentication: mapWebhookAuthenticationCreateRequest(plan.WebhookAuthentication),
-		IntegrationSettings:   mapIntegrationSettingsCreateRequest(ctx, plan.IntegrationSettings),
+		IntegrationSettings:   mapIntegrationSettingsCreateRequest(plan.IntegrationSettings),
 	}
 }
 
-func mapIntegrationSettingsCreateRequest(ctx context.Context, plan *IntegrationSettingsModel) *integrationSettingsResponse {
+func mapIntegrationSettingsCreateRequest(plan *IntegrationSettingsModel) *integrationSettingsResponse {
 	if plan == nil {
 		return nil
 	}
 
 	return &integrationSettingsResponse{
-		HttpMonitoring: mapHttpMonitoringCreateRequest(ctx, plan.HttpMonitoring),
+		HttpMonitoring: mapHttpMonitoringCreateRequest(plan.HttpMonitoring),
 	}
 }
 
-func mapHttpMonitoringCreateRequest(ctx context.Context, plan *HttpMonitoringModel) *httpMonitoringResponse {
+func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringResponse {
 	if plan == nil {
 		return nil
 	}
@@ -168,30 +168,30 @@ func mapWebhookAuthenticationBearerCreateRequest(plan *BearerModel) *webhookAuth
 	}
 }
 
-func mapSnoozeSettingsCreateRequest(ctx context.Context, plan *SnoozeSettingsModel) *snoozeSettingsResponse {
+func mapSnoozeSettingsCreateRequest(plan *SnoozeSettingsModel) *snoozeSettingsResponse {
 	if plan == nil {
 		return nil
 	}
 
 	return &snoozeSettingsResponse{
 		SnoozeWindowInMinutes: plan.SnoozeWindowInMinutes.ValueInt64Pointer(),
-		Filters:               mapSnoozeFiltersCreateRequest(ctx, plan.Filters),
+		Filters:               mapSnoozeFiltersCreateRequest(plan.Filters),
 	}
 }
 
-func mapSnoozeFiltersCreateRequest(ctx context.Context, plan *[]SnoozeFilterModel) *[]snoozeFilterResponse {
+func mapSnoozeFiltersCreateRequest(plan *[]SnoozeFilterModel) *[]snoozeFilterResponse {
 	if plan == nil {
 		return nil
 	}
 
 	filters := make([]snoozeFilterResponse, len(*plan))
 	for i, filter := range *plan {
-		filters[i] = *mapSnoozeFilterCreateRequest(ctx, &filter)
+		filters[i] = *mapSnoozeFilterCreateRequest(&filter)
 	}
 	return &filters
 }
 
-func mapSnoozeFilterCreateRequest(ctx context.Context, plan *SnoozeFilterModel) *snoozeFilterResponse {
+func mapSnoozeFilterCreateRequest(plan *SnoozeFilterModel) *snoozeFilterResponse {
 	if plan == nil {
 		return nil
 	}
@@ -212,9 +212,9 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, plan 
 		IsMuted:               plan.IsMuted.ValueBool(),
 		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
 		Type:                  plan.Type.ValueString(),
-		SnoozeSettings:        mapSnoozeSettingsCreateRequest(ctx, plan.SnoozeSettings),
+		SnoozeSettings:        mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
 		WebhookAuthentication: mapWebhookAuthenticationCreateRequest(plan.WebhookAuthentication),
-		IntegrationSettings:   mapIntegrationSettingsCreateRequest(ctx, plan.IntegrationSettings),
+		IntegrationSettings:   mapIntegrationSettingsCreateRequest(plan.IntegrationSettings),
 	}
 
 	url := "/inbound-integration"

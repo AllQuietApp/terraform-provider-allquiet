@@ -443,20 +443,20 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
 	data.WebhookAuthentication = mapWebhookAuthenticationResponseToModel(response.WebhookAuthentication)
-	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(ctx, response.IntegrationSettings)
+	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(response.IntegrationSettings)
 }
 
-func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integrationSettingsResponse) *IntegrationSettingsModel {
+func mapIntegrationSettingsResponseToModel(response *integrationSettingsResponse) *IntegrationSettingsModel {
 	if response == nil {
 		return nil
 	}
 
 	return &IntegrationSettingsModel{
-		HttpMonitoring: mapHttpMonitoringResponseToModel(ctx, response.HttpMonitoring),
+		HttpMonitoring: mapHttpMonitoringResponseToModel(response.HttpMonitoring),
 	}
 }
 
-func mapHttpMonitoringResponseToModel(ctx context.Context, response *httpMonitoringResponse) *HttpMonitoringModel {
+func mapHttpMonitoringResponseToModel(response *httpMonitoringResponse) *HttpMonitoringModel {
 	if response == nil {
 		return nil
 	}

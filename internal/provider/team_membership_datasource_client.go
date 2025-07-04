@@ -20,7 +20,7 @@ type teamMembershipDataSourceResponse struct {
 
 func (c *AllQuietAPIClient) GetTeamMembershipDataSource(ctx context.Context, teamMembershipDataSource *TeamMembershipDataSourceModel, diagnostics *diag.Diagnostics) (*teamMembershipDataSourceResponse, error) {
 
-	url := getTeamMembershipUrl(teamMembershipDataSource, diagnostics)
+	url := getTeamMembershipUrl(teamMembershipDataSource)
 	if url == nil {
 		return nil, nil
 	}
@@ -48,7 +48,7 @@ func (c *AllQuietAPIClient) GetTeamMembershipDataSource(ctx context.Context, tea
 	return &result, nil
 }
 
-func getTeamMembershipUrl(teamMembershipDataSource *TeamMembershipDataSourceModel, diagnostics *diag.Diagnostics) *string {
+func getTeamMembershipUrl(teamMembershipDataSource *TeamMembershipDataSourceModel) *string {
 
 	if teamMembershipDataSource.Id.ValueStringPointer() != nil {
 		url := fmt.Sprintf("/team-membership/%s", url.PathEscape(teamMembershipDataSource.Id.ValueString()))
