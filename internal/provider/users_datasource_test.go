@@ -15,7 +15,7 @@ import (
 
 func TestAccUsersDataSource(t *testing.T) {
 	uid := uuid.New().String()
-	emailPrefix := fmt.Sprintf("acceptance-tests+millie+%s", uid)
+	emailPrefix := fmt.Sprintf("acceptance-tests+millie+ds+%s", uid)
 	displayName := fmt.Sprintf("Millie Bobby Brown %s", uid)
 
 	resource.Test(t, resource.TestCase{
@@ -84,5 +84,6 @@ func testAccUsersDataSourceExample() string {
 		panic(err)
 	}
 
-	return string(dat)
+	example := string(dat)
+	return RandomizeExample(example)
 }

@@ -134,5 +134,10 @@ func testAccStatusPageResourceExample() string {
 		panic(err)
 	}
 
-	return strings.Replace(RandomizeExample(string(dat)), "public-status-page-test", "public-status-page-test"+uuid.New().String(), -1)
+	return strings.Replace(
+		strings.Replace(RandomizeExample(string(dat)), "public-status-page-test", "public-status-page-test"+uuid.New().String(), -1),
+		"status-page-test-resource.allquiet.com",
+		"status-page-test-resource-"+uuid.New().String()+".allquiet.com",
+		-1,
+	)
 }
