@@ -33,26 +33,31 @@ type StatusPage struct {
 
 // StatusPageModel describes the resource data model.
 type StatusPageModel struct {
-	Id                            types.String `tfsdk:"id"`
-	DisplayName                   types.String `tfsdk:"display_name"`
-	PublicTitle                   types.String `tfsdk:"public_title"`
-	PublicDescription             types.String `tfsdk:"public_description"`
-	Slug                          types.String `tfsdk:"slug"`
-	Services                      types.List   `tfsdk:"services"`
-	PublicCompanyUrl              types.String `tfsdk:"public_company_url"`
-	PublicCompanyName             types.String `tfsdk:"public_company_name"`
-	PublicSupportUrl              types.String `tfsdk:"public_support_url"`
-	PublicSupportEmail            types.String `tfsdk:"public_support_email"`
-	HistoryInDays                 types.Int64  `tfsdk:"history_in_days"`
-	TimeZoneId                    types.String `tfsdk:"time_zone_id"`
-	DisablePublicSubscription     types.Bool   `tfsdk:"disable_public_subscription"`
-	PublicSeverityMappingMinor    types.String `tfsdk:"public_severity_mapping_minor"`
-	PublicSeverityMappingWarning  types.String `tfsdk:"public_severity_mapping_warning"`
-	PublicSeverityMappingCritical types.String `tfsdk:"public_severity_mapping_critical"`
-	BannerBackgroundColor         types.String `tfsdk:"banner_background_color"`
-	BannerBackgroundColorDarkMode types.String `tfsdk:"banner_background_color_dark_mode"`
-	BannerTextColor               types.String `tfsdk:"banner_text_color"`
-	BannerTextColorDarkMode       types.String `tfsdk:"banner_text_color_dark_mode"`
+	Id                            types.String        `tfsdk:"id"`
+	DisplayName                   types.String        `tfsdk:"display_name"`
+	PublicTitle                   types.String        `tfsdk:"public_title"`
+	PublicDescription             types.String        `tfsdk:"public_description"`
+	Slug                          types.String        `tfsdk:"slug"`
+	Services                      types.List          `tfsdk:"services"`
+	PublicCompanyUrl              types.String        `tfsdk:"public_company_url"`
+	PublicCompanyName             types.String        `tfsdk:"public_company_name"`
+	PublicSupportUrl              types.String        `tfsdk:"public_support_url"`
+	PublicSupportEmail            types.String        `tfsdk:"public_support_email"`
+	HistoryInDays                 types.Int64         `tfsdk:"history_in_days"`
+	TimeZoneId                    types.String        `tfsdk:"time_zone_id"`
+	DisablePublicSubscription     types.Bool          `tfsdk:"disable_public_subscription"`
+	PublicSeverityMappingMinor    types.String        `tfsdk:"public_severity_mapping_minor"`
+	PublicSeverityMappingWarning  types.String        `tfsdk:"public_severity_mapping_warning"`
+	PublicSeverityMappingCritical types.String        `tfsdk:"public_severity_mapping_critical"`
+	BannerBackgroundColor         types.String        `tfsdk:"banner_background_color"`
+	BannerBackgroundColorDarkMode types.String        `tfsdk:"banner_background_color_dark_mode"`
+	BannerTextColor               types.String        `tfsdk:"banner_text_color"`
+	BannerTextColorDarkMode       types.String        `tfsdk:"banner_text_color_dark_mode"`
+	CustomHostSettings            *CustomHostSettings `tfsdk:"custom_host_settings"`
+}
+
+type CustomHostSettings struct {
+	Host types.String `tfsdk:"host"`
 }
 
 func (r *StatusPage) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -85,8 +90,18 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 				Optional:            true,
 			},
 			"slug": schema.StringAttribute{
-				MarkdownDescription: "The slug of the status page",
-				Required:            true,
+				MarkdownDescription: "The slug of the status page. Provide slug or custom host settings.",
+				Optional:            true,
+			},
+			"custom_host_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "The custom host settings of the status page (CNAME). Provide slug or custom host settings.",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"host": schema.StringAttribute{
+						MarkdownDescription: "The host of the status page",
+						Required:            true,
+					},
+				},
 			},
 			"services": schema.ListAttribute{
 				Optional:            true,
@@ -306,4 +321,15 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.BannerBackgroundColorDarkMode = types.StringPointerValue(response.BannerBackgroundColorDarkMode)
 	data.BannerTextColor = types.StringPointerValue(response.BannerTextColor)
 	data.BannerTextColorDarkMode = types.StringPointerValue(response.BannerTextColorDarkMode)
+	data.CustomHostSettings = mapCustomHostSettingsResponseToModel(response.CustomHostSettings)
+}
+
+func mapCustomHostSettingsResponseToModel(response *customHostSettingsResponse) *CustomHostSettings {
+	if response == nil {
+		return nil
+	}
+
+	return &CustomHostSettings{
+		Host: types.StringValue(response.Host),
+	}
 }

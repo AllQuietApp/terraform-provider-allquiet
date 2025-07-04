@@ -29,28 +29,38 @@ type statusPageResponse struct {
 	BannerBackgroundColorDarkMode *string
 	BannerTextColor               *string
 	BannerTextColorDarkMode       *string
+	CustomHostSettings            *customHostSettingsResponse
+}
+
+type customHostSettingsResponse struct {
+	Host string `json:"host"`
 }
 
 type statusPageCreateRequest struct {
-	DisplayName                   string    `json:"displayName"`
-	PublicTitle                   string    `json:"publicTitle"`
-	PublicDescription             *string   `json:"publicDescription"`
-	Slug                          *string   `json:"slug"`
-	ServiceIds                    *[]string `json:"serviceIds"`
-	PublicCompanyUrl              *string   `json:"publicCompanyUrl"`
-	PublicCompanyName             *string   `json:"publicCompanyName"`
-	PublicSupportUrl              *string   `json:"publicSupportUrl"`
-	PublicSupportEmail            *string   `json:"publicSupportEmail"`
-	HistoryInDays                 int64     `json:"historyInDays"`
-	TimeZoneId                    *string   `json:"timeZoneId"`
-	DisablePublicSubscription     bool      `json:"disablePublicSubscription"`
-	PublicSeverityMappingMinor    *string   `json:"publicSeverityMappingMinor"`
-	PublicSeverityMappingWarning  *string   `json:"publicSeverityMappingWarning"`
-	PublicSeverityMappingCritical *string   `json:"publicSeverityMappingCritical"`
-	BannerBackgroundColor         *string   `json:"bannerBackgroundColor"`
-	BannerBackgroundColorDarkMode *string   `json:"bannerBackgroundColorDarkMode"`
-	BannerTextColor               *string   `json:"bannerTextColor"`
-	BannerTextColorDarkMode       *string   `json:"bannerTextColorDarkMode"`
+	DisplayName                   string                     `json:"displayName"`
+	PublicTitle                   string                     `json:"publicTitle"`
+	PublicDescription             *string                    `json:"publicDescription"`
+	Slug                          *string                    `json:"slug"`
+	ServiceIds                    *[]string                  `json:"serviceIds"`
+	PublicCompanyUrl              *string                    `json:"publicCompanyUrl"`
+	PublicCompanyName             *string                    `json:"publicCompanyName"`
+	PublicSupportUrl              *string                    `json:"publicSupportUrl"`
+	PublicSupportEmail            *string                    `json:"publicSupportEmail"`
+	HistoryInDays                 int64                      `json:"historyInDays"`
+	TimeZoneId                    *string                    `json:"timeZoneId"`
+	DisablePublicSubscription     bool                       `json:"disablePublicSubscription"`
+	PublicSeverityMappingMinor    *string                    `json:"publicSeverityMappingMinor"`
+	PublicSeverityMappingWarning  *string                    `json:"publicSeverityMappingWarning"`
+	PublicSeverityMappingCritical *string                    `json:"publicSeverityMappingCritical"`
+	BannerBackgroundColor         *string                    `json:"bannerBackgroundColor"`
+	BannerBackgroundColorDarkMode *string                    `json:"bannerBackgroundColorDarkMode"`
+	BannerTextColor               *string                    `json:"bannerTextColor"`
+	BannerTextColorDarkMode       *string                    `json:"bannerTextColorDarkMode"`
+	CustomHostSettings            *customHostSettingsRequest `json:"customHostSettings"`
+}
+
+type customHostSettingsRequest struct {
+	Host string `json:"host"`
 }
 
 func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest {
@@ -74,6 +84,17 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		BannerBackgroundColorDarkMode: plan.BannerBackgroundColorDarkMode.ValueStringPointer(),
 		BannerTextColor:               plan.BannerTextColor.ValueStringPointer(),
 		BannerTextColorDarkMode:       plan.BannerTextColorDarkMode.ValueStringPointer(),
+		CustomHostSettings:            mapCustomHostSettingsRequestToModel(plan.CustomHostSettings),
+	}
+}
+
+func mapCustomHostSettingsRequestToModel(request *CustomHostSettings) *customHostSettingsRequest {
+	if request == nil {
+		return nil
+	}
+
+	return &customHostSettingsRequest{
+		Host: request.Host.ValueString(),
 	}
 }
 
