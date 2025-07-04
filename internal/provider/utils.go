@@ -184,7 +184,7 @@ var logErrorRequest = false
 func logErrorResponse(resp *http.Response, req interface{}) error {
 	err := fmt.Errorf("%s %s: %d", resp.Request.Method, resp.Request.URL.RequestURI(), resp.StatusCode)
 
-	if resp.StatusCode == 400 {
+	if resp.StatusCode == 400 || resp.StatusCode == 401 || resp.StatusCode == 403 {
 		data, _ := io.ReadAll(resp.Body)
 
 		errDecode, errBadRequest := handleBadRequestResponse(data)
@@ -192,7 +192,7 @@ func logErrorResponse(resp *http.Response, req interface{}) error {
 			errDecode, errBadRequest = handleBadRequestResultResponse(data)
 
 			if errDecode != nil {
-				err = fmt.Errorf("%s\ncould not decode 400 response: %s", err, errDecode)
+				err = fmt.Errorf("%s\ncould not decode %d response: %s", err, resp.StatusCode, errDecode)
 			}
 		}
 
