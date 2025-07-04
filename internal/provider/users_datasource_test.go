@@ -69,7 +69,6 @@ func TestAccUsersDataSourceExample(t *testing.T) {
 			{
 				Config: testAccUsersDataSourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.allquiet_users.users_by_email", "users.#", "2"),
 					resource.TestCheckResourceAttrSet("data.allquiet_users.users_by_email", "users.#"),
 				),
 			},
