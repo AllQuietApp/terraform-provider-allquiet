@@ -50,7 +50,9 @@ type IntegrationModel struct {
 }
 
 type IntegrationSettingsModel struct {
-	HttpMonitoring *HttpMonitoringModel `tfsdk:"http_monitoring"`
+	HttpMonitoring   *HttpMonitoringModel   `tfsdk:"http_monitoring"`
+	HeartbeatMonitor *HeartbeatMonitorModel `tfsdk:"heartbeat_monitor"`
+	CronjobMonitor   *CronjobMonitorModel   `tfsdk:"cronjob_monitor"`
 }
 
 type HttpMonitoringModel struct {
@@ -70,6 +72,19 @@ type HttpMonitoringModel struct {
 	SSLCertificateMaxAgeInDaysDown     types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_down"`
 	SeverityDegraded                   types.String `tfsdk:"severity_degraded"`
 	SeverityDown                       types.String `tfsdk:"severity_down"`
+}
+
+type HeartbeatMonitorModel struct {
+	IntervalInSec    types.Int64  `tfsdk:"interval_in_sec"`
+	GracePeriodInSec types.Int64  `tfsdk:"grace_period_in_sec"`
+	Severity         types.String `tfsdk:"severity"`
+}
+
+type CronjobMonitorModel struct {
+	CronExpression   types.String `tfsdk:"cron_expression"`
+	GracePeriodInSec types.Int64  `tfsdk:"grace_period_in_sec"`
+	Severity         types.String `tfsdk:"severity"`
+	TimeZoneId       types.String `tfsdk:"time_zone_id"`
 }
 
 type WebhookAuthenticationModel struct {
@@ -310,6 +325,52 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 							},
 						},
 					},
+					"heartbeat_monitor": schema.SingleNestedAttribute{
+						MarkdownDescription: "The heartbeat monitor of the integration",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"interval_in_sec": schema.Int64Attribute{
+								MarkdownDescription: "The interval in seconds of the heartbeat monitor",
+								Required:            true,
+							},
+							"grace_period_in_sec": schema.Int64Attribute{
+								MarkdownDescription: "The grace period in seconds of the heartbeat monitor",
+								Required:            true,
+							},
+							"severity": schema.StringAttribute{
+								MarkdownDescription: "The severity of the heartbeat monitor. Possible values are: " + strings.Join(ValidSeverities, ", "),
+								Required:            true,
+								Validators: []validator.String{
+									SeverityValidator("Not a valid severity"),
+								},
+							},
+						},
+					},
+					"cronjob_monitor": schema.SingleNestedAttribute{
+						MarkdownDescription: "The cronjob monitor of the integration",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"cron_expression": schema.StringAttribute{
+								MarkdownDescription: "The cron expression of the cronjob monitor",
+								Required:            true,
+							},
+							"grace_period_in_sec": schema.Int64Attribute{
+								MarkdownDescription: "The grace period in seconds of the cronjob monitor",
+								Required:            true,
+							},
+							"severity": schema.StringAttribute{
+								MarkdownDescription: "The severity of the cronjob monitor. Possible values are: " + strings.Join(ValidSeverities, ", "),
+								Required:            true,
+								Validators: []validator.String{
+									SeverityValidator("Not a valid severity"),
+								},
+							},
+							"time_zone_id": schema.StringAttribute{
+								MarkdownDescription: "The time zone id of the cronjob monitor. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)",
+								Optional:            true,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -452,7 +513,35 @@ func mapIntegrationSettingsResponseToModel(response *integrationSettingsResponse
 	}
 
 	return &IntegrationSettingsModel{
-		HttpMonitoring: mapHttpMonitoringResponseToModel(response.HttpMonitoring),
+		HttpMonitoring:   mapHttpMonitoringResponseToModel(response.HttpMonitoring),
+		HeartbeatMonitor: mapHeartbeatMonitorResponseToModel(response.HeartbeatMonitor),
+		CronjobMonitor:   mapCronjobMonitorResponseToModel(response.CronjobMonitor),
+	}
+}
+
+func mapHeartbeatMonitorResponseToModel(response *heartbeatMonitorResponse) *HeartbeatMonitorModel {
+	if response == nil {
+		return nil
+	}
+
+	return &HeartbeatMonitorModel{
+		IntervalInSec:    types.Int64Value(response.IntervalInSec),
+		GracePeriodInSec: types.Int64Value(response.GracePeriodInSec),
+		Severity:         types.StringValue(response.Severity),
+	}
+}
+
+func mapCronjobMonitorResponseToModel(response *cronjobMonitorResponse) *CronjobMonitorModel {
+
+	if response == nil {
+		return nil
+	}
+
+	return &CronjobMonitorModel{
+		CronExpression:   types.StringValue(response.CronExpression),
+		GracePeriodInSec: types.Int64Value(response.GracePeriodInSec),
+		Severity:         types.StringValue(response.Severity),
+		TimeZoneId:       types.StringPointerValue(response.TimeZoneId),
 	}
 }
 

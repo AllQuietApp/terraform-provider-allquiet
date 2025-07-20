@@ -42,6 +42,12 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.headers.Content-Type", "application/json"),
+					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.interval_in_sec", "60"),
+					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.grace_period_in_sec", "10"),
+					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.severity", "Warning"),
+					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.cron_expression", "0 0 * * *"),
+					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.grace_period_in_sec", "10"),
+					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
 				),
 			},
 			// ImportState testing
@@ -76,6 +82,12 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.interval_in_seconds", "60"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
+					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.interval_in_sec", "60"),
+					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.grace_period_in_sec", "10"),
+					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.severity", "Warning"),
+					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.cron_expression", "0 0 * * *"),
+					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.grace_period_in_sec", "10"),
+					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -181,6 +193,34 @@ resource "allquiet_integration" "http_monitoring" {
 		}
 	}
 }
+	
+resource "allquiet_integration" "heartbeat_monitor" {
+	display_name = "My Heartbeat Monitoring Integration"
+	team_id = allquiet_team.test.id
+	type = "HeartbeatMonitor"
+	integration_settings = {
+		heartbeat_monitor = {
+			interval_in_sec = 60
+			grace_period_in_sec = 10
+			severity = "Warning"
+		}
+	}
+}
+	
+resource "allquiet_integration" "cronjob_monitor" {
+	display_name = "My Cronjob Monitoring Integration"
+	team_id = allquiet_team.test.id
+	type = "CronJobMonitor"
+	integration_settings = {
+		cronjob_monitor = {
+			cron_expression = "0 0 * * *"
+			grace_period_in_sec = 10
+			severity = "Critical"
+			time_zone_id = "Europe/Amsterdam"
+		}
+	}
+}
+
 
 `, display_name)
 

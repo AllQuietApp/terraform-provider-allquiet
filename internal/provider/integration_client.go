@@ -44,7 +44,22 @@ type webhookAuthenticationBearerResponse struct {
 }
 
 type integrationSettingsResponse struct {
-	HttpMonitoring *httpMonitoringResponse `json:"httpMonitoring"`
+	HttpMonitoring   *httpMonitoringResponse   `json:"httpMonitoring"`
+	HeartbeatMonitor *heartbeatMonitorResponse `json:"heartbeatMonitor"`
+	CronjobMonitor   *cronjobMonitorResponse   `json:"cronjobMonitor"`
+}
+
+type heartbeatMonitorResponse struct {
+	IntervalInSec    int64  `json:"intervalInSec"`
+	GracePeriodInSec int64  `json:"gracePeriodInSec"`
+	Severity         string `json:"severity"`
+}
+
+type cronjobMonitorResponse struct {
+	CronExpression   string  `json:"cronExpression"`
+	GracePeriodInSec int64   `json:"gracePeriodInSec"`
+	Severity         string  `json:"severity"`
+	TimeZoneId       *string `json:"timeZoneId"`
 }
 
 type httpMonitoringResponse struct {
@@ -98,7 +113,36 @@ func mapIntegrationSettingsCreateRequest(plan *IntegrationSettingsModel) *integr
 	}
 
 	return &integrationSettingsResponse{
-		HttpMonitoring: mapHttpMonitoringCreateRequest(plan.HttpMonitoring),
+		HttpMonitoring:   mapHttpMonitoringCreateRequest(plan.HttpMonitoring),
+		HeartbeatMonitor: mapHeartbeatMonitorCreateRequest(plan.HeartbeatMonitor),
+		CronjobMonitor:   mapCronjobMonitorCreateRequest(plan.CronjobMonitor),
+	}
+}
+
+func mapHeartbeatMonitorCreateRequest(plan *HeartbeatMonitorModel) *heartbeatMonitorResponse {
+
+	if plan == nil {
+		return nil
+	}
+
+	return &heartbeatMonitorResponse{
+		IntervalInSec:    plan.IntervalInSec.ValueInt64(),
+		GracePeriodInSec: plan.GracePeriodInSec.ValueInt64(),
+		Severity:         plan.Severity.ValueString(),
+	}
+}
+
+func mapCronjobMonitorCreateRequest(plan *CronjobMonitorModel) *cronjobMonitorResponse {
+
+	if plan == nil {
+		return nil
+	}
+
+	return &cronjobMonitorResponse{
+		CronExpression:   plan.CronExpression.ValueString(),
+		GracePeriodInSec: plan.GracePeriodInSec.ValueInt64(),
+		Severity:         plan.Severity.ValueString(),
+		TimeZoneId:       plan.TimeZoneId.ValueStringPointer(),
 	}
 }
 
