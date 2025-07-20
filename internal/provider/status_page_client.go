@@ -30,33 +30,49 @@ type statusPageResponse struct {
 	BannerTextColor               *string
 	BannerTextColorDarkMode       *string
 	CustomHostSettings            *customHostSettingsResponse
+	ServiceGroups                 *[]statusPageServiceGroupResponse
+}
+
+type statusPageServiceGroupResponse struct {
+	Id                string
+	PublicDisplayName string
+	PublicDescription *string
+	ServiceIds        *[]string
 }
 
 type customHostSettingsResponse struct {
 	Host string `json:"host"`
 }
 
+type statusPageServiceGroupRequest struct {
+	Id                *string   `json:"id"`
+	PublicDisplayName string    `json:"publicDisplayName"`
+	PublicDescription *string   `json:"publicDescription"`
+	ServiceIds        *[]string `json:"serviceIds"`
+}
+
 type statusPageCreateRequest struct {
-	DisplayName                   string                     `json:"displayName"`
-	PublicTitle                   string                     `json:"publicTitle"`
-	PublicDescription             *string                    `json:"publicDescription"`
-	Slug                          *string                    `json:"slug"`
-	ServiceIds                    *[]string                  `json:"serviceIds"`
-	PublicCompanyUrl              *string                    `json:"publicCompanyUrl"`
-	PublicCompanyName             *string                    `json:"publicCompanyName"`
-	PublicSupportUrl              *string                    `json:"publicSupportUrl"`
-	PublicSupportEmail            *string                    `json:"publicSupportEmail"`
-	HistoryInDays                 int64                      `json:"historyInDays"`
-	TimeZoneId                    *string                    `json:"timeZoneId"`
-	DisablePublicSubscription     bool                       `json:"disablePublicSubscription"`
-	PublicSeverityMappingMinor    *string                    `json:"publicSeverityMappingMinor"`
-	PublicSeverityMappingWarning  *string                    `json:"publicSeverityMappingWarning"`
-	PublicSeverityMappingCritical *string                    `json:"publicSeverityMappingCritical"`
-	BannerBackgroundColor         *string                    `json:"bannerBackgroundColor"`
-	BannerBackgroundColorDarkMode *string                    `json:"bannerBackgroundColorDarkMode"`
-	BannerTextColor               *string                    `json:"bannerTextColor"`
-	BannerTextColorDarkMode       *string                    `json:"bannerTextColorDarkMode"`
-	CustomHostSettings            *customHostSettingsRequest `json:"customHostSettings"`
+	DisplayName                   string                           `json:"displayName"`
+	PublicTitle                   string                           `json:"publicTitle"`
+	PublicDescription             *string                          `json:"publicDescription"`
+	Slug                          *string                          `json:"slug"`
+	ServiceIds                    *[]string                        `json:"serviceIds"`
+	PublicCompanyUrl              *string                          `json:"publicCompanyUrl"`
+	PublicCompanyName             *string                          `json:"publicCompanyName"`
+	PublicSupportUrl              *string                          `json:"publicSupportUrl"`
+	PublicSupportEmail            *string                          `json:"publicSupportEmail"`
+	HistoryInDays                 int64                            `json:"historyInDays"`
+	TimeZoneId                    *string                          `json:"timeZoneId"`
+	DisablePublicSubscription     bool                             `json:"disablePublicSubscription"`
+	PublicSeverityMappingMinor    *string                          `json:"publicSeverityMappingMinor"`
+	PublicSeverityMappingWarning  *string                          `json:"publicSeverityMappingWarning"`
+	PublicSeverityMappingCritical *string                          `json:"publicSeverityMappingCritical"`
+	BannerBackgroundColor         *string                          `json:"bannerBackgroundColor"`
+	BannerBackgroundColorDarkMode *string                          `json:"bannerBackgroundColorDarkMode"`
+	BannerTextColor               *string                          `json:"bannerTextColor"`
+	BannerTextColorDarkMode       *string                          `json:"bannerTextColorDarkMode"`
+	CustomHostSettings            *customHostSettingsRequest       `json:"customHostSettings"`
+	ServiceGroups                 *[]statusPageServiceGroupRequest `json:"serviceGroups"`
 }
 
 type customHostSettingsRequest struct {
@@ -85,7 +101,32 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		BannerTextColor:               plan.BannerTextColor.ValueStringPointer(),
 		BannerTextColorDarkMode:       plan.BannerTextColorDarkMode.ValueStringPointer(),
 		CustomHostSettings:            mapCustomHostSettingsRequestToModel(plan.CustomHostSettings),
+		ServiceGroups:                 mapStatusPageServiceGroupsRequestToModel(plan.ServiceGroups),
 	}
+}
+
+func mapStatusPageServiceGroupsRequestToModel(plan *[]StatusPageServiceGroupModel) *[]statusPageServiceGroupRequest {
+
+	if plan == nil {
+		return nil
+	}
+
+	serviceGroups := make([]statusPageServiceGroupRequest, len(*plan))
+	for i, serviceGroup := range *plan {
+		// Only include ID if it's not empty and not unknown
+		var id *string
+		if !serviceGroup.Id.IsNull() && !serviceGroup.Id.IsUnknown() && serviceGroup.Id.ValueString() != "" {
+			id = serviceGroup.Id.ValueStringPointer()
+		}
+
+		serviceGroups[i] = statusPageServiceGroupRequest{
+			Id:                id,
+			PublicDisplayName: serviceGroup.PublicDisplayName.ValueString(),
+			PublicDescription: serviceGroup.PublicDescription.ValueStringPointer(),
+			ServiceIds:        ListToStringArray(serviceGroup.Services),
+		}
+	}
+	return &serviceGroups
 }
 
 func mapCustomHostSettingsRequestToModel(request *CustomHostSettings) *customHostSettingsRequest {

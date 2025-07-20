@@ -14,10 +14,23 @@ The `status_page` resource represents a status page in All Quiet.
 
 ```terraform
 resource "allquiet_service" "payment_api" {
-  display_name       = "Payment API"
-  public_title       = "Payment API"
-  public_description = "Payment APIs and integrations"
+  display_name       = "Payment Provider"
+  public_title       = "Payment Provider"
+  public_description = "Payment Provider and integrations"
 }
+
+resource "allquiet_service" "chat_gpt" {
+  display_name       = "Chat GPT"
+  public_title       = "Chat GPT"
+  public_description = "Chat GPT and integrations"
+}
+
+resource "allquiet_service" "shipping_api" {
+  display_name       = "Shipping API"
+  public_title       = "Shipping API"
+  public_description = "Shipping APIs and integrations"
+}
+
 
 resource "allquiet_status_page" "public_status_page" {
   slug                              = "public-status-page-test"
@@ -39,8 +52,22 @@ resource "allquiet_status_page" "public_status_page" {
   banner_text_color_dark_mode       = "#ffffff"
 
   time_zone_id = "Europe/Amsterdam"
-  services = [
-    allquiet_service.payment_api.id
+  service_groups = [
+    {
+      public_display_name = "External Services"
+      public_description  = "External services and integrations"
+      services = [
+        allquiet_service.payment_api.id,
+        allquiet_service.chat_gpt.id
+      ]
+    },
+    {
+      public_display_name = "Internal Services"
+      public_description  = "Internal services and integrations"
+      services = [
+        allquiet_service.shipping_api.id
+      ]
+    }
   ]
 }
 
@@ -68,8 +95,22 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
   banner_text_color_dark_mode       = "#ffffff"
 
   time_zone_id = "Europe/Amsterdam"
-  services = [
-    allquiet_service.payment_api.id
+  service_groups = [
+    {
+      public_display_name = "External Services"
+      public_description  = "External services and integrations"
+      services = [
+        allquiet_service.payment_api.id,
+        allquiet_service.chat_gpt.id
+      ]
+    },
+    {
+      public_display_name = "Internal Services"
+      public_description  = "Internal services and integrations"
+      services = [
+        allquiet_service.shipping_api.id
+      ]
+    }
   ]
 }
 ```
@@ -99,7 +140,8 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
 - `public_severity_mapping_warning` (String) The public severity mapping warning of the status page
 - `public_support_email` (String) The public support email of the status page
 - `public_support_url` (String) The public support url of the status page
-- `services` (List of String) The service ids of the status page
+- `service_groups` (Attributes List) The service groups of the status page (see [below for nested schema](#nestedatt--service_groups))
+- `services` (List of String, Deprecated) The service ids of the status page
 - `slug` (String) The slug of the status page. Provide slug or custom host settings.
 - `time_zone_id` (String) The time zone id of the status page
 
@@ -113,3 +155,20 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
 Required:
 
 - `host` (String) The host of the status page
+
+
+<a id="nestedatt--service_groups"></a>
+### Nested Schema for `service_groups`
+
+Required:
+
+- `public_display_name` (String) The public display name of the service group
+- `services` (List of String) The service ids of the service group
+
+Optional:
+
+- `public_description` (String) The public description of the service group
+
+Read-Only:
+
+- `id` (String) Internal id of the service group

@@ -62,6 +62,45 @@ func TestAccStatusPageResource(t *testing.T) {
 	})
 }
 
+func TestAccStatusPageResourceWithGroups(t *testing.T) {
+	var slug = "public-status-page-test" + uuid.New().String()
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccStatusPageResourceWithGroupsConfig("Status Page One", slug),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "display_name", "Status Page One"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "public_title", "Status Page One"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "public_description", "Payment APIs and integrations"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "history_in_days", "30"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "disable_public_subscription", "false"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:      "allquiet_status_page.test_with_groups",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read testing
+			{
+				Config: testAccStatusPageResourceWithGroupsConfig("Status Page Two", slug),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "display_name", "Status Page Two"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "public_title", "Status Page Two"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "public_description", "Payment APIs and integrations"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "history_in_days", "30"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "disable_public_subscription", "false"),
+				),
+			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
 func TestAccStatusPageResourceExample(t *testing.T) {
 	var config = testAccStatusPageResourceExample()
 
@@ -123,6 +162,52 @@ resource "allquiet_status_page" "test_custom_host_settings" {
   }
 }
 	`, display_name, slug, host)
+}
+
+func testAccStatusPageResourceWithGroupsConfig(display_name string, slug string) string {
+	return fmt.Sprintf(`
+resource "allquiet_service" "test_service_1" {
+  display_name = "Payment API 1"
+  public_title = "Payment API 1"
+}
+resource "allquiet_service" "test_service_2" {
+  display_name = "Payment API 2"
+  public_title = "Payment API 2"
+}
+resource "allquiet_service" "test_service_3" {
+  display_name = "AI API"
+  public_title = "AI API"
+}
+resource "allquiet_status_page" "test_with_groups" {
+  display_name = %[1]q
+  public_title = %[1]q
+  public_description = "Payment APIs and integrations"  
+  history_in_days = 30
+  disable_public_subscription = false
+  banner_background_color = "#000000"
+  banner_background_color_dark_mode = "#447788"
+  banner_text_color = "#ffffff"
+  banner_text_color_dark_mode = "#ffffff"
+  slug = %[2]q
+  service_groups = [
+    {
+      public_display_name = "Payment APIs"
+	  public_description = "Payment APIs and integrations"
+      services = [
+        allquiet_service.test_service_1.id,
+        allquiet_service.test_service_2.id,
+      ]
+    },
+	{
+		public_display_name = "Chat Bot"
+		public_description = "AI APIs and integrations"
+		services = [
+			allquiet_service.test_service_3.id,
+		]
+	}
+  ]
+}
+	`, display_name, slug)
 }
 
 func testAccStatusPageResourceExample() string {

@@ -1,8 +1,21 @@
 resource "allquiet_service" "payment_api" {
-  display_name       = "Payment API"
-  public_title       = "Payment API"
-  public_description = "Payment APIs and integrations"
+  display_name       = "Payment Provider"
+  public_title       = "Payment Provider"
+  public_description = "Payment Provider and integrations"
 }
+
+resource "allquiet_service" "chat_gpt" {
+  display_name       = "Chat GPT"
+  public_title       = "Chat GPT"
+  public_description = "Chat GPT and integrations"
+}
+
+resource "allquiet_service" "shipping_api" {
+  display_name       = "Shipping API"
+  public_title       = "Shipping API"
+  public_description = "Shipping APIs and integrations"
+}
+
 
 resource "allquiet_status_page" "public_status_page" {
   slug                              = "public-status-page-test"
@@ -24,8 +37,22 @@ resource "allquiet_status_page" "public_status_page" {
   banner_text_color_dark_mode       = "#ffffff"
 
   time_zone_id = "Europe/Amsterdam"
-  services = [
-    allquiet_service.payment_api.id
+  service_groups = [
+    {
+      public_display_name = "External Services"
+      public_description  = "External services and integrations"
+      services = [
+        allquiet_service.payment_api.id,
+        allquiet_service.chat_gpt.id
+      ]
+    },
+    {
+      public_display_name = "Internal Services"
+      public_description  = "Internal services and integrations"
+      services = [
+        allquiet_service.shipping_api.id
+      ]
+    }
   ]
 }
 
@@ -53,8 +80,22 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
   banner_text_color_dark_mode       = "#ffffff"
 
   time_zone_id = "Europe/Amsterdam"
-  services = [
-    allquiet_service.payment_api.id
+  service_groups = [
+    {
+      public_display_name = "External Services"
+      public_description  = "External services and integrations"
+      services = [
+        allquiet_service.payment_api.id,
+        allquiet_service.chat_gpt.id
+      ]
+    },
+    {
+      public_display_name = "Internal Services"
+      public_description  = "Internal services and integrations"
+      services = [
+        allquiet_service.shipping_api.id
+      ]
+    }
   ]
 }
 

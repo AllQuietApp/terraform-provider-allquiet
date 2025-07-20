@@ -33,27 +33,35 @@ type StatusPage struct {
 
 // StatusPageModel describes the resource data model.
 type StatusPageModel struct {
-	Id                            types.String        `tfsdk:"id"`
-	DisplayName                   types.String        `tfsdk:"display_name"`
-	PublicTitle                   types.String        `tfsdk:"public_title"`
-	PublicDescription             types.String        `tfsdk:"public_description"`
-	Slug                          types.String        `tfsdk:"slug"`
-	Services                      types.List          `tfsdk:"services"`
-	PublicCompanyUrl              types.String        `tfsdk:"public_company_url"`
-	PublicCompanyName             types.String        `tfsdk:"public_company_name"`
-	PublicSupportUrl              types.String        `tfsdk:"public_support_url"`
-	PublicSupportEmail            types.String        `tfsdk:"public_support_email"`
-	HistoryInDays                 types.Int64         `tfsdk:"history_in_days"`
-	TimeZoneId                    types.String        `tfsdk:"time_zone_id"`
-	DisablePublicSubscription     types.Bool          `tfsdk:"disable_public_subscription"`
-	PublicSeverityMappingMinor    types.String        `tfsdk:"public_severity_mapping_minor"`
-	PublicSeverityMappingWarning  types.String        `tfsdk:"public_severity_mapping_warning"`
-	PublicSeverityMappingCritical types.String        `tfsdk:"public_severity_mapping_critical"`
-	BannerBackgroundColor         types.String        `tfsdk:"banner_background_color"`
-	BannerBackgroundColorDarkMode types.String        `tfsdk:"banner_background_color_dark_mode"`
-	BannerTextColor               types.String        `tfsdk:"banner_text_color"`
-	BannerTextColorDarkMode       types.String        `tfsdk:"banner_text_color_dark_mode"`
-	CustomHostSettings            *CustomHostSettings `tfsdk:"custom_host_settings"`
+	Id                            types.String                   `tfsdk:"id"`
+	DisplayName                   types.String                   `tfsdk:"display_name"`
+	PublicTitle                   types.String                   `tfsdk:"public_title"`
+	PublicDescription             types.String                   `tfsdk:"public_description"`
+	Slug                          types.String                   `tfsdk:"slug"`
+	Services                      types.List                     `tfsdk:"services"`
+	ServiceGroups                 *[]StatusPageServiceGroupModel `tfsdk:"service_groups"`
+	PublicCompanyUrl              types.String                   `tfsdk:"public_company_url"`
+	PublicCompanyName             types.String                   `tfsdk:"public_company_name"`
+	PublicSupportUrl              types.String                   `tfsdk:"public_support_url"`
+	PublicSupportEmail            types.String                   `tfsdk:"public_support_email"`
+	HistoryInDays                 types.Int64                    `tfsdk:"history_in_days"`
+	TimeZoneId                    types.String                   `tfsdk:"time_zone_id"`
+	DisablePublicSubscription     types.Bool                     `tfsdk:"disable_public_subscription"`
+	PublicSeverityMappingMinor    types.String                   `tfsdk:"public_severity_mapping_minor"`
+	PublicSeverityMappingWarning  types.String                   `tfsdk:"public_severity_mapping_warning"`
+	PublicSeverityMappingCritical types.String                   `tfsdk:"public_severity_mapping_critical"`
+	BannerBackgroundColor         types.String                   `tfsdk:"banner_background_color"`
+	BannerBackgroundColorDarkMode types.String                   `tfsdk:"banner_background_color_dark_mode"`
+	BannerTextColor               types.String                   `tfsdk:"banner_text_color"`
+	BannerTextColorDarkMode       types.String                   `tfsdk:"banner_text_color_dark_mode"`
+	CustomHostSettings            *CustomHostSettings            `tfsdk:"custom_host_settings"`
+}
+
+type StatusPageServiceGroupModel struct {
+	Id                types.String `tfsdk:"id"`
+	PublicDisplayName types.String `tfsdk:"public_display_name"`
+	PublicDescription types.String `tfsdk:"public_description"`
+	Services          types.List   `tfsdk:"services"`
 }
 
 type CustomHostSettings struct {
@@ -105,10 +113,39 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 			},
 			"services": schema.ListAttribute{
 				Optional:            true,
+				DeprecationMessage:  "Use service_groups instead",
 				MarkdownDescription: "The service ids of the status page",
 				ElementType:         types.StringType,
 				Validators: []validator.List{
 					listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+				},
+			},
+			"service_groups": schema.ListNestedAttribute{
+				Optional:            true,
+				MarkdownDescription: "The service groups of the status page",
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed:            true,
+							MarkdownDescription: "Internal id of the service group",
+						},
+						"public_display_name": schema.StringAttribute{
+							MarkdownDescription: "The public display name of the service group",
+							Required:            true,
+						},
+						"public_description": schema.StringAttribute{
+							MarkdownDescription: "The public description of the service group",
+							Optional:            true,
+						},
+						"services": schema.ListAttribute{
+							Required:            true,
+							MarkdownDescription: "The service ids of the service group",
+							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+							},
+						},
+					},
 				},
 			},
 			"public_company_url": schema.StringAttribute{
@@ -322,6 +359,24 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.BannerTextColor = types.StringPointerValue(response.BannerTextColor)
 	data.BannerTextColorDarkMode = types.StringPointerValue(response.BannerTextColorDarkMode)
 	data.CustomHostSettings = mapCustomHostSettingsResponseToModel(response.CustomHostSettings)
+	data.ServiceGroups = mapStatusPageServiceGroupsResponseToModel(ctx, response.ServiceGroups)
+}
+
+func mapStatusPageServiceGroupsResponseToModel(ctx context.Context, response *[]statusPageServiceGroupResponse) *[]StatusPageServiceGroupModel {
+	if response == nil {
+		return nil
+	}
+
+	serviceGroups := make([]StatusPageServiceGroupModel, len(*response))
+	for i, serviceGroup := range *response {
+		serviceGroups[i] = StatusPageServiceGroupModel{
+			Id:                types.StringValue(serviceGroup.Id),
+			PublicDisplayName: types.StringValue(serviceGroup.PublicDisplayName),
+			PublicDescription: types.StringPointerValue(serviceGroup.PublicDescription),
+			Services:          MapNullableList(ctx, serviceGroup.ServiceIds),
+		}
+	}
+	return &serviceGroups
 }
 
 func mapCustomHostSettingsResponseToModel(response *customHostSettingsResponse) *CustomHostSettings {
