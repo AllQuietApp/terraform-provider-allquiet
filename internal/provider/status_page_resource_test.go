@@ -16,8 +16,8 @@ import (
 
 func TestAccStatusPageResource(t *testing.T) {
 	var slug = "public-status-page-test" + uuid.New().String()
-	var host = "status-page-test-" + uuid.New().String() + ".allquiet.com"
-	var host2 = "status-page-test-" + uuid.New().String() + ".allquiet.com"
+	var host = "spt-" + uuid.New().String() + ".allquiet.com"
+	var host2 = "spt-" + uuid.New().String() + ".allquiet.com"
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
