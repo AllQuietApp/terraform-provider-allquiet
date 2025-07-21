@@ -93,8 +93,8 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 						Validators:          []validator.String{stringvalidator.OneOf(ValidTeamConnectionModes...)},
 					},
 					"team_ids": schema.ListAttribute{
-						MarkdownDescription: "The team ids for the integration",
-						Required:            true,
+						MarkdownDescription: "The team ids for the integration. If not provided, team_connection_mode must be set to 'OrganizationTeams'.",
+						Optional:            true,
 						ElementType:         types.StringType,
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),

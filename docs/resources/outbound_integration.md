@@ -76,4 +76,7 @@ resource "allquiet_outbound_integration" "slack_selected_teams" {
 Required:
 
 - `team_connection_mode` (String) The team connection mode for the integration. Possible values are: OrganizationTeams, SelectedTeams
-- `team_ids` (List of String) The team ids for the integration
+
+Optional:
+
+- `team_ids` (List of String) The team ids for the integration. If not provided, team_connection_mode must be set to 'OrganizationTeams'.
