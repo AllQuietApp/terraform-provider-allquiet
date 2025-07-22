@@ -405,7 +405,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_repeating_tier" {
       auto_escalation_enabled       = true
       auto_escalation_after_minutes = 5
       repeats                       = 2
-      repeats_after_minutes         = 0
+      repeats_after_minutes         = null
       auto_escalation_severities    = ["Critical"]
       schedules = [
         {

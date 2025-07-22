@@ -144,7 +144,7 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 						Optional:            true,
 						MarkdownDescription: "How many minutes after the last tier all tiers should repeat.",
 						Validators: []validator.Int64{
-							int64validator.Between(0, OneMonthInSeconds),
+							int64validator.Between(1, OneMonthInSeconds),
 						},
 					},
 					"repeats_stop_mode": schema.StringAttribute{
@@ -258,7 +258,7 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 							Optional:            true,
 							MarkdownDescription: "How many minutes after the rotation should repeat.",
 							Validators: []validator.Int64{
-								int64validator.Between(0, OneMonthInSeconds),
+								int64validator.Between(1, OneMonthInSeconds),
 							},
 						},
 						"repeats_stop_mode": schema.StringAttribute{

@@ -90,7 +90,78 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		user_id = allquiet_user.kolmogorov.id
 		role    = "Member"
 	  }
+
+	  resource "allquiet_team" "my_team_with_empty_weekly_schedules" {
+		display_name = "My team with empty weekly schedules"
+		time_zone_id = "America/Los_Angeles"
+	  }
+
+	  resource "allquiet_team_membership" "my_team_with_empty_weekly_schedules_kolmogorov" {
+		team_id = allquiet_team.my_team_with_empty_weekly_schedules.id
+		user_id = allquiet_user.kolmogorov.id
+		role    = "Member"
+	  }
 	  
+	  resource "allquiet_team_membership" "my_team_with_empty_weekly_schedules_galois" {
+		team_id = allquiet_team.my_team_with_empty_weekly_schedules.id
+		user_id = allquiet_user.galois.id
+		role    = "Member"
+	  }
+
+resource "allquiet_team_escalations" "my_team_with_empty_weekly_schedules" {
+  escalation_tiers = [
+    {
+      auto_assign_to_teams_severities   = ["Critical", "Warning"]
+      auto_assign_to_teams_time_filters = null
+      auto_escalation_after_minutes     = 10
+      auto_escalation_enabled           = false
+      auto_escalation_severities        = null
+      auto_escalation_stop_mode         = "acknowledged"
+      auto_escalation_time_filters      = null
+      repeats                           = 1
+      repeats_after_minutes             = 10
+      repeats_stop_mode                 = "acknowledged"
+      schedules = [
+        {
+          rotation_settings = {
+            auto_rotation_size      = null
+            custom_repeat_unit      = null
+            custom_repeat_value     = null
+            effective_from          = "2025-06-11"
+            repeats                 = "weekly"
+            rotation_mode           = "explicit"
+            starts_on_date_of_month = null
+            starts_on_day_of_week   = "wed"
+            starts_on_time          = "14:00"
+          }
+          rotations = [
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_empty_weekly_schedules_galois.id
+                },
+              ]
+            },
+            {
+              members = [
+                {
+                  team_membership_id = allquiet_team_membership.my_team_with_empty_weekly_schedules_kolmogorov.id
+                },
+              ]
+            },
+          ]
+          schedule_settings = {
+            weekly_schedules = null
+          }
+        },
+      ]
+    },
+  ]
+  team_id = allquiet_team.my_team_with_empty_weekly_schedules.id
+  tier_settings = null
+}
+
+
 	  resource "allquiet_team_escalations" "my_team" {
 		team_id = allquiet_team.my_team.id
 		escalation_tiers = [
@@ -120,7 +191,7 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 				}
 			]
 			repeats = 1
-			repeats_after_minutes = 0
+			repeats_after_minutes = 5
 			schedules = [
 			  {
 				schedule_settings = {
@@ -185,7 +256,7 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 			auto_escalation_severities = ["Critical", "Warning"]
 			auto_escalation_stop_mode = "acknowledged"
 			repeats = 1
-			repeats_after_minutes = 0
+			repeats_after_minutes = 5
 			repeats_stop_mode = "resolved"
 			schedules = [
 			  {
