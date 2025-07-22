@@ -280,7 +280,7 @@ Optional:
 - `attributes` (Attributes List) (see [below for nested schema](#nestedatt--rules--conditions--attributes))
 - `date_restriction` (Attributes) (see [below for nested schema](#nestedatt--rules--conditions--date_restriction))
 - `integrations` (List of String) Integration IDs
-- `intents` (List of String) Intents. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
+- `intents` (List of String) Intents. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
 - `schedule` (Attributes) (see [below for nested schema](#nestedatt--rules--conditions--schedule))
 - `severities` (List of String) Severeties. Possible values are: Critical, Warning, Minor
 - `statuses` (List of String) Statuses. Possible values are: Open, Resolved
@@ -323,7 +323,7 @@ Optional:
 
 Optional:
 
-- `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
+- `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
 - `affects_services` (List of String) Will affect the specified services. Only with add_interaction 'Affects'.
 - `assign_to_teams` (List of String) Will assign the incident to the specified teams.
 - `change_severity` (String) Will change the severity of the incident. Possible values are: Critical, Warning, Minor

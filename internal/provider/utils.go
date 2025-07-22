@@ -34,6 +34,8 @@ var ValidIntents = []string{
 	"Created",
 	"Deleted",
 	"Updated",
+	"Snoozed",
+	"Unsnoozed",
 }
 
 func NonNullableArrayToStringArray(array *[]string) []string {

@@ -104,7 +104,7 @@ Required:
 
 Optional:
 
-- `disabled_intents_email` (List of String) Disabled intents for Email notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
-- `disabled_intents_push` (List of String) Disabled intents for Push notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
-- `disabled_intents_sms` (List of String) Disabled intents for SMS notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
-- `disabled_intents_voice` (List of String) Disabled intents for Voice Call notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated
+- `disabled_intents_email` (List of String) Disabled intents for Email notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
+- `disabled_intents_push` (List of String) Disabled intents for Push notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
+- `disabled_intents_sms` (List of String) Disabled intents for SMS notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
+- `disabled_intents_voice` (List of String) Disabled intents for Voice Call notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
