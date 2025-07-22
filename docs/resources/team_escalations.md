@@ -588,7 +588,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_all_tiers_repeati
       auto_escalation_after_minutes = 5
       auto_escalation_stop_mode     = "acknowledged"
       repeats                       = 2
-      repeats_after_minutes         = 0
+      repeats_after_minutes         = 1
       repeats_stop_mode             = "resolved"
       schedules = [
         {
