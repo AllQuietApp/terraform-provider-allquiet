@@ -85,7 +85,7 @@ func ListToStringArray(list types.List) *[]string {
 	return &result
 }
 
-func MapNullableListWithEmpty(ctx context.Context, stringArray *[]string) types.List {
+func mapNullableListWithEmpty(ctx context.Context, stringArray *[]string) types.List {
 	if stringArray == nil {
 		return types.ListNull(types.StringType)
 	}
@@ -109,20 +109,7 @@ func MapNullableListWithEmpty(ctx context.Context, stringArray *[]string) types.
 }
 
 func MapNullableList(ctx context.Context, stringArray *[]string) types.List {
-	if stringArray == nil {
-		return types.ListNull(types.StringType)
-	}
-	var stringList []types.String
-	for _, s := range *stringArray {
-		stringList = append(stringList, types.StringValue(s))
-	}
-
-	listValue, diags := types.ListValueFrom(ctx, types.StringType, stringList)
-	if diags.HasError() {
-		return types.List{}
-	}
-
-	return listValue
+	return mapNullableListWithEmpty(ctx, stringArray)
 }
 
 type badRequestResponse struct {

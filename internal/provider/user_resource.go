@@ -346,24 +346,24 @@ func mapUserResponseToModel(ctx context.Context, response *userResponse, data *U
 		data.IncidentNotificationSettings = &IncidentNotificationSettingsModel{
 			ShouldSendSMS: types.BoolValue(response.IncidentNotificationSettings.ShouldSendSMS),
 			DelayInMinSMS: types.Int64Value(response.IncidentNotificationSettings.DelayInMinSMS),
-			SeveritiesSMS: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.SeveritiesSMS),
+			SeveritiesSMS: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesSMS),
 
 			ShouldCallVoice: types.BoolValue(response.IncidentNotificationSettings.ShouldCallVoice),
 			DelayInMinVoice: types.Int64Value(response.IncidentNotificationSettings.DelayInMinVoice),
-			SeveritiesVoice: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.SeveritiesVoice),
+			SeveritiesVoice: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesVoice),
 
 			ShouldSendPush: types.BoolValue(response.IncidentNotificationSettings.ShouldSendPush),
 			DelayInMinPush: types.Int64Value(response.IncidentNotificationSettings.DelayInMinPush),
-			SeveritiesPush: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.SeveritiesPush),
+			SeveritiesPush: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesPush),
 
 			ShouldSendEmail: types.BoolValue(response.IncidentNotificationSettings.ShouldSendEmail),
 			DelayInMinEmail: types.Int64Value(response.IncidentNotificationSettings.DelayInMinEmail),
-			SeveritiesEmail: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.SeveritiesEmail),
+			SeveritiesEmail: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesEmail),
 
-			DisabledIntentsEmail: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsEmail),
-			DisabledIntentsVoice: MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsVoice),
-			DisabledIntentsPush:  MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsPush),
-			DisabledIntentsSMS:   MapNullableListWithEmpty(ctx, response.IncidentNotificationSettings.DisabledIntentsSMS),
+			DisabledIntentsEmail: MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsEmail),
+			DisabledIntentsVoice: MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsVoice),
+			DisabledIntentsPush:  MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsPush),
+			DisabledIntentsSMS:   MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsSMS),
 		}
 	}
 

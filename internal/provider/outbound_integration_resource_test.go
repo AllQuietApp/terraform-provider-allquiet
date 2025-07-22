@@ -73,6 +73,7 @@ func TestAccOutboundIntegrationResourceExample(t *testing.T) {
 }
 
 func testAccOutboundIntegrationResourceConfig(display_name string) string {
+
 	return fmt.Sprintf(`
 resource "allquiet_team" "test" {
   display_name = "Root"
@@ -86,6 +87,28 @@ resource "allquiet_outbound_integration" "test" {
   team_connection_settings = {
     team_connection_mode = "SelectedTeams"
     team_ids = [allquiet_team.test.id]
+  }
+}
+
+resource "allquiet_outbound_integration" "test_empty_team_ids" {
+  display_name = "%[1]s (Empty Team IDs)"	
+  team_id = allquiet_team.test.id
+  type = "Slack"
+  triggers_only_on_forwarded = true
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+    team_ids = []
+  }
+}
+
+resource "allquiet_outbound_integration" "test_null_team_ids" {
+  display_name = "%[1]s (Null Team IDs)"	
+  team_id = allquiet_team.test.id
+  type = "Slack"
+  triggers_only_on_forwarded = true
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+    team_ids = null
   }
 }
 `, display_name)
