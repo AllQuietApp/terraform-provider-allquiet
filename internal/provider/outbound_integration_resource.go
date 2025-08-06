@@ -41,12 +41,7 @@ type OutboundIntegrationModel struct {
 	Type                    types.String `tfsdk:"type"`
 	TriggersOnlyOnForwarded types.Bool   `tfsdk:"triggers_only_on_forwarded"`
 
-	TeamConnectionSettings *OutboundIntegrationTeamConnectionSettings `tfsdk:"team_connection_settings"`
-}
-
-type OutboundIntegrationTeamConnectionSettings struct {
-	TeamConnectionMode types.String `tfsdk:"team_connection_mode"`
-	TeamIds            types.List   `tfsdk:"team_ids"`
+	TeamConnectionSettings *TeamConnectionSettings `tfsdk:"team_connection_settings"`
 }
 
 func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -231,7 +226,7 @@ func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outbou
 	data.TriggersOnlyOnForwarded = types.BoolPointerValue(response.TriggersOnlyOnForwarded)
 
 	if response.TeamConnectionSettings != nil {
-		data.TeamConnectionSettings = &OutboundIntegrationTeamConnectionSettings{
+		data.TeamConnectionSettings = &TeamConnectionSettings{
 			TeamConnectionMode: types.StringValue(response.TeamConnectionSettings.TeamConnectionMode),
 			TeamIds:            MapNullableList(ctx, response.TeamConnectionSettings.TeamIds),
 		}

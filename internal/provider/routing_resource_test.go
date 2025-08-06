@@ -128,6 +128,96 @@ resource "allquiet_routing" "test" {
 	}
   ]
 }
+
+resource "allquiet_routing" "test_with_team_connection_settings" {
+	display_name = %[1]q
+	team_id = allquiet_team.root.id
+	team_connection_settings = {	
+		team_connection_mode = "SelectedTeams"
+		team_ids = [allquiet_team.root.id, allquiet_team.test.id]
+	}
+	rules = [
+	  {
+		conditions = {
+		  statuses = ["Open"]
+		  severities = ["Critical", "Warning"]
+	   },
+	   channels = {
+	   },
+	   actions = {
+		 assign_to_teams = [allquiet_team.test.id]
+	   }
+	  },
+	  {
+		conditions = {
+		  attributes = [
+			{
+			  name = "source"
+			  operator = "=" 
+			  value = "web"
+			}
+		  ]
+		},
+		channels = {
+		  notification_channels = ["VoiceCall"]
+		},
+		actions = {
+			set_attributes = [
+			  {
+				  name = "Team"
+				  value = "Sales"
+				  hide_in_previews = true
+			  }
+		  ]
+		}
+	  }
+	]
+  }
+
+
+resource "allquiet_routing" "test_with_team_connection_settings_organization_teams" {
+	display_name = %[1]q
+	team_id = allquiet_team.root.id
+	team_connection_settings = {	
+		team_connection_mode = "OrganizationTeams"
+	}
+	rules = [
+	  {
+		conditions = {
+		  statuses = ["Open"]
+		  severities = ["Critical", "Warning"]
+	   },
+	   channels = {
+	   },
+	   actions = {
+		 assign_to_teams = [allquiet_team.test.id]
+	   }
+	  },
+	  {
+		conditions = {
+		  attributes = [
+			{
+			  name = "source"
+			  operator = "=" 
+			  value = "web"
+			}
+		  ]
+		},
+		channels = {
+		  notification_channels = ["VoiceCall"]
+		},
+		actions = {
+			set_attributes = [
+			  {
+				  name = "Team"
+				  value = "Sales"
+				  hide_in_previews = true
+			  }
+		  ]
+		}
+	  }
+	]
+  }
 `, display_name)
 
 }

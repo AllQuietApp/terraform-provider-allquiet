@@ -17,6 +17,10 @@ resource "allquiet_team" "root" {
   display_name = "Root"
 }
 
+resource "allquiet_team" "infrastructure" {
+  display_name = "Infrastructure"
+}
+
 resource "allquiet_team" "pres_sales" {
   display_name = "Pre Sales"
 }
@@ -58,6 +62,10 @@ resource "allquiet_service" "pre_sales" {
 resource "allquiet_routing" "example_1" {
   team_id      = allquiet_team.root.id
   display_name = "Route to specific team based on attribute"
+  team_connection_settings = {
+    team_connection_mode = "SelectedTeams"
+    team_ids             = [allquiet_team.root.id, allquiet_team.infrastructure.id]
+  }
   rules = [
     {
       conditions = {
@@ -94,6 +102,9 @@ resource "allquiet_routing" "example_1" {
 resource "allquiet_routing" "example_2" {
   team_id      = allquiet_team.root.id
   display_name = "Mute Slack Outbound Integration when Minor"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
   rules = [
     {
       conditions = {
@@ -255,6 +266,7 @@ resource "allquiet_routing" "example_9" {
 ### Optional
 
 - `rules` (Attributes List) (see [below for nested schema](#nestedatt--rules))
+- `team_connection_settings` (Attributes) The team connection settings for the routing (see [below for nested schema](#nestedatt--team_connection_settings))
 
 ### Read-Only
 
@@ -357,3 +369,16 @@ Optional:
 - `notification_channels_muted` (Boolean) If true will mute the notification channels
 - `outbound_integrations` (List of String) Outbound integrations
 - `outbound_integrations_muted` (Boolean) If true will mute the outbound integrations
+
+
+
+<a id="nestedatt--team_connection_settings"></a>
+### Nested Schema for `team_connection_settings`
+
+Required:
+
+- `team_connection_mode` (String) The team connection mode for the routing. Possible values are: OrganizationTeams, SelectedTeams
+
+Optional:
+
+- `team_ids` (List of String) The team ids for the routing. If not provided, team_connection_mode must be set to 'OrganizationTeams'.

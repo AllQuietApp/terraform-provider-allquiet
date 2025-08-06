@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -36,10 +37,11 @@ type Routing struct {
 
 // RoutingModel describes the resource data model.
 type RoutingModel struct {
-	Id          types.String       `tfsdk:"id"`
-	DisplayName types.String       `tfsdk:"display_name"`
-	TeamId      types.String       `tfsdk:"team_id"`
-	Rules       []RoutingRuleModel `tfsdk:"rules"`
+	Id                     types.String            `tfsdk:"id"`
+	DisplayName            types.String            `tfsdk:"display_name"`
+	TeamId                 types.String            `tfsdk:"team_id"`
+	Rules                  []RoutingRuleModel      `tfsdk:"rules"`
+	TeamConnectionSettings *TeamConnectionSettings `tfsdk:"team_connection_settings"`
 }
 
 type RoutingRuleModel struct {
@@ -343,6 +345,25 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 					},
 				},
 			},
+			"team_connection_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "The team connection settings for the routing",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"team_connection_mode": schema.StringAttribute{
+						Required:            true,
+						MarkdownDescription: "The team connection mode for the routing. Possible values are: " + strings.Join(ValidTeamConnectionModes, ", "),
+						Validators:          []validator.String{stringvalidator.OneOf(ValidTeamConnectionModes...)},
+					},
+					"team_ids": schema.ListAttribute{
+						MarkdownDescription: "The team ids for the routing. If not provided, team_connection_mode must be set to 'OrganizationTeams'.",
+						Optional:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -469,6 +490,12 @@ func mapRoutingResponseToModel(ctx context.Context, response *routingResponse, d
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.TeamId = types.StringValue(response.TeamId)
 	data.Rules = mapRoutingRuleResponseToModel(ctx, response.Rules)
+	if response.TeamConnectionSettings != nil {
+		data.TeamConnectionSettings = &TeamConnectionSettings{
+			TeamConnectionMode: types.StringValue(response.TeamConnectionSettings.TeamConnectionMode),
+			TeamIds:            MapNullableList(ctx, response.TeamConnectionSettings.TeamIds),
+		}
+	}
 }
 
 func mapRoutingRuleResponseToModel(ctx context.Context, rules []routingRule) []RoutingRuleModel {

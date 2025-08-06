@@ -2,6 +2,10 @@ resource "allquiet_team" "root" {
   display_name = "Root"
 }
 
+resource "allquiet_team" "infrastructure" {
+  display_name = "Infrastructure"
+}
+
 resource "allquiet_team" "pres_sales" {
   display_name = "Pre Sales"
 }
@@ -43,6 +47,10 @@ resource "allquiet_service" "pre_sales" {
 resource "allquiet_routing" "example_1" {
   team_id      = allquiet_team.root.id
   display_name = "Route to specific team based on attribute"
+  team_connection_settings = {
+    team_connection_mode = "SelectedTeams"
+    team_ids             = [allquiet_team.root.id, allquiet_team.infrastructure.id]
+  }
   rules = [
     {
       conditions = {
@@ -79,6 +87,9 @@ resource "allquiet_routing" "example_1" {
 resource "allquiet_routing" "example_2" {
   team_id      = allquiet_team.root.id
   display_name = "Mute Slack Outbound Integration when Minor"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
   rules = [
     {
       conditions = {

@@ -9,10 +9,11 @@ import (
 )
 
 type routingResponse struct {
-	Id          string        `json:"id"`
-	DisplayName string        `json:"displayName"`
-	TeamId      string        `json:"teamId"`
-	Rules       []routingRule `json:"rules"`
+	Id                     string                  `json:"id"`
+	DisplayName            string                  `json:"displayName"`
+	TeamId                 string                  `json:"teamId"`
+	Rules                  []routingRule           `json:"rules"`
+	TeamConnectionSettings *teamConnectionSettings `json:"teamConnectionSettings"`
 }
 
 type routingRule struct {
@@ -63,9 +64,10 @@ type routingRuleChannels struct {
 }
 
 type routingCreateRequest struct {
-	DisplayName string        `json:"displayName"`
-	TeamId      string        `json:"teamId"`
-	Rules       []routingRule `json:"rules"`
+	DisplayName            string                  `json:"displayName"`
+	TeamId                 string                  `json:"teamId"`
+	Rules                  []routingRule           `json:"rules"`
+	TeamConnectionSettings *teamConnectionSettings `json:"teamConnectionSettings"`
 }
 
 type routingRuleDateRestriction struct {
@@ -81,9 +83,10 @@ type routingRuleSchedule struct {
 
 func mapRoutingCreateRequest(plan *RoutingModel) *routingCreateRequest {
 	return &routingCreateRequest{
-		DisplayName: plan.DisplayName.ValueString(),
-		TeamId:      plan.TeamId.ValueString(),
-		Rules:       mapRoutingRules(plan.Rules),
+		DisplayName:            plan.DisplayName.ValueString(),
+		TeamId:                 plan.TeamId.ValueString(),
+		Rules:                  mapRoutingRules(plan.Rules),
+		TeamConnectionSettings: MapTeamConnectionSettingsToRequest(plan.TeamConnectionSettings),
 	}
 }
 
