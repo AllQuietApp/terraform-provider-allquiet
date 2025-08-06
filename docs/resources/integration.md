@@ -119,7 +119,7 @@ resource "allquiet_integration" "http_monitoring_head" {
   type         = "HttpMonitoring"
   integration_settings = {
     http_monitoring = {
-      url = "https://your-domain-to-test.com"
+      url = "https://allquiet.com"
 
       method                                   = "HEAD"
       timeout_in_milliseconds                  = 4000 # 4 seconds
