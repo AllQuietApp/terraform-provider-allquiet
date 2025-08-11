@@ -103,6 +103,21 @@ resource "allquiet_service" "test" {
 		}
 	]
 }
+
+resource "allquiet_service" "test_with_team_connection_settings" {
+  display_name = %[1]q
+  public_title = %[1]q
+  public_description = "Payment APIs and integrations"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
+  templates = [
+		{
+			display_name = "Refunds delayed"
+			message = "Refunds are currently delayed. All refunds will be processed but can currently take longer than usual to complete."
+		}
+	]
+}
 `, display_name)
 
 }

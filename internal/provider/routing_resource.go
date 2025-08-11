@@ -490,12 +490,7 @@ func mapRoutingResponseToModel(ctx context.Context, response *routingResponse, d
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.TeamId = types.StringValue(response.TeamId)
 	data.Rules = mapRoutingRuleResponseToModel(ctx, response.Rules)
-	if response.TeamConnectionSettings != nil {
-		data.TeamConnectionSettings = &TeamConnectionSettings{
-			TeamConnectionMode: types.StringValue(response.TeamConnectionSettings.TeamConnectionMode),
-			TeamIds:            MapNullableList(ctx, response.TeamConnectionSettings.TeamIds),
-		}
-	}
+	data.TeamConnectionSettings = MapTeamConnectionSettingsResponseToModel(ctx, response.TeamConnectionSettings)
 }
 
 func mapRoutingRuleResponseToModel(ctx context.Context, rules []routingRule) []RoutingRuleModel {

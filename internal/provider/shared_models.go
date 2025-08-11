@@ -4,6 +4,8 @@
 package provider
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -32,4 +34,15 @@ func MapTeamConnectionSettingsToRequest(settings *TeamConnectionSettings) *teamC
 		TeamConnectionMode: settings.TeamConnectionMode.ValueString(),
 		TeamIds:            ListToStringArray(settings.TeamIds),
 	}
+}
+
+func MapTeamConnectionSettingsResponseToModel(ctx context.Context, settings *teamConnectionSettings) *TeamConnectionSettings {
+	if settings != nil {
+		return &TeamConnectionSettings{
+			TeamConnectionMode: types.StringValue(settings.TeamConnectionMode),
+			TeamIds:            MapNullableList(ctx, settings.TeamIds),
+		}
+	}
+
+	return nil
 }

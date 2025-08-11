@@ -9,11 +9,12 @@ import (
 )
 
 type serviceResponse struct {
-	Id                string
-	DisplayName       string
-	PublicTitle       string
-	PublicDescription *string
-	Templates         *[]serviceTemplate
+	Id                     string
+	DisplayName            string
+	PublicTitle            string
+	PublicDescription      *string
+	Templates              *[]serviceTemplate
+	TeamConnectionSettings *teamConnectionSettings
 }
 
 type serviceTemplate struct {
@@ -23,18 +24,20 @@ type serviceTemplate struct {
 }
 
 type serviceCreateRequest struct {
-	DisplayName       string             `json:"displayName"`
-	PublicTitle       string             `json:"publicTitle"`
-	PublicDescription *string            `json:"publicDescription"`
-	Templates         *[]serviceTemplate `json:"templates"`
+	DisplayName            string                  `json:"displayName"`
+	PublicTitle            string                  `json:"publicTitle"`
+	PublicDescription      *string                 `json:"publicDescription"`
+	Templates              *[]serviceTemplate      `json:"templates"`
+	TeamConnectionSettings *teamConnectionSettings `json:"teamConnectionSettings"`
 }
 
 func mapServiceCreateRequest(plan *ServiceModel) *serviceCreateRequest {
 	return &serviceCreateRequest{
-		DisplayName:       plan.DisplayName.ValueString(),
-		PublicTitle:       plan.PublicTitle.ValueString(),
-		PublicDescription: plan.PublicDescription.ValueStringPointer(),
-		Templates:         mapTemplates(plan.Templates),
+		DisplayName:            plan.DisplayName.ValueString(),
+		PublicTitle:            plan.PublicTitle.ValueString(),
+		PublicDescription:      plan.PublicDescription.ValueStringPointer(),
+		Templates:              mapTemplates(plan.Templates),
+		TeamConnectionSettings: MapTeamConnectionSettingsToRequest(plan.TeamConnectionSettings),
 	}
 }
 

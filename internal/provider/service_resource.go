@@ -6,12 +6,16 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -31,11 +35,12 @@ type Service struct {
 
 // ServiceModel describes the resource data model.
 type ServiceModel struct {
-	Id                types.String            `tfsdk:"id"`
-	DisplayName       types.String            `tfsdk:"display_name"`
-	PublicTitle       types.String            `tfsdk:"public_title"`
-	PublicDescription types.String            `tfsdk:"public_description"`
-	Templates         *[]ServiceTemplateModel `tfsdk:"templates"`
+	Id                     types.String            `tfsdk:"id"`
+	DisplayName            types.String            `tfsdk:"display_name"`
+	PublicTitle            types.String            `tfsdk:"public_title"`
+	PublicDescription      types.String            `tfsdk:"public_description"`
+	Templates              *[]ServiceTemplateModel `tfsdk:"templates"`
+	TeamConnectionSettings *TeamConnectionSettings `tfsdk:"team_connection_settings"`
 }
 
 type ServiceTemplateModel struct {
@@ -96,6 +101,25 @@ func (r *Service) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 					},
 				},
 			},
+			"team_connection_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "The team connection settings for the integration",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"team_connection_mode": schema.StringAttribute{
+						Required:            true,
+						MarkdownDescription: "The team connection mode for the integration. Possible values are: " + strings.Join(ValidTeamConnectionModes, ", "),
+						Validators:          []validator.String{stringvalidator.OneOf(ValidTeamConnectionModes...)},
+					},
+					"team_ids": schema.ListAttribute{
+						MarkdownDescription: "The team ids for the integration. If not provided, team_connection_mode must be set to 'OrganizationTeams'.",
+						Optional:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -135,7 +159,7 @@ func (r *Service) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	mapServiceResponseToModel(serviceResponse, &data)
+	mapServiceResponseToModel(ctx, serviceResponse, &data)
 
 	tflog.Trace(ctx, "created service resource")
 
@@ -163,7 +187,7 @@ func (r *Service) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	mapServiceResponseToModel(serviceResponse, &data)
+	mapServiceResponseToModel(ctx, serviceResponse, &data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -184,7 +208,7 @@ func (r *Service) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	mapServiceResponseToModel(serviceResponse, &data)
+	mapServiceResponseToModel(ctx, serviceResponse, &data)
 
 	tflog.Trace(ctx, "updated service resource")
 
@@ -216,13 +240,14 @@ func (r *Service) ImportState(ctx context.Context, req resource.ImportStateReque
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapServiceResponseToModel(response *serviceResponse, data *ServiceModel) {
+func mapServiceResponseToModel(ctx context.Context, response *serviceResponse, data *ServiceModel) {
 
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.PublicTitle = types.StringValue(response.PublicTitle)
 	data.PublicDescription = types.StringPointerValue(response.PublicDescription)
 	data.Templates = mapServiceTemplateResponseToModel(response.Templates)
+	data.TeamConnectionSettings = MapTeamConnectionSettingsResponseToModel(ctx, response.TeamConnectionSettings)
 }
 
 func mapServiceTemplateResponseToModel(templates *[]serviceTemplate) *[]ServiceTemplateModel {
