@@ -102,11 +102,12 @@ type SnoozeSettingsModel struct {
 }
 
 type SnoozeFilterModel struct {
-	SelectedDays          types.List   `tfsdk:"selected_days"`
-	From                  types.String `tfsdk:"from"`
-	Until                 types.String `tfsdk:"until"`
-	SnoozeWindowInMinutes types.Int64  `tfsdk:"snooze_window_in_minutes"`
-	SnoozeUntilAbsolute   types.String `tfsdk:"snooze_until_absolute"`
+	SelectedDays               types.List   `tfsdk:"selected_days"`
+	From                       types.String `tfsdk:"from"`
+	Until                      types.String `tfsdk:"until"`
+	SnoozeWindowInMinutes      types.Int64  `tfsdk:"snooze_window_in_minutes"`
+	SnoozeUntilAbsolute        types.String `tfsdk:"snooze_until_absolute"`
+	SnoozeUntilWeekdayAbsolute types.String `tfsdk:"snooze_until_weekday_absolute"`
 }
 
 func (r *Integration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -191,6 +192,11 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 									MarkdownDescription: "The absolute time to snooze the integration until. Format:HH:mm. Examples: When the incident happens at 01 am in the night, and the snooze until absolute is set to 07:00, the incident will be snoozed until 07:00 the same night. If the incident happens at 14:00, it will be snoozed until 07:00 the next day.",
 									Optional:            true,
 									Validators:          []validator.String{TimeValidator("Not a valid time")},
+								},
+								"snooze_until_weekday_absolute": schema.StringAttribute{
+									MarkdownDescription: "The absolute day of week to snooze the integration until. Needs to be combined with snooze_until_absolute. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
+									Optional:            true,
+									Validators:          []validator.String{DaysOfWeekValidator("Not a valid day of week")},
 								},
 							},
 						},
@@ -636,10 +642,11 @@ func mapSnoozeFiltersResponseToModel(ctx context.Context, response *[]snoozeFilt
 
 func mapSnoozeFilterResponseToModel(ctx context.Context, response *snoozeFilterResponse) *SnoozeFilterModel {
 	return &SnoozeFilterModel{
-		SelectedDays:          MapNullableList(ctx, response.SelectedDays),
-		From:                  types.StringPointerValue(response.From),
-		Until:                 types.StringPointerValue(response.Until),
-		SnoozeWindowInMinutes: types.Int64PointerValue(response.SnoozeWindowInMinutes),
-		SnoozeUntilAbsolute:   types.StringPointerValue(response.SnoozeUntilAbsolute),
+		SelectedDays:               MapNullableList(ctx, response.SelectedDays),
+		From:                       types.StringPointerValue(response.From),
+		Until:                      types.StringPointerValue(response.Until),
+		SnoozeWindowInMinutes:      types.Int64PointerValue(response.SnoozeWindowInMinutes),
+		SnoozeUntilAbsolute:        types.StringPointerValue(response.SnoozeUntilAbsolute),
+		SnoozeUntilWeekdayAbsolute: types.StringPointerValue(response.SnoozeUntilWeekdayAbsolute),
 	}
 }

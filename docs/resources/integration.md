@@ -60,6 +60,21 @@ resource "allquiet_integration" "webhook_snooze_absolute" {
   }
 }
 
+resource "allquiet_integration" "webhook_snooze_absolute_with_weekday" {
+  display_name = "My Webhook Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Webhook"
+  snooze_settings = {
+    filters = [
+      {
+        selected_days                 = ["sat", "sun"]
+        snooze_until_absolute         = "07:00"
+        snooze_until_weekday_absolute = "mon"
+      }
+    ]
+  }
+}
+
 resource "allquiet_integration" "heartbeat_monitor" {
   display_name = "My Heartbeat Monitoring Integration"
   team_id      = allquiet_team.root.id
@@ -239,6 +254,7 @@ Optional:
 - `from` (String) From time of the time filter. Format: HH:mm
 - `selected_days` (List of String) Days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
 - `snooze_until_absolute` (String) The absolute time to snooze the integration until. Format:HH:mm. Examples: When the incident happens at 01 am in the night, and the snooze until absolute is set to 07:00, the incident will be snoozed until 07:00 the same night. If the incident happens at 14:00, it will be snoozed until 07:00 the next day.
+- `snooze_until_weekday_absolute` (String) The absolute day of week to snooze the integration until. Needs to be combined with snooze_until_absolute. Possible values are: sun, mon, tue, wed, thu, fri, sat
 - `snooze_window_in_minutes` (Number) The snooze window in minutes. If your integration is flaky and you'd like to reduce noise, you can set a snooze window. This will keep the incident snoozed for the specified time period and only alert you once the snooze window is over and the incident has not been resolved yet. Max 1440 minutes (24 hours).
 - `until` (String) Until time of the time filter. Format: HH:mm
 

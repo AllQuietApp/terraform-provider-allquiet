@@ -76,6 +76,9 @@ type RoutingRuleActionsModel struct {
 	AffectsServices               types.List                             `tfsdk:"affects_services"`
 	ForwardToOutboundIntegrations types.List                             `tfsdk:"forward_to_outbound_integrations"`
 	SetAttributes                 []RoutingRuleActionsSetAttributesModel `tfsdk:"set_attributes"`
+	SnoozeForRelativeInMinutes    types.Int64                            `tfsdk:"snooze_for_relative_in_minutes"`
+	SnoozeUntilAbsolute           types.String                           `tfsdk:"snooze_until_absolute"`
+	SnoozeUntilWeekdayAbsolute    types.String                           `tfsdk:"snooze_until_weekday_absolute"`
 }
 
 type RoutingRuleActionsSetAttributesModel struct {
@@ -308,6 +311,20 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 											},
 										},
 									},
+								},
+								"snooze_for_relative_in_minutes": schema.Int64Attribute{
+									Optional:            true,
+									MarkdownDescription: "Snooze for relative in minutes",
+								},
+								"snooze_until_absolute": schema.StringAttribute{
+									Optional:            true,
+									MarkdownDescription: "Snooze until absolute",
+									Validators:          []validator.String{TimeValidator("Not a valid time")},
+								},
+								"snooze_until_weekday_absolute": schema.StringAttribute{
+									Optional:            true,
+									MarkdownDescription: "Snooze until weekday absolute. Possible values are: " + strings.Join(ValidDaysOfWeek, ", "),
+									Validators:          []validator.String{DaysOfWeekValidator("Not a valid day of week")},
 								},
 							},
 						},
@@ -576,6 +593,9 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 		AffectsServices:               MapNullableList(ctx, actions.AffectsServices),
 		ForwardToOutboundIntegrations: MapNullableList(ctx, actions.ForwardToOutboundIntegrations),
 		SetAttributes:                 mapRoutingRuleActionsSetAttributesResponseToModel(actions.SetAttributes),
+		SnoozeForRelativeInMinutes:    types.Int64PointerValue(actions.SnoozeForRelativeInMinutes),
+		SnoozeUntilAbsolute:           types.StringPointerValue(actions.SnoozeUntilAbsolute),
+		SnoozeUntilWeekdayAbsolute:    types.StringPointerValue(actions.SnoozeUntilWeekdayAbsolute),
 	}
 }
 

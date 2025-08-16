@@ -45,6 +45,21 @@ resource "allquiet_integration" "webhook_snooze_absolute" {
   }
 }
 
+resource "allquiet_integration" "webhook_snooze_absolute_with_weekday" {
+  display_name = "My Webhook Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Webhook"
+  snooze_settings = {
+    filters = [
+      {
+        selected_days                 = ["sat", "sun"]
+        snooze_until_absolute         = "07:00"
+        snooze_until_weekday_absolute = "mon"
+      }
+    ]
+  }
+}
+
 resource "allquiet_integration" "heartbeat_monitor" {
   display_name = "My Heartbeat Monitoring Integration"
   team_id      = allquiet_team.root.id

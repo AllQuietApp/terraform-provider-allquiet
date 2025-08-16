@@ -167,6 +167,32 @@ resource "allquiet_integration" "webhook_snooze_absolute" {
 	}
 }
 
+resource "allquiet_integration" "webhook_snooze_absolute_with_weekday" {
+	display_name = "My Webhook Integration"
+	team_id = allquiet_team.test.id
+	type = "Webhook"
+	snooze_settings = {
+		filters = [
+			{
+				selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				from = "22:00"
+				until = "07:00"
+				snooze_until_absolute = "07:00"
+				snooze_until_weekday_absolute = "tue"
+			},
+			{
+				selected_days = ["sat", "sun"]
+				snooze_window_in_minutes = 10
+			}
+		]
+	}
+	webhook_authentication = {
+		type = "bearer"
+		bearer = {
+			token = "my-token"
+		}
+	}
+}
 	
 resource "allquiet_integration" "http_monitoring" {
 	display_name = "My HTTP Monitoring Integration"

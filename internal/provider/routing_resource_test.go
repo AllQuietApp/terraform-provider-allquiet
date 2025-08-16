@@ -129,6 +129,79 @@ resource "allquiet_routing" "test" {
   ]
 }
 
+resource "allquiet_routing" "test_with_snooze_relative" {
+	display_name = %[1]q
+	team_id = allquiet_team.root.id
+	rules = [
+	  {
+		conditions = {
+		  statuses = ["Open"]
+		  severities = ["Critical", "Warning"]
+	   },
+	   channels = {
+	   },
+	   actions = {
+		 assign_to_teams = [allquiet_team.test.id]
+	   }
+	  },
+	  {
+		conditions = {
+		  attributes = [
+			{
+			  name = "source"
+			  operator = "=" 
+			  value = "web"
+			}
+		  ]
+		},
+		channels = {
+		  notification_channels = ["VoiceCall"]
+		},
+		actions = {
+		  add_interaction = "Snoozed"
+		  snooze_for_relative_in_minutes = 10
+		}
+	  }
+	]
+  }
+
+resource "allquiet_routing" "test_with_snooze_absolute" {
+	display_name = %[1]q
+	team_id = allquiet_team.root.id
+	rules = [
+	  {
+		conditions = {
+		  statuses = ["Open"]
+		  severities = ["Critical", "Warning"]
+	   },
+	   channels = {
+	   },
+	   actions = {
+		 assign_to_teams = [allquiet_team.test.id]
+	   }
+	  },
+	  {
+		conditions = {
+		  attributes = [
+			{
+			  name = "source"
+			  operator = "=" 
+			  value = "web"
+			}
+		  ]
+		},
+		channels = {
+		  notification_channels = ["VoiceCall"]
+		},
+		actions = {
+		  add_interaction = "Snoozed"
+		  snooze_until_absolute = "07:00"
+		  snooze_until_weekday_absolute = "mon"
+		}
+	  }
+	]
+  }
+
 resource "allquiet_routing" "test_with_team_connection_settings" {
 	display_name = %[1]q
 	team_id = allquiet_team.root.id

@@ -238,3 +238,44 @@ resource "allquiet_routing" "example_9" {
     }
   ]
 }
+
+resource "allquiet_routing" "example_10" {
+  team_id      = allquiet_team.root.id
+  display_name = "Snooze Minor incidents for 10 minutes"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
+  rules = [
+    {
+      conditions = {
+        severities = ["Minor", "Warning"]
+      },
+      actions = {
+        add_interaction                = "Snoozed"
+        snooze_for_relative_in_minutes = 10
+      }
+    },
+  ]
+}
+
+
+
+resource "allquiet_routing" "example_11" {
+  team_id      = allquiet_team.root.id
+  display_name = "Snooze Minor incidents until Monday 07:00"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
+  rules = [
+    {
+      conditions = {
+        severities = ["Minor", "Warning"]
+      },
+      actions = {
+        add_interaction               = "Snoozed"
+        snooze_until_absolute         = "07:00"
+        snooze_until_weekday_absolute = "mon"
+      }
+    },
+  ]
+}

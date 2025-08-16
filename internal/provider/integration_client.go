@@ -87,11 +87,12 @@ type snoozeSettingsResponse struct {
 }
 
 type snoozeFilterResponse struct {
-	SelectedDays          *[]string `json:"selectedDays"`
-	From                  *string   `json:"from"`
-	Until                 *string   `json:"until"`
-	SnoozeWindowInMinutes *int64    `json:"snoozeWindowInMinutes"`
-	SnoozeUntilAbsolute   *string   `json:"snoozeUntilAbsolute"`
+	SelectedDays               *[]string `json:"selectedDays"`
+	From                       *string   `json:"from"`
+	Until                      *string   `json:"until"`
+	SnoozeWindowInMinutes      *int64    `json:"snoozeWindowInMinutes"`
+	SnoozeUntilAbsolute        *string   `json:"snoozeUntilAbsolute"`
+	SnoozeUntilWeekdayAbsolute *string   `json:"snoozeUntilWeekdayAbsolute"`
 }
 
 func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateRequest {
@@ -241,11 +242,12 @@ func mapSnoozeFilterCreateRequest(plan *SnoozeFilterModel) *snoozeFilterResponse
 	}
 
 	return &snoozeFilterResponse{
-		SelectedDays:          ListToStringArray(plan.SelectedDays),
-		From:                  plan.From.ValueStringPointer(),
-		Until:                 plan.Until.ValueStringPointer(),
-		SnoozeWindowInMinutes: plan.SnoozeWindowInMinutes.ValueInt64Pointer(),
-		SnoozeUntilAbsolute:   plan.SnoozeUntilAbsolute.ValueStringPointer(),
+		SelectedDays:               ListToStringArray(plan.SelectedDays),
+		From:                       plan.From.ValueStringPointer(),
+		Until:                      plan.Until.ValueStringPointer(),
+		SnoozeWindowInMinutes:      plan.SnoozeWindowInMinutes.ValueInt64Pointer(),
+		SnoozeUntilAbsolute:        plan.SnoozeUntilAbsolute.ValueStringPointer(),
+		SnoozeUntilWeekdayAbsolute: plan.SnoozeUntilWeekdayAbsolute.ValueStringPointer(),
 	}
 }
 

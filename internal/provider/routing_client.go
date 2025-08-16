@@ -48,6 +48,9 @@ type routingRuleActions struct {
 	AffectsServices               *[]string                  `json:"affectsServices"`
 	ForwardToOutboundIntegrations *[]string                  `json:"forwardToOutboundIntegrations"`
 	SetAttributes                 *[]routingRuleSetAttribute `json:"setAttributes"`
+	SnoozeForRelativeInMinutes    *int64                     `json:"snoozeForRelativeInMinutes"`
+	SnoozeUntilAbsolute           *string                    `json:"snoozeUntilAbsolute"`
+	SnoozeUntilWeekdayAbsolute    *string                    `json:"snoozeUntilWeekdayAbsolute"`
 }
 
 type routingRuleSetAttribute struct {
@@ -168,6 +171,9 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 		AffectsServices:               ListToStringArray(actions.AffectsServices),
 		ForwardToOutboundIntegrations: ListToStringArray(actions.ForwardToOutboundIntegrations),
 		SetAttributes:                 mapRoutingRuleSetAttributes(actions.SetAttributes),
+		SnoozeForRelativeInMinutes:    actions.SnoozeForRelativeInMinutes.ValueInt64Pointer(),
+		SnoozeUntilAbsolute:           actions.SnoozeUntilAbsolute.ValueStringPointer(),
+		SnoozeUntilWeekdayAbsolute:    actions.SnoozeUntilWeekdayAbsolute.ValueStringPointer(),
 	}
 }
 
