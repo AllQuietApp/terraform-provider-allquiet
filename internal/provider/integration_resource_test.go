@@ -247,6 +247,22 @@ resource "allquiet_integration" "cronjob_monitor" {
 	}
 }
 
+resource "allquiet_integration" "ping_monitor" {
+	display_name = "My Ping Monitoring Integration"
+	team_id = allquiet_team.test.id
+	type = "PingMonitor"
+	integration_settings = {
+		ping_monitor = {
+			host = "google.com"
+			timeout_in_milliseconds = 1000
+			interval_in_seconds = 60
+			is_paused = false
+			severity_degraded = "Warning"
+			severity_down = "Critical"
+		}
+	}
+}
+
 
 `, display_name)
 

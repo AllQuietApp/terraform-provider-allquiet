@@ -150,6 +150,23 @@ resource "allquiet_integration" "http_monitoring_head" {
   }
 }
 
+resource "allquiet_integration" "ping_monitor" {
+  display_name = "My Ping Monitoring Integration"
+  team_id      = allquiet_team.root.id
+  type         = "PingMonitor"
+  integration_settings = {
+    ping_monitor = {
+      host = "google.com"
+
+      timeout_in_milliseconds = 1000
+      interval_in_seconds     = 300
+      is_paused               = false
+      severity_degraded       = "Warning"
+      severity_down           = "Critical"
+    }
+  }
+}
+
 
 locals {
   computed_amazon_cloudwatch_webhook_url = allquiet_integration.amazon_cloudwatch.webhook_url
@@ -186,6 +203,7 @@ Optional:
 - `cronjob_monitor` (Attributes) The cronjob monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--cronjob_monitor))
 - `heartbeat_monitor` (Attributes) The heartbeat monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--heartbeat_monitor))
 - `http_monitoring` (Attributes) The http monitoring of the integration (see [below for nested schema](#nestedatt--integration_settings--http_monitoring))
+- `ping_monitor` (Attributes) The ping monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--ping_monitor))
 
 <a id="nestedatt--integration_settings--cronjob_monitor"></a>
 ### Nested Schema for `integration_settings.cronjob_monitor`
@@ -235,6 +253,22 @@ Optional:
 - `severity_down` (String) The severity down of the http monitoring. Possible values are: Critical, Warning, Minor
 - `ssl_certificate_max_age_in_days_degraded` (Number) The ssl certificate max age in days degraded of the http monitoring
 - `ssl_certificate_max_age_in_days_down` (Number) The ssl certificate max age in days down of the http monitoring
+
+
+<a id="nestedatt--integration_settings--ping_monitor"></a>
+### Nested Schema for `integration_settings.ping_monitor`
+
+Required:
+
+- `host` (String) The host of the ping monitor
+- `interval_in_seconds` (Number) The interval in seconds of the ping monitor. Valid values are: 30, 60, 120, 300, 600, 900, 1800, 3600, 86400
+- `timeout_in_milliseconds` (Number) The timeout in milliseconds of the ping monitor. Min 50, max 60000.
+
+Optional:
+
+- `is_paused` (Boolean) If the ping monitor is paused
+- `severity_degraded` (String) The severity degraded of the ping monitor. Possible values are: Critical, Warning, Minor
+- `severity_down` (String) The severity down of the ping monitor. Possible values are: Critical, Warning, Minor
 
 
 

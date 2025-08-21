@@ -53,6 +53,7 @@ type IntegrationSettingsModel struct {
 	HttpMonitoring   *HttpMonitoringModel   `tfsdk:"http_monitoring"`
 	HeartbeatMonitor *HeartbeatMonitorModel `tfsdk:"heartbeat_monitor"`
 	CronjobMonitor   *CronjobMonitorModel   `tfsdk:"cronjob_monitor"`
+	PingMonitor      *PingMonitorModel      `tfsdk:"ping_monitor"`
 }
 
 type HttpMonitoringModel struct {
@@ -66,12 +67,21 @@ type HttpMonitoringModel struct {
 	BearerAuthenticationToken          types.String `tfsdk:"bearer_authentication_token"`
 	Headers                            types.Map    `tfsdk:"headers"`
 	Body                               types.String `tfsdk:"body"`
-	IsPaused                           types.Bool   `tfsdk:"is_paused"`
 	ContentTest                        types.String `tfsdk:"content_test"`
 	SSLCertificateMaxAgeInDaysDegraded types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_degraded"`
 	SSLCertificateMaxAgeInDaysDown     types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_down"`
 	SeverityDegraded                   types.String `tfsdk:"severity_degraded"`
 	SeverityDown                       types.String `tfsdk:"severity_down"`
+	IsPaused                           types.Bool   `tfsdk:"is_paused"`
+}
+
+type PingMonitorModel struct {
+	Host                  types.String `tfsdk:"host"`
+	TimeoutInMilliseconds types.Int64  `tfsdk:"timeout_in_milliseconds"`
+	IntervalInSeconds     types.Int64  `tfsdk:"interval_in_seconds"`
+	SeverityDegraded      types.String `tfsdk:"severity_degraded"`
+	SeverityDown          types.String `tfsdk:"severity_down"`
+	IsPaused              types.Bool   `tfsdk:"is_paused"`
 }
 
 type HeartbeatMonitorModel struct {
@@ -377,6 +387,50 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 							},
 						},
 					},
+					"ping_monitor": schema.SingleNestedAttribute{
+						MarkdownDescription: "The ping monitor of the integration",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"host": schema.StringAttribute{
+								MarkdownDescription: "The host of the ping monitor",
+								Required:            true,
+							},
+							"timeout_in_milliseconds": schema.Int64Attribute{
+								MarkdownDescription: "The timeout in milliseconds of the ping monitor. Min 50, max 60000.",
+								Required:            true,
+								Validators: []validator.Int64{
+									int64validator.Between(50, 60000),
+								},
+							},
+							"interval_in_seconds": schema.Int64Attribute{
+								MarkdownDescription: "The interval in seconds of the ping monitor. Valid values are: " + strings.Join(ValidIntervalsInSecondsAsString, ", "),
+								Required:            true,
+								Validators: []validator.Int64{
+									IntervalInSecondsValidator("Not a valid interval in seconds"),
+								},
+							},
+							"is_paused": schema.BoolAttribute{
+								MarkdownDescription: "If the ping monitor is paused",
+								Optional:            true,
+								Computed:            true,
+								Default:             booldefault.StaticBool(false),
+							},
+							"severity_degraded": schema.StringAttribute{
+								MarkdownDescription: "The severity degraded of the ping monitor. Possible values are: " + strings.Join(ValidSeverities, ", "),
+								Optional:            true,
+								Validators: []validator.String{
+									SeverityValidator("Not a valid severity"),
+								},
+							},
+							"severity_down": schema.StringAttribute{
+								MarkdownDescription: "The severity down of the ping monitor. Possible values are: " + strings.Join(ValidSeverities, ", "),
+								Optional:            true,
+								Validators: []validator.String{
+									SeverityValidator("Not a valid severity"),
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -522,6 +576,23 @@ func mapIntegrationSettingsResponseToModel(response *integrationSettingsResponse
 		HttpMonitoring:   mapHttpMonitoringResponseToModel(response.HttpMonitoring),
 		HeartbeatMonitor: mapHeartbeatMonitorResponseToModel(response.HeartbeatMonitor),
 		CronjobMonitor:   mapCronjobMonitorResponseToModel(response.CronjobMonitor),
+		PingMonitor:      mapPingMonitorResponseToModel(response.PingMonitor),
+	}
+}
+
+func mapPingMonitorResponseToModel(response *pingMonitorResponse) *PingMonitorModel {
+
+	if response == nil {
+		return nil
+	}
+
+	return &PingMonitorModel{
+		Host:                  types.StringValue(response.Host),
+		TimeoutInMilliseconds: types.Int64Value(response.TimeoutInMilliseconds),
+		IntervalInSeconds:     types.Int64Value(response.IntervalInSeconds),
+		SeverityDegraded:      types.StringValue(response.SeverityDegraded),
+		SeverityDown:          types.StringValue(response.SeverityDown),
+		IsPaused:              types.BoolValue(response.IsPaused),
 	}
 }
 

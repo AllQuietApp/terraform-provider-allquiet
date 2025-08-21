@@ -135,6 +135,23 @@ resource "allquiet_integration" "http_monitoring_head" {
   }
 }
 
+resource "allquiet_integration" "ping_monitor" {
+  display_name = "My Ping Monitoring Integration"
+  team_id      = allquiet_team.root.id
+  type         = "PingMonitor"
+  integration_settings = {
+    ping_monitor = {
+      host = "google.com"
+
+      timeout_in_milliseconds = 1000
+      interval_in_seconds     = 300
+      is_paused               = false
+      severity_degraded       = "Warning"
+      severity_down           = "Critical"
+    }
+  }
+}
+
 
 locals {
   computed_amazon_cloudwatch_webhook_url = allquiet_integration.amazon_cloudwatch.webhook_url

@@ -47,6 +47,16 @@ type integrationSettingsResponse struct {
 	HttpMonitoring   *httpMonitoringResponse   `json:"httpMonitoring"`
 	HeartbeatMonitor *heartbeatMonitorResponse `json:"heartbeatMonitor"`
 	CronjobMonitor   *cronjobMonitorResponse   `json:"cronjobMonitor"`
+	PingMonitor      *pingMonitorResponse      `json:"pingMonitor"`
+}
+
+type pingMonitorResponse struct {
+	Host                  string `json:"host"`
+	TimeoutInMilliseconds int64  `json:"timeoutInMilliseconds"`
+	IntervalInSeconds     int64  `json:"intervalInSeconds"`
+	SeverityDegraded      string `json:"severityDegraded"`
+	SeverityDown          string `json:"severityDown"`
+	IsPaused              bool   `json:"isPaused"`
 }
 
 type heartbeatMonitorResponse struct {
@@ -117,6 +127,22 @@ func mapIntegrationSettingsCreateRequest(plan *IntegrationSettingsModel) *integr
 		HttpMonitoring:   mapHttpMonitoringCreateRequest(plan.HttpMonitoring),
 		HeartbeatMonitor: mapHeartbeatMonitorCreateRequest(plan.HeartbeatMonitor),
 		CronjobMonitor:   mapCronjobMonitorCreateRequest(plan.CronjobMonitor),
+		PingMonitor:      mapPingMonitorCreateRequest(plan.PingMonitor),
+	}
+}
+
+func mapPingMonitorCreateRequest(plan *PingMonitorModel) *pingMonitorResponse {
+	if plan == nil {
+		return nil
+	}
+
+	return &pingMonitorResponse{
+		Host:                  plan.Host.ValueString(),
+		TimeoutInMilliseconds: plan.TimeoutInMilliseconds.ValueInt64(),
+		IntervalInSeconds:     plan.IntervalInSeconds.ValueInt64(),
+		SeverityDegraded:      plan.SeverityDegraded.ValueString(),
+		SeverityDown:          plan.SeverityDown.ValueString(),
+		IsPaused:              plan.IsPaused.ValueBool(),
 	}
 }
 
