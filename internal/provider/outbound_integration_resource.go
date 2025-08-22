@@ -35,11 +35,12 @@ type OutboundIntegration struct {
 
 // OutboundIntegrationModel describes the resource data model.
 type OutboundIntegrationModel struct {
-	Id                      types.String `tfsdk:"id"`
-	DisplayName             types.String `tfsdk:"display_name"`
-	TeamId                  types.String `tfsdk:"team_id"`
-	Type                    types.String `tfsdk:"type"`
-	TriggersOnlyOnForwarded types.Bool   `tfsdk:"triggers_only_on_forwarded"`
+	Id                          types.String `tfsdk:"id"`
+	DisplayName                 types.String `tfsdk:"display_name"`
+	TeamId                      types.String `tfsdk:"team_id"`
+	Type                        types.String `tfsdk:"type"`
+	TriggersOnlyOnForwarded     types.Bool   `tfsdk:"triggers_only_on_forwarded"`
+	SkipUpdatingAfterForwarding types.Bool   `tfsdk:"skip_updating_after_forwarding"`
 
 	TeamConnectionSettings *TeamConnectionSettings `tfsdk:"team_connection_settings"`
 }
@@ -74,7 +75,12 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 				Required:            true,
 			},
 			"triggers_only_on_forwarded": schema.BoolAttribute{
-				MarkdownDescription: "If true, the integration will only trigger when explicitly forwarded",
+				MarkdownDescription: "If true, the integration will only trigger once explicitly forwarded.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"skip_updating_after_forwarding": schema.BoolAttribute{
+				MarkdownDescription: "If true, the integration will not trigger on updates, once it has been forwarded.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -224,6 +230,7 @@ func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outbou
 	data.TeamId = types.StringValue(response.TeamId)
 	data.Type = types.StringValue(response.Type)
 	data.TriggersOnlyOnForwarded = types.BoolPointerValue(response.TriggersOnlyOnForwarded)
+	data.SkipUpdatingAfterForwarding = types.BoolPointerValue(response.SkipUpdatingAfterForwarding)
 
 	if response.TeamConnectionSettings != nil {
 		data.TeamConnectionSettings = &TeamConnectionSettings{

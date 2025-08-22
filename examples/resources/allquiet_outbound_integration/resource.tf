@@ -35,3 +35,11 @@ resource "allquiet_outbound_integration" "slack_selected_teams" {
     team_ids             = [allquiet_team.root.id, allquiet_team.engineering.id]
   }
 }
+
+resource "allquiet_outbound_integration" "webhook" {
+  display_name = "My Webhook Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Webhook"
+  triggers_only_on_forwarded = true
+  skip_updating_after_forwarding = true
+}

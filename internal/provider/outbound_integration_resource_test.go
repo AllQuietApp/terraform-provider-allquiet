@@ -111,6 +111,20 @@ resource "allquiet_outbound_integration" "test_null_team_ids" {
     team_ids = null
   }
 }
+
+
+
+resource "allquiet_outbound_integration" "test_webhook" {
+	display_name = "%[1]s (Webhook)"	
+	team_id = allquiet_team.test.id
+	type = "Webhook"
+	triggers_only_on_forwarded = true
+	skip_updating_after_forwarding = true
+	team_connection_settings = {
+	  team_connection_mode = "OrganizationTeams"
+	  team_ids = null
+	}
+  }
 `, display_name)
 
 }

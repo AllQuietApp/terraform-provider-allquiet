@@ -9,29 +9,32 @@ import (
 )
 
 type outboundIntegrationResponse struct {
-	Id                      string
-	DisplayName             string
-	TeamId                  string
-	Type                    string
-	TriggersOnlyOnForwarded *bool
-	TeamConnectionSettings  *teamConnectionSettings
+	Id                          string
+	DisplayName                 string
+	TeamId                      string
+	Type                        string
+	TriggersOnlyOnForwarded     *bool
+	SkipUpdatingAfterForwarding *bool
+	TeamConnectionSettings      *teamConnectionSettings
 }
 
 type outboundIntegrationCreateRequest struct {
-	DisplayName             string                  `json:"displayName"`
-	TeamId                  string                  `json:"teamId"`
-	Type                    string                  `json:"type"`
-	TriggersOnlyOnForwarded *bool                   `json:"triggersOnlyOnForwarded"`
-	TeamConnectionSettings  *teamConnectionSettings `json:"teamConnectionSettings"`
+	DisplayName                 string                  `json:"displayName"`
+	TeamId                      string                  `json:"teamId"`
+	Type                        string                  `json:"type"`
+	TriggersOnlyOnForwarded     *bool                   `json:"triggersOnlyOnForwarded"`
+	SkipUpdatingAfterForwarding *bool                   `json:"skipUpdatingAfterForwarding"`
+	TeamConnectionSettings      *teamConnectionSettings `json:"teamConnectionSettings"`
 }
 
 func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outboundIntegrationCreateRequest {
 	return &outboundIntegrationCreateRequest{
-		DisplayName:             plan.DisplayName.ValueString(),
-		TeamId:                  plan.TeamId.ValueString(),
-		Type:                    plan.Type.ValueString(),
-		TriggersOnlyOnForwarded: plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
-		TeamConnectionSettings:  MapTeamConnectionSettingsToRequest(plan.TeamConnectionSettings),
+		DisplayName:                 plan.DisplayName.ValueString(),
+		TeamId:                      plan.TeamId.ValueString(),
+		Type:                        plan.Type.ValueString(),
+		TriggersOnlyOnForwarded:     plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
+		SkipUpdatingAfterForwarding: plan.SkipUpdatingAfterForwarding.ValueBoolPointer(),
+		TeamConnectionSettings:      MapTeamConnectionSettingsToRequest(plan.TeamConnectionSettings),
 	}
 }
 func (c *AllQuietAPIClient) CreateOutboundIntegrationResource(ctx context.Context, data *OutboundIntegrationModel) (*outboundIntegrationResponse, error) {
