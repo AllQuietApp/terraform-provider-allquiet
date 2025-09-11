@@ -122,7 +122,7 @@ resource "allquiet_integration" "http_monitoring_head" {
       url = "https://allquiet.com"
 
       method                                   = "HEAD"
-      timeout_in_milliseconds                  = 4000 # 4 seconds
+      timeout_in_milliseconds                  = 5000 # 5 seconds
       interval_in_seconds                      = 300  # 5 minutes
       authentication_type                      = "Bearer"
       bearer_authentication_token              = "your_secret_token"

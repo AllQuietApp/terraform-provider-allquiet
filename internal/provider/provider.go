@@ -150,6 +150,7 @@ func (p *AllQuietProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewStatusPage,
 		NewOrganizationMembership,
 		NewIntegrationMaintenanceWindow,
+		NewOnCallOverride,
 	}
 }
 
@@ -161,6 +162,7 @@ func (p *AllQuietProvider) DataSources(ctx context.Context) []func() datasource.
 		NewTeamsDataSource,
 		NewTeamMembershipDataSource,
 		NewTeamMembershipsDataSource,
+		NewOnCallOverridesDataSource,
 	}
 }
 
