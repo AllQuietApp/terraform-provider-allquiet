@@ -110,7 +110,7 @@ resource "allquiet_integration" "http_monitoring_post" {
     http_monitoring = {
       url                         = "https://allquiet.com"
       method                      = "POST"
-      timeout_in_milliseconds     = 4000 # 4 seconds
+      timeout_in_milliseconds     = 1000 # 1 second
       interval_in_seconds         = 300  # 5 minutes
       authentication_type         = "Bearer"
       bearer_authentication_token = "your_secret_token"
