@@ -48,6 +48,12 @@ type integrationSettingsResponse struct {
 	HeartbeatMonitor *heartbeatMonitorResponse `json:"heartbeatMonitor"`
 	CronjobMonitor   *cronjobMonitorResponse   `json:"cronjobMonitor"`
 	PingMonitor      *pingMonitorResponse      `json:"pingMonitor"`
+	Email            *emailResponse            `json:"email"`
+}
+
+type emailResponse struct {
+	Aliases      *[]string `json:"aliases"`
+	EmailAddress string    `json:"emailAddress"`
 }
 
 type pingMonitorResponse struct {
@@ -128,6 +134,17 @@ func mapIntegrationSettingsCreateRequest(plan *IntegrationSettingsModel) *integr
 		HeartbeatMonitor: mapHeartbeatMonitorCreateRequest(plan.HeartbeatMonitor),
 		CronjobMonitor:   mapCronjobMonitorCreateRequest(plan.CronjobMonitor),
 		PingMonitor:      mapPingMonitorCreateRequest(plan.PingMonitor),
+		Email:            mapEmailCreateRequest(plan.Email),
+	}
+}
+
+func mapEmailCreateRequest(plan *EmailSettingsModel) *emailResponse {
+	if plan == nil {
+		return nil
+	}
+
+	return &emailResponse{
+		Aliases: ListToStringArray(plan.Aliases),
 	}
 }
 

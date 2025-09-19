@@ -152,6 +152,17 @@ resource "allquiet_integration" "ping_monitor" {
   }
 }
 
+resource "allquiet_integration" "email_with_aliases" {
+  display_name = "My Email Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Email"
+  integration_settings = {
+    email = {
+      aliases = ["email-alias1@integrations.allquiet.app", "email-alias2@integrations.allquiet.app"]
+    }
+  }
+}
+
 
 locals {
   computed_amazon_cloudwatch_webhook_url = allquiet_integration.amazon_cloudwatch.webhook_url

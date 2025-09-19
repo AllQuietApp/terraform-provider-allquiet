@@ -54,6 +54,7 @@ type IntegrationSettingsModel struct {
 	HeartbeatMonitor *HeartbeatMonitorModel `tfsdk:"heartbeat_monitor"`
 	CronjobMonitor   *CronjobMonitorModel   `tfsdk:"cronjob_monitor"`
 	PingMonitor      *PingMonitorModel      `tfsdk:"ping_monitor"`
+	Email            *EmailSettingsModel    `tfsdk:"email"`
 }
 
 type HttpMonitoringModel struct {
@@ -73,6 +74,11 @@ type HttpMonitoringModel struct {
 	SeverityDegraded                   types.String `tfsdk:"severity_degraded"`
 	SeverityDown                       types.String `tfsdk:"severity_down"`
 	IsPaused                           types.Bool   `tfsdk:"is_paused"`
+}
+
+type EmailSettingsModel struct {
+	Aliases      types.List   `tfsdk:"aliases"`
+	EmailAddress types.String `tfsdk:"email_address"`
 }
 
 type PingMonitorModel struct {
@@ -431,6 +437,21 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 							},
 						},
 					},
+					"email": schema.SingleNestedAttribute{
+						MarkdownDescription: "The email settings of the integration",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"aliases": schema.ListAttribute{
+								MarkdownDescription: "The custom aliases of the email if you want to use custom aliases instead of the auto generated email address",
+								ElementType:         types.StringType,
+								Optional:            true,
+							},
+							"email_address": schema.StringAttribute{
+								MarkdownDescription: "The auto generated email address of the integration",
+								Computed:            true,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -564,10 +585,10 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
 	data.WebhookAuthentication = mapWebhookAuthenticationResponseToModel(response.WebhookAuthentication)
-	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(response.IntegrationSettings)
+	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(ctx, response.IntegrationSettings)
 }
 
-func mapIntegrationSettingsResponseToModel(response *integrationSettingsResponse) *IntegrationSettingsModel {
+func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integrationSettingsResponse) *IntegrationSettingsModel {
 	if response == nil {
 		return nil
 	}
@@ -577,6 +598,18 @@ func mapIntegrationSettingsResponseToModel(response *integrationSettingsResponse
 		HeartbeatMonitor: mapHeartbeatMonitorResponseToModel(response.HeartbeatMonitor),
 		CronjobMonitor:   mapCronjobMonitorResponseToModel(response.CronjobMonitor),
 		PingMonitor:      mapPingMonitorResponseToModel(response.PingMonitor),
+		Email:            mapEmailResponseToModel(ctx, response.Email),
+	}
+}
+
+func mapEmailResponseToModel(ctx context.Context, response *emailResponse) *EmailSettingsModel {
+	if response == nil {
+		return nil
+	}
+
+	return &EmailSettingsModel{
+		Aliases:      MapNullableList(ctx, response.Aliases),
+		EmailAddress: types.StringValue(response.EmailAddress),
 	}
 }
 

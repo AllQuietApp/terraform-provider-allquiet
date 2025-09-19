@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -329,4 +330,15 @@ func AddQueryParam(currentUrl string, key string, value string) string {
 		return fmt.Sprintf("%s&%s=%s", currentUrl, key, url.QueryEscape(value))
 	}
 	return fmt.Sprintf("%s?%s=%s", currentUrl, key, url.QueryEscape(value))
+}
+
+func GetAccTestEnv() string {
+	endpoint := os.Getenv("ALLQUIET_API_ENDPOINT")
+	if strings.Contains(endpoint, "https://allquiet.app") {
+		return "prod"
+	}
+	if strings.Contains(endpoint, "https://allquiet-test.app") {
+		return "test"
+	}
+	return "local"
 }

@@ -59,7 +59,7 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 To run the acceptance tests you'll need a real API Key from All Quiet. You can set the key in your shell:
 
 ```shell
-export ALLQUIET_ENDPOINT=https://localhost:7061/api/public/v1
+export ALLQUIET_ENDPOINT=https://allquiet-local.ngrok.io/api/public/v1
 export ALLQUIET_API_KEY=test
 ```
 
@@ -72,6 +72,6 @@ make testacc
 Run specific tests
 
 ```shell
-make testacc TESTARGS='-run=TestAccUserDataSource -count=1'
+make testacc TESTARGS='-run=TestAccIntegration -count=1'
 ```
 

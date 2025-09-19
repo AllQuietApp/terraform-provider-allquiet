@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -130,7 +132,7 @@ func TestAccIntegrationResourceExample(t *testing.T) {
 }
 
 func testAccIntegrationResourceConfig(display_name string) string {
-	return fmt.Sprintf(`
+	result := fmt.Sprintf(`
 resource "allquiet_team" "test" {
   display_name = "Root"
 }
@@ -263,9 +265,21 @@ resource "allquiet_integration" "ping_monitor" {
 	}
 }
 
+resource "allquiet_integration" "email_with_aliases" {
+	display_name = "My Email Integration"
+	team_id      = allquiet_team.test.id
+	type         = "Email"
+	integration_settings = {
+	  email = {
+		aliases = ["email-alias-acc-test@integrations.allquiet.app", "email-alias-acc-test2@integrations.allquiet.app"]
+	  }
+	}
+  }
+  
 
 `, display_name)
 
+	return replaceEmailAliases(result)
 }
 
 func testAccIntegrationResourceExample() string {
@@ -276,5 +290,14 @@ func testAccIntegrationResourceExample() string {
 		panic(err)
 	}
 
-	return RandomizeExample(string(dat))
+	return RandomizeExample(replaceEmailAliases(string(dat)))
+}
+
+func replaceEmailAliases(str string) string {
+	if GetAccTestEnv() == "local" {
+		return strings.Replace(str, "@integrations.allquiet.app", "+"+uuid.New().String()+"@integrations-dev.allquiet-test.app", -1)
+	} else {
+		return strings.Replace(str, "@integrations.allquiet.app", "+"+uuid.New().String()+"@integrations.allquiet.app", -1)
+	}
+
 }

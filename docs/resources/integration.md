@@ -167,6 +167,17 @@ resource "allquiet_integration" "ping_monitor" {
   }
 }
 
+resource "allquiet_integration" "email_with_aliases" {
+  display_name = "My Email Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Email"
+  integration_settings = {
+    email = {
+      aliases = ["email-alias1@integrations.allquiet.app", "email-alias2@integrations.allquiet.app"]
+    }
+  }
+}
+
 
 locals {
   computed_amazon_cloudwatch_webhook_url = allquiet_integration.amazon_cloudwatch.webhook_url
@@ -201,6 +212,7 @@ locals {
 Optional:
 
 - `cronjob_monitor` (Attributes) The cronjob monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--cronjob_monitor))
+- `email` (Attributes) The email settings of the integration (see [below for nested schema](#nestedatt--integration_settings--email))
 - `heartbeat_monitor` (Attributes) The heartbeat monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--heartbeat_monitor))
 - `http_monitoring` (Attributes) The http monitoring of the integration (see [below for nested schema](#nestedatt--integration_settings--http_monitoring))
 - `ping_monitor` (Attributes) The ping monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--ping_monitor))
@@ -217,6 +229,18 @@ Required:
 Optional:
 
 - `time_zone_id` (String) The time zone id of the cronjob monitor. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)
+
+
+<a id="nestedatt--integration_settings--email"></a>
+### Nested Schema for `integration_settings.email`
+
+Optional:
+
+- `aliases` (List of String) The custom aliases of the email if you want to use custom aliases instead of the auto generated email address
+
+Read-Only:
+
+- `email_address` (String) The auto generated email address of the integration
 
 
 <a id="nestedatt--integration_settings--heartbeat_monitor"></a>
