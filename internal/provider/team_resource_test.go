@@ -86,7 +86,7 @@ func TestAccTeamExample(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "time_zone_id", "America/Los_Angeles"),
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.day_of_week", "mon"),
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.time", "09:00"),
-					resource.TestCheckResourceAttr("allquiet_team.my_team", "labels.#", "0"),
+					resource.TestCheckResourceAttr("allquiet_team.my_team", "labels.#", "3"),
 				),
 			},
 			// ImportState testing
