@@ -26,6 +26,10 @@ data "allquiet_team" "test" {
 
 - `display_name` (String) Display name of the team to look up
 
+### Optional
+
+- `labels` (List of String) Labels of the team
+
 ### Read-Only
 
 - `id` (String) Team ID

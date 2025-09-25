@@ -20,6 +20,7 @@ resource "allquiet_team" "my_team" {
     day_of_week = "mon"
     time        = "09:00"
   }
+  labels = ["Product", "Services", "Operations"]
 }
 ```
 
@@ -33,6 +34,7 @@ resource "allquiet_team" "my_team" {
 ### Optional
 
 - `incident_engagement_report_settings` (Attributes) Settings when to send the incident report for the team (see [below for nested schema](#nestedatt--incident_engagement_report_settings))
+- `labels` (List of String) The labels of the team
 - `time_zone_id` (String) The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)
 
 ### Read-Only

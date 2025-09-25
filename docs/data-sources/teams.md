@@ -47,6 +47,10 @@ output "team_time_zone_ids" {
 <a id="nestedatt--teams"></a>
 ### Nested Schema for `teams`
 
+Optional:
+
+- `labels` (List of String) Labels of the team
+
 Read-Only:
 
 - `display_name` (String) Display name of the team
