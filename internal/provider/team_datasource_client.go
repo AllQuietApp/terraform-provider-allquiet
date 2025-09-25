@@ -11,9 +11,10 @@ import (
 )
 
 type teamDataSourceResponse struct {
-	Id          string `json:"id"`
-	DisplayName string `json:"displayName"`
-	TimeZoneId  string `json:"timeZoneId"`
+	Id          string    `json:"id"`
+	DisplayName string    `json:"displayName"`
+	TimeZoneId  string    `json:"timeZoneId"`
+	Labels      *[]string `json:"labels"`
 }
 
 func (c *AllQuietAPIClient) GetTeamDataSource(ctx context.Context, teamDataSource *TeamDataSourceModel, diagnostics *diag.Diagnostics) (*teamDataSourceResponse, error) {

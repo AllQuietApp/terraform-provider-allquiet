@@ -44,6 +44,7 @@ type TeamModel struct {
 	DisplayName                      types.String                           `tfsdk:"display_name"`
 	TimeZoneId                       types.String                           `tfsdk:"time_zone_id"`
 	IncidentEngagementReportSettings *IncidentEngagementReportSettingsModel `tfsdk:"incident_engagement_report_settings"`
+	Labels                           types.List                             `tfsdk:"labels"`
 }
 
 func (r *Team) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -92,6 +93,11 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					},
 				},
 			},
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "The labels of the team",
+				Optional:            true,
+				ElementType:         types.StringType,
+			},
 		},
 	}
 }
@@ -131,7 +137,7 @@ func (r *Team) Create(ctx context.Context, req resource.CreateRequest, resp *res
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create team resource, got error: %s", err))
 		return
 	}
-	mapTeamResponseToModel(teamResponse, &data)
+	mapTeamResponseToModel(ctx, teamResponse, &data)
 
 	tflog.Trace(ctx, "created team resource")
 
@@ -159,7 +165,7 @@ func (r *Team) Read(ctx context.Context, req resource.ReadRequest, resp *resourc
 		return
 	}
 
-	mapTeamResponseToModel(teamResponse, &data)
+	mapTeamResponseToModel(ctx, teamResponse, &data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -180,7 +186,7 @@ func (r *Team) Update(ctx context.Context, req resource.UpdateRequest, resp *res
 		return
 	}
 
-	mapTeamResponseToModel(teamResponse, &data)
+	mapTeamResponseToModel(ctx, teamResponse, &data)
 
 	tflog.Trace(ctx, "updated team resource")
 
@@ -212,10 +218,11 @@ func (r *Team) ImportState(ctx context.Context, req resource.ImportStateRequest,
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapTeamResponseToModel(response *teamResponse, data *TeamModel) {
+func mapTeamResponseToModel(ctx context.Context, response *teamResponse, data *TeamModel) {
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.TimeZoneId = types.StringValue(response.TimeZoneId)
+	data.Labels = MapNullableList(ctx, response.Labels)
 	if response.IncidentEngagementReportSettings != nil {
 		data.IncidentEngagementReportSettings = &IncidentEngagementReportSettingsModel{
 			DayOfWeek: types.StringValue(response.IncidentEngagementReportSettings.DayOfWeek),

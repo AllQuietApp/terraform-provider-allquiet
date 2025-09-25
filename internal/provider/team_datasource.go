@@ -30,6 +30,7 @@ type TeamDataSourceModel struct {
 	Id          types.String `tfsdk:"id"`
 	DisplayName types.String `tfsdk:"display_name"`
 	TimeZoneId  types.String `tfsdk:"time_zone_id"`
+	Labels      types.List   `tfsdk:"labels"`
 }
 
 func (d *TeamDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -52,6 +53,12 @@ func (d *TeamDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 			"time_zone_id": schema.StringAttribute{
 				MarkdownDescription: "The timezone id. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)",
 				Computed:            true,
+			},
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Labels of the team",
+				Computed:            true,
+				ElementType:         types.StringType,
+				Optional:            true,
 			},
 		},
 	}

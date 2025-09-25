@@ -25,6 +25,9 @@ func TestAccTeamsDataSource(t *testing.T) {
 				Config: testAccTeamsDataSourceConfig(displayName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.allquiet_teams.test_by_display_name", "teams.#", "3"),
+					resource.TestCheckResourceAttr("data.allquiet_teams.test_with_labels", "teams.0.labels.#", "2"),
+					resource.TestCheckResourceAttr("data.allquiet_teams.test_with_labels", "teams.0.labels.0", "label1"),
+					resource.TestCheckResourceAttr("data.allquiet_teams.test_with_labels", "teams.0.labels.1", "label2"),
 				),
 			},
 		},
@@ -46,9 +49,19 @@ func testAccTeamsDataSourceConfig(displayName string) string {
 			display_name = "%[1]s 3"
 		}
 
+		resource "allquiet_team" "team_with_labels" {
+			display_name = "Team with labels"
+			labels = ["label1", "label2"]
+		}
+
 		data "allquiet_teams" "test_by_display_name" {
 			display_name = "%[1]s"
 			depends_on = [allquiet_team.test1, allquiet_team.test2, allquiet_team.test3]
+		}
+
+		data "allquiet_teams" "test_with_labels" {
+			display_name = "Team with labels"
+			depends_on = [allquiet_team.team_with_labels]
 		}
 	`, displayName)
 }

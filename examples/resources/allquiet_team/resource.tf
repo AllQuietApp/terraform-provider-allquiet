@@ -6,4 +6,5 @@ resource "allquiet_team" "my_team" {
     day_of_week = "mon"
     time        = "09:00"
   }
+  labels = ["Product", "Services", "Operations"]
 }

@@ -25,6 +25,9 @@ func TestAccTeamResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_team.test", "time_zone_id", "Europe/Berlin"),
 					resource.TestCheckResourceAttr("allquiet_team.test", "incident_engagement_report_settings.day_of_week", "mon"),
 					resource.TestCheckResourceAttr("allquiet_team.test", "incident_engagement_report_settings.time", "09:00"),
+					resource.TestCheckResourceAttr("allquiet_team.test_labels", "labels.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_team.test_labels", "labels.0", "label1"),
+					resource.TestCheckResourceAttr("allquiet_team.test_labels", "labels.1", "label2"),
 				),
 			},
 			// ImportState testing
@@ -41,6 +44,9 @@ func TestAccTeamResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_team.test", "time_zone_id", "Europe/Berlin"),
 					resource.TestCheckResourceAttr("allquiet_team.test", "incident_engagement_report_settings.day_of_week", "tue"),
 					resource.TestCheckResourceAttr("allquiet_team.test", "incident_engagement_report_settings.time", "09:00"),
+					resource.TestCheckResourceAttr("allquiet_team.test_labels", "labels.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_team.test_labels", "labels.0", "label1"),
+					resource.TestCheckResourceAttr("allquiet_team.test_labels", "labels.1", "label2"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -58,6 +64,12 @@ resource "allquiet_team" "test" {
 		time = "09:00"
 	}
 }
+
+resource "allquiet_team" "test_labels" {
+  display_name = %[1]q
+  time_zone_id = "Europe/Berlin"
+  labels = ["label1", "label2"]
+}
 `, display_name, day_of_week)
 }
 
@@ -74,6 +86,7 @@ func TestAccTeamExample(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "time_zone_id", "America/Los_Angeles"),
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.day_of_week", "mon"),
 					resource.TestCheckResourceAttr("allquiet_team.my_team", "incident_engagement_report_settings.time", "09:00"),
+					resource.TestCheckResourceAttr("allquiet_team.my_team", "labels.#", "0"),
 				),
 			},
 			// ImportState testing

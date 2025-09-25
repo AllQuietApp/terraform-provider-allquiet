@@ -13,6 +13,7 @@ type teamResponse struct {
 	DisplayName                      string
 	TimeZoneId                       string
 	IncidentEngagementReportSettings *incidentEngagementReportSettings
+	Labels                           *[]string
 }
 
 type incidentEngagementReportSettings struct {
@@ -24,6 +25,7 @@ type teamCreateRequest struct {
 	DisplayName                      string                            `json:"displayName"`
 	TimeZoneId                       string                            `json:"timeZoneId"`
 	IncidentEngagementReportSettings *incidentEngagementReportSettings `json:"incidentEngagementReportSettings"`
+	Labels                           *[]string                         `json:"labels"`
 }
 
 func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
@@ -40,6 +42,7 @@ func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
 		DisplayName:                      plan.DisplayName.ValueString(),
 		TimeZoneId:                       plan.TimeZoneId.ValueString(),
 		IncidentEngagementReportSettings: settings,
+		Labels:                           ListToStringArray(plan.Labels),
 	}
 }
 

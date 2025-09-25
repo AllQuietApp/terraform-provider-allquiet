@@ -61,6 +61,12 @@ func (d *TeamsDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 							MarkdownDescription: "The timezone id. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)",
 							Computed:            true,
 						},
+						"labels": schema.ListAttribute{
+							MarkdownDescription: "Labels of the team",
+							Computed:            true,
+							ElementType:         types.StringType,
+							Optional:            true,
+						},
 					},
 				},
 			},
@@ -109,14 +115,14 @@ func (d *TeamsDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	mapTeamsResponseToDataSourceModel(teamsResponse, &data)
+	mapTeamsResponseToDataSourceModel(ctx, teamsResponse, &data)
 
 	tflog.Trace(ctx, "read a data source")
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func mapTeamsResponseToDataSourceModel(teamsResponse *teamsDataSourceResponse, data *TeamsDataSourceModel) {
+func mapTeamsResponseToDataSourceModel(ctx context.Context, teamsResponse *teamsDataSourceResponse, data *TeamsDataSourceModel) {
 	if teamsResponse.Teams == nil {
 		data.Teams = make([]TeamDataSourceModel, 0, len(teamsResponse.Teams))
 		return
@@ -129,6 +135,7 @@ func mapTeamsResponseToDataSourceModel(teamsResponse *teamsDataSourceResponse, d
 			DisplayName: types.StringValue(team.DisplayName),
 			TimeZoneId:  types.StringValue(team.TimeZoneId),
 			Id:          types.StringValue(team.Id),
+			Labels:      MapNullableList(ctx, team.Labels),
 		})
 	}
 }
