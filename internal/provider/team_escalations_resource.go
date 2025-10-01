@@ -584,7 +584,8 @@ func mapTeamEscalationsSchedulesResponseToData(ctx context.Context, teamEscalati
 }
 
 func mapTeamEscalationsRotationsResponseToData(data []teamEscalationsRotation) []TeamEscalationsRotationModel {
-	var rotations []TeamEscalationsRotationModel
+	//var rotations []TeamEscalationsRotationModel
+	rotations := make([]TeamEscalationsRotationModel, 0, len(data))
 	for _, rotation := range data {
 		rotations = append(rotations, TeamEscalationsRotationModel{
 			Members: mapTeamEscalationsRotationMembersResponseToData(rotation.Members),
