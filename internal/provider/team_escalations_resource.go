@@ -594,7 +594,8 @@ func mapTeamEscalationsRotationsResponseToData(data []teamEscalationsRotation) [
 }
 
 func mapTeamEscalationsRotationMembersResponseToData(data []teamEscalationsRotationMember) []TeamEscalationsRotationMemberModel {
-	var members []TeamEscalationsRotationMemberModel
+	// Always return a slice, even if empty, to maintain consistency with Terraform's expectations
+	members := make([]TeamEscalationsRotationMemberModel, 0, len(data))
 	for _, member := range data {
 		members = append(members, TeamEscalationsRotationMemberModel{
 			TeamMembershipId: types.StringValue(member.TeamMembershipId),

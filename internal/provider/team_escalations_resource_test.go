@@ -73,6 +73,10 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		display_name = "My team with weekend rotation"
 		time_zone_id = "America/Los_Angeles"
 	  }
+	  resource "allquiet_team" "my_team2" {
+		display_name = "My team with weekend rotation"
+		time_zone_id = "America/Los_Angeles"
+	  }
 
 	  resource "allquiet_team" "engineering" {
 		display_name = "Engineering"
@@ -108,58 +112,58 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		role    = "Member"
 	  }
 
-resource "allquiet_team_escalations" "my_team_with_empty_weekly_schedules" {
-  escalation_tiers = [
-    {
-      auto_assign_to_teams_severities   = ["Critical", "Warning"]
-      auto_assign_to_teams_time_filters = null
-      auto_escalation_after_minutes     = 10
-      auto_escalation_enabled           = false
-      auto_escalation_severities        = null
-      auto_escalation_stop_mode         = "acknowledged"
-      auto_escalation_time_filters      = null
-      repeats                           = 1
-      repeats_after_minutes             = 10
-      repeats_stop_mode                 = "acknowledged"
-      schedules = [
-        {
-          rotation_settings = {
-            auto_rotation_size      = null
-            custom_repeat_unit      = null
-            custom_repeat_value     = null
-            effective_from          = "2025-06-11"
-            repeats                 = "weekly"
-            rotation_mode           = "explicit"
-            starts_on_date_of_month = null
-            starts_on_day_of_week   = "wed"
-            starts_on_time          = "14:00"
-          }
-          rotations = [
-            {
-              members = [
-                {
-                  team_membership_id = allquiet_team_membership.my_team_with_empty_weekly_schedules_galois.id
-                },
-              ]
-            },
-            {
-              members = [
-                {
-                  team_membership_id = allquiet_team_membership.my_team_with_empty_weekly_schedules_kolmogorov.id
-                },
-              ]
-            },
-          ]
-          schedule_settings = {
-            weekly_schedules = null
-          }
-        },
-      ]
-    },
-  ]
-  team_id = allquiet_team.my_team_with_empty_weekly_schedules.id
-  tier_settings = null
-}
+	  resource "allquiet_team_escalations" "my_team_with_empty_weekly_schedules" {
+		escalation_tiers = [
+			{
+			auto_assign_to_teams_severities   = ["Critical", "Warning"]
+			auto_assign_to_teams_time_filters = null
+			auto_escalation_after_minutes     = 10
+			auto_escalation_enabled           = false
+			auto_escalation_severities        = null
+			auto_escalation_stop_mode         = "acknowledged"
+			auto_escalation_time_filters      = null
+			repeats                           = 1
+			repeats_after_minutes             = 10
+			repeats_stop_mode                 = "acknowledged"
+			schedules = [
+				{
+				rotation_settings = {
+					auto_rotation_size      = null
+					custom_repeat_unit      = null
+					custom_repeat_value     = null
+					effective_from          = "2025-06-11"
+					repeats                 = "weekly"
+					rotation_mode           = "explicit"
+					starts_on_date_of_month = null
+					starts_on_day_of_week   = "wed"
+					starts_on_time          = "14:00"
+				}
+				rotations = [
+					{
+					members = [
+						{
+						team_membership_id = allquiet_team_membership.my_team_with_empty_weekly_schedules_galois.id
+						},
+					]
+					},
+					{
+					members = [
+						{
+						team_membership_id = allquiet_team_membership.my_team_with_empty_weekly_schedules_kolmogorov.id
+						},
+					]
+					},
+				]
+				schedule_settings = {
+					weekly_schedules = null
+				}
+				},
+			]
+			},
+		]
+		team_id = allquiet_team.my_team_with_empty_weekly_schedules.id
+		tier_settings = null
+		}
 
 
 	  resource "allquiet_team_escalations" "my_team" {
@@ -214,6 +218,54 @@ resource "allquiet_team_escalations" "my_team_with_empty_weekly_schedules" {
 		  }
 		]
 	  }
+
+
+	  resource "allquiet_team_escalations" "my_team_with_empty_members" {
+		team_id = allquiet_team.my_team2.id
+		escalation_tiers = [
+		  {
+			auto_escalation_after_minutes = 5
+			auto_escalation_severities = ["Critical", "Warning"]
+			auto_escalation_stop_mode = "acknowledged"
+			repeats = 1
+			repeats_after_minutes = 5
+			repeats_stop_mode = "resolved"
+			schedules = [
+			  {
+				schedule_settings = {
+				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				}
+				rotations = [
+				  {
+					members = []
+				  }
+				]
+			  },
+			  {
+				schedule_settings = {
+				  weekly_schedules = [
+					{
+						selected_days = ["mon", "tue", "wed", "thu", "fri"]
+						from = "06:00"
+						until = "18:00"
+					},
+					{
+						selected_days = ["sat", "sun"]
+						from = "10:00"
+						until = "16:00"
+					}
+				  ]
+				}
+				rotations = [
+				  {
+					members = []
+				  }
+				]
+			  }
+			]
+		  }
+		]
+	  }
 	  
 `, uuid.New().String(), uuid.New().String())
 }
@@ -235,6 +287,10 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 		display_name = "My team with weekend rotation"
 		time_zone_id = "America/Los_Angeles"
 	  }
+	  resource "allquiet_team" "my_team2" {
+		display_name = "My team with weekend rotation"
+		time_zone_id = "America/Los_Angeles"
+	  }
 	  
 	  resource "allquiet_team_membership" "my_team_galois" {
 		team_id = allquiet_team.my_team.id
@@ -248,6 +304,12 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 		role    = "Member"
 	  }
 	  
+	  resource "allquiet_team_membership" "my_team2_gauss" {
+		team_id = allquiet_team.my_team2.id
+		user_id = allquiet_user.gauss.id
+		role    = "Member"
+	  }
+
 	  resource "allquiet_team_escalations" "my_team" {
 		team_id = allquiet_team.my_team.id
 		escalation_tiers = [
@@ -296,6 +358,61 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 					members = [
 					  {
 						team_membership_id = allquiet_team_membership.my_team_galois.id
+					  }
+					]
+				  }
+				]
+			  }
+			]
+		  }
+		]
+	  }
+
+	  resource "allquiet_team_escalations" "my_team_with_empty_members" {
+		team_id = allquiet_team.my_team2.id
+		escalation_tiers = [
+		  {
+			auto_escalation_after_minutes = 5
+			auto_escalation_severities = ["Critical", "Warning"]
+			auto_escalation_stop_mode = "acknowledged"
+			repeats = 1
+			repeats_after_minutes = 5
+			repeats_stop_mode = "resolved"
+			schedules = [
+			  {
+				schedule_settings = {
+				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				}
+				rotations = [
+				  {
+					members = [
+					  {
+						team_membership_id = allquiet_team_membership.my_team2_gauss.id
+					  }
+					]
+				  }
+				]
+			  },
+			  {
+				schedule_settings = {
+				  weekly_schedules = [
+					{
+						selected_days = ["mon", "tue", "wed", "thu", "fri"]
+						from = "06:00"
+						until = "18:00"
+					},
+					{
+						selected_days = ["sat", "sun"]
+						from = "10:00"
+						until = "16:00"
+					}
+				  ]
+				}
+				rotations = [
+				  {
+					members = [
+					  {
+						team_membership_id = allquiet_team_membership.my_team2_gauss.id
 					  }
 					]
 				  }
