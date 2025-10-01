@@ -528,7 +528,7 @@ func mapTeamEscalationsResponseToModel(ctx context.Context, response *teamEscala
 }
 
 func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscalationsTier) []TeamEscalationsTierModel {
-	var tiers []TeamEscalationsTierModel
+	tiers := make([]TeamEscalationsTierModel, 0, len(data))
 	for _, tier := range data {
 
 		var autoEscalationAfterMinutes types.Int64
@@ -572,7 +572,7 @@ func mapTeamEscalationsTimeFiltersToData(ctx context.Context, timeFilters *[]tea
 }
 
 func mapTeamEscalationsSchedulesResponseToData(ctx context.Context, teamEscalationsSchedule []teamEscalationsSchedule) []TeamEscalationsScheduleModel {
-	var schedules []TeamEscalationsScheduleModel
+	schedules := make([]TeamEscalationsScheduleModel, 0, len(teamEscalationsSchedule))
 	for _, schedule := range teamEscalationsSchedule {
 		schedules = append(schedules, TeamEscalationsScheduleModel{
 			ScheduleSettings: mapTeamEscalationsScheduleSettingsResponseToData(ctx, schedule.ScheduleSettings),
@@ -584,7 +584,6 @@ func mapTeamEscalationsSchedulesResponseToData(ctx context.Context, teamEscalati
 }
 
 func mapTeamEscalationsRotationsResponseToData(data []teamEscalationsRotation) []TeamEscalationsRotationModel {
-	//var rotations []TeamEscalationsRotationModel
 	rotations := make([]TeamEscalationsRotationModel, 0, len(data))
 	for _, rotation := range data {
 		rotations = append(rotations, TeamEscalationsRotationModel{
@@ -595,7 +594,6 @@ func mapTeamEscalationsRotationsResponseToData(data []teamEscalationsRotation) [
 }
 
 func mapTeamEscalationsRotationMembersResponseToData(data []teamEscalationsRotationMember) []TeamEscalationsRotationMemberModel {
-	// Always return a slice, even if empty, to maintain consistency with Terraform's expectations
 	members := make([]TeamEscalationsRotationMemberModel, 0, len(data))
 	for _, member := range data {
 		members = append(members, TeamEscalationsRotationMemberModel{
