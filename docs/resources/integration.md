@@ -150,6 +150,28 @@ resource "allquiet_integration" "http_monitoring_head" {
   }
 }
 
+resource "allquiet_integration" "http_monitoring_with_max_retries" {
+  display_name = "My HTTP Monitoring Integration"
+  team_id      = allquiet_team.root.id
+  type         = "HttpMonitoring"
+  integration_settings = {
+    http_monitoring = {
+      url                                      = "https://allquiet.com"
+      method                                   = "GET"
+      timeout_in_milliseconds                  = 1000
+      interval_in_seconds                      = 300
+      authentication_type                      = "Bearer"
+      bearer_authentication_token              = "your_secret_token"
+      is_paused                                = false
+      ssl_certificate_max_age_in_days_degraded = 30
+      ssl_certificate_max_age_in_days_down     = 10
+      severity_degraded                        = "Warning"
+      severity_down                            = "Critical"
+      max_retries                              = 0
+    }
+  }
+}
+
 resource "allquiet_integration" "ping_monitor" {
   display_name = "My Ping Monitoring Integration"
   team_id      = allquiet_team.root.id
@@ -163,6 +185,25 @@ resource "allquiet_integration" "ping_monitor" {
       is_paused               = false
       severity_degraded       = "Warning"
       severity_down           = "Critical"
+    }
+  }
+}
+
+
+resource "allquiet_integration" "ping_monitor_with_max_retries" {
+  display_name = "My Ping Monitoring Integration"
+  team_id      = allquiet_team.root.id
+  type         = "PingMonitor"
+  integration_settings = {
+    ping_monitor = {
+      host = "google.com"
+
+      timeout_in_milliseconds = 1000
+      interval_in_seconds     = 300
+      is_paused               = false
+      severity_degraded       = "Warning"
+      severity_down           = "Critical"
+      max_retries             = 5
     }
   }
 }
@@ -273,6 +314,7 @@ Optional:
 - `content_test` (String) The content test of the http monitoring
 - `headers` (Map of String, Sensitive) The headers of the http monitoring
 - `is_paused` (Boolean) If the http monitoring is paused
+- `max_retries` (Number) The max retries of the ping monitor
 - `severity_degraded` (String) The severity degraded of the http monitoring. Possible values are: Critical, Warning, Minor
 - `severity_down` (String) The severity down of the http monitoring. Possible values are: Critical, Warning, Minor
 - `ssl_certificate_max_age_in_days_degraded` (Number) The ssl certificate max age in days degraded of the http monitoring
@@ -291,6 +333,7 @@ Required:
 Optional:
 
 - `is_paused` (Boolean) If the ping monitor is paused
+- `max_retries` (Number) The max retries of the ping monitor
 - `severity_degraded` (String) The severity degraded of the ping monitor. Possible values are: Critical, Warning, Minor
 - `severity_down` (String) The severity down of the ping monitor. Possible values are: Critical, Warning, Minor
 

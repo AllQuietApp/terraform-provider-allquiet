@@ -59,6 +59,7 @@ type emailResponse struct {
 type pingMonitorResponse struct {
 	Host                  string `json:"host"`
 	TimeoutInMilliseconds int64  `json:"timeoutInMilliseconds"`
+	MaxRetries            int64  `json:"maxRetries"`
 	IntervalInSeconds     int64  `json:"intervalInSeconds"`
 	SeverityDegraded      string `json:"severityDegraded"`
 	SeverityDown          string `json:"severityDown"`
@@ -82,6 +83,7 @@ type httpMonitoringResponse struct {
 	Url                                string             `json:"url"`
 	Method                             string             `json:"method"`
 	TimeoutInMilliseconds              int64              `json:"timeoutInMilliseconds"`
+	MaxRetries                         int64              `json:"maxRetries"`
 	IntervalInSeconds                  int64              `json:"intervalInSeconds"`
 	AuthenticationType                 *string            `json:"authenticationType"`
 	BasicAuthenticationUsername        *string            `json:"basicAuthenticationUsername"`
@@ -157,6 +159,7 @@ func mapPingMonitorCreateRequest(plan *PingMonitorModel) *pingMonitorResponse {
 		Host:                  plan.Host.ValueString(),
 		TimeoutInMilliseconds: plan.TimeoutInMilliseconds.ValueInt64(),
 		IntervalInSeconds:     plan.IntervalInSeconds.ValueInt64(),
+		MaxRetries:            plan.MaxRetries.ValueInt64(),
 		SeverityDegraded:      plan.SeverityDegraded.ValueString(),
 		SeverityDown:          plan.SeverityDown.ValueString(),
 		IsPaused:              plan.IsPaused.ValueBool(),
@@ -199,6 +202,7 @@ func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringRe
 		Url:                                plan.Url.ValueString(),
 		Method:                             plan.Method.ValueString(),
 		TimeoutInMilliseconds:              plan.TimeoutInMilliseconds.ValueInt64(),
+		MaxRetries:                         plan.MaxRetries.ValueInt64(),
 		IntervalInSeconds:                  plan.IntervalInSeconds.ValueInt64(),
 		AuthenticationType:                 plan.AuthenticationType.ValueStringPointer(),
 		BasicAuthenticationUsername:        plan.BasicAuthenticationUsername.ValueStringPointer(),

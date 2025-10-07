@@ -333,7 +333,7 @@ func AddQueryParam(currentUrl string, key string, value string) string {
 }
 
 func GetAccTestEnv() string {
-	endpoint := os.Getenv("ALLQUIET_API_ENDPOINT")
+	endpoint := os.Getenv("ALLQUIET_ENDPOINT")
 
 	if endpoint == "" || strings.Contains(endpoint, "https://allquiet.app") {
 		return "prod"

@@ -61,6 +61,7 @@ type HttpMonitoringModel struct {
 	Url                                types.String `tfsdk:"url"`
 	Method                             types.String `tfsdk:"method"`
 	TimeoutInMilliseconds              types.Int64  `tfsdk:"timeout_in_milliseconds"`
+	MaxRetries                         types.Int64  `tfsdk:"max_retries"`
 	IntervalInSeconds                  types.Int64  `tfsdk:"interval_in_seconds"`
 	AuthenticationType                 types.String `tfsdk:"authentication_type"`
 	BasicAuthenticationUsername        types.String `tfsdk:"basic_authentication_username"`
@@ -84,6 +85,7 @@ type EmailSettingsModel struct {
 type PingMonitorModel struct {
 	Host                  types.String `tfsdk:"host"`
 	TimeoutInMilliseconds types.Int64  `tfsdk:"timeout_in_milliseconds"`
+	MaxRetries            types.Int64  `tfsdk:"max_retries"`
 	IntervalInSeconds     types.Int64  `tfsdk:"interval_in_seconds"`
 	SeverityDegraded      types.String `tfsdk:"severity_degraded"`
 	SeverityDown          types.String `tfsdk:"severity_down"`
@@ -275,6 +277,14 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 									int64validator.Between(50, 60000),
 								},
 							},
+							"max_retries": schema.Int64Attribute{
+								MarkdownDescription: "The max retries of the ping monitor",
+								Optional:            true,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 5),
+								},
+								Computed: true,
+							},
 							"interval_in_seconds": schema.Int64Attribute{
 								MarkdownDescription: "The interval in seconds of the http monitoring. Valid values are: " + strings.Join(ValidIntervalsInSecondsAsString, ", "),
 								Required:            true,
@@ -407,6 +417,14 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 								Validators: []validator.Int64{
 									int64validator.Between(50, 60000),
 								},
+							},
+							"max_retries": schema.Int64Attribute{
+								MarkdownDescription: "The max retries of the ping monitor",
+								Optional:            true,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 5),
+								},
+								Computed: true,
 							},
 							"interval_in_seconds": schema.Int64Attribute{
 								MarkdownDescription: "The interval in seconds of the ping monitor. Valid values are: " + strings.Join(ValidIntervalsInSecondsAsString, ", "),
@@ -622,6 +640,7 @@ func mapPingMonitorResponseToModel(response *pingMonitorResponse) *PingMonitorMo
 	return &PingMonitorModel{
 		Host:                  types.StringValue(response.Host),
 		TimeoutInMilliseconds: types.Int64Value(response.TimeoutInMilliseconds),
+		MaxRetries:            types.Int64Value(response.MaxRetries),
 		IntervalInSeconds:     types.Int64Value(response.IntervalInSeconds),
 		SeverityDegraded:      types.StringValue(response.SeverityDegraded),
 		SeverityDown:          types.StringValue(response.SeverityDown),
@@ -664,6 +683,7 @@ func mapHttpMonitoringResponseToModel(response *httpMonitoringResponse) *HttpMon
 		Url:                                types.StringValue(response.Url),
 		Method:                             types.StringValue(response.Method),
 		TimeoutInMilliseconds:              types.Int64Value(response.TimeoutInMilliseconds),
+		MaxRetries:                         types.Int64Value(response.MaxRetries),
 		IntervalInSeconds:                  types.Int64Value(response.IntervalInSeconds),
 		AuthenticationType:                 types.StringPointerValue(response.AuthenticationType),
 		BasicAuthenticationUsername:        types.StringPointerValue(response.BasicAuthenticationUsername),

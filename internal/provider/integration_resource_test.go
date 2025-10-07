@@ -50,6 +50,8 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.cron_expression", "0 0 * * *"),
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_max_retries", "integration_settings.http_monitoring.max_retries", "0"),
+					resource.TestCheckResourceAttr("allquiet_integration.ping_monitor_with_max_retries", "integration_settings.ping_monitor.max_retries", "5"),
 				),
 			},
 			// ImportState testing
@@ -90,6 +92,8 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.cron_expression", "0 0 * * *"),
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_max_retries", "integration_settings.http_monitoring.max_retries", "0"),
+					resource.TestCheckResourceAttr("allquiet_integration.ping_monitor_with_max_retries", "integration_settings.ping_monitor.max_retries", "5"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -221,6 +225,23 @@ resource "allquiet_integration" "http_monitoring" {
 		}
 	}
 }
+
+resource "allquiet_integration" "http_monitoring_with_max_retries" {
+	display_name = "My HTTP Monitoring Integration"
+	team_id = allquiet_team.test.id
+	type = "HttpMonitoring"
+	integration_settings = {
+		http_monitoring = {
+			url = "https://example.com"
+			method = "GET"
+			timeout_in_milliseconds = 1000
+			interval_in_seconds = 60
+			authentication_type = "Bearer"
+			bearer_authentication_token = "my-token"
+			max_retries = 0
+		}
+	}
+}
 	
 resource "allquiet_integration" "heartbeat_monitor" {
 	display_name = "My Heartbeat Monitoring Integration"
@@ -265,6 +286,23 @@ resource "allquiet_integration" "ping_monitor" {
 	}
 }
 
+resource "allquiet_integration" "ping_monitor_with_max_retries" {
+	display_name = "My Ping Monitoring Integration"
+	team_id = allquiet_team.test.id
+	type = "PingMonitor"
+	integration_settings = {
+		ping_monitor = {
+			host = "google.com"
+			timeout_in_milliseconds = 1000
+			interval_in_seconds = 60
+			is_paused = false
+			severity_degraded = "Warning"
+			severity_down = "Critical"
+			max_retries = 5
+		}
+	}
+}
+
 resource "allquiet_integration" "email_with_aliases" {
 	display_name = "My Email Integration"
 	team_id      = allquiet_team.test.id
@@ -294,10 +332,11 @@ func testAccIntegrationResourceExample() string {
 }
 
 func replaceEmailAliases(str string) string {
-	if GetAccTestEnv() == "local" {
-		return strings.Replace(str, "@integrations.allquiet.app", "+"+uuid.New().String()+"@integrations-dev.allquiet-test.app", -1)
+	env := GetAccTestEnv()
+	if env == "local" {
+		return strings.Replace(str, "@integrations.allquiet.app", "+"+uuid.New().String()+"+"+env+"@integrations-dev.allquiet-test.app", -1)
 	} else {
-		return strings.Replace(str, "@integrations.allquiet.app", "+"+uuid.New().String()+"@integrations.allquiet.app", -1)
+		return strings.Replace(str, "@integrations.allquiet.app", "+"+uuid.New().String()+"+"+env+"@integrations.allquiet.app", -1)
 	}
 
 }
