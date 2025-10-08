@@ -40,8 +40,8 @@ data "allquiet_users" "all_users" {
 
 ### Optional
 
-- `display_name` (String) Display name of the user to look up
-- `email` (String) Email address of the user to look up
+- `display_name` (String, Sensitive) Display name of the user to look up
+- `email` (String, Sensitive) Email address of the user to look up
 
 ### Read-Only
 
@@ -52,7 +52,7 @@ data "allquiet_users" "all_users" {
 
 Read-Only:
 
-- `display_name` (String) Display name of the user
-- `email` (String) Email address of the user
+- `display_name` (String, Sensitive) Display name of the user
+- `email` (String, Sensitive) Email address of the user
 - `id` (String) User ID
 - `scim_external_id` (String) If the user was provisioned by SCIM, this is the SCIM external ID of the user

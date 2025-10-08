@@ -44,10 +44,12 @@ func (d *UsersDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 			"email": schema.StringAttribute{
 				MarkdownDescription: "Email address of the user to look up",
 				Optional:            true,
+				Sensitive:           true,
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "Display name of the user to look up",
 				Optional:            true,
+				Sensitive:           true,
 			},
 			"users": schema.ListNestedAttribute{
 				MarkdownDescription: "List of users",
@@ -61,10 +63,12 @@ func (d *UsersDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 						"email": schema.StringAttribute{
 							MarkdownDescription: "Email address of the user",
 							Computed:            true,
+							Sensitive:           true,
 						},
 						"display_name": schema.StringAttribute{
 							MarkdownDescription: "Display name of the user",
 							Computed:            true,
+							Sensitive:           true,
 						},
 						"scim_external_id": schema.StringAttribute{
 							MarkdownDescription: "If the user was provisioned by SCIM, this is the SCIM external ID of the user",

@@ -71,13 +71,13 @@ resource "allquiet_user" "billie_eilish" {
 
 ### Required
 
-- `display_name` (String) The display name of the user
-- `email` (String) The email of the user
+- `display_name` (String, Sensitive) The display name of the user
+- `email` (String, Sensitive) The email of the user
 
 ### Optional
 
 - `incident_notification_settings` (Attributes) Settings which channels to use for incident notifications (see [below for nested schema](#nestedatt--incident_notification_settings))
-- `phone_number` (String) The phone number of the user
+- `phone_number` (String, Sensitive) The phone number of the user
 - `time_zone_id` (String) The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)
 
 ### Read-Only

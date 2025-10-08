@@ -87,6 +87,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "The display name of the user",
 				Required:            true,
+				Sensitive:           true,
 			},
 			"email": schema.StringAttribute{
 				MarkdownDescription: "The email of the user",
@@ -95,6 +96,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`),
 					"must contain email matching the pattern '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'",
 				)},
+				Sensitive: true,
 			},
 			"phone_number": schema.StringAttribute{
 				MarkdownDescription: "The phone number of the user",
@@ -103,6 +105,7 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 					regexp.MustCompile(`^\+\d+$`),
 					"must contain phone number in international format matching the pattern '^\\+\\d+$'",
 				)},
+				Sensitive: true,
 			},
 			"time_zone_id": schema.StringAttribute{
 				MarkdownDescription: "The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)",
