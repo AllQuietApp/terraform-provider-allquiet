@@ -89,6 +89,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
         },
 
         {
+          display_name = "Weekend schedule"
           schedule_settings = {
             selected_days = ["sat", "sun"]
           }
@@ -166,6 +167,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rot
       auto_escalation_after_minutes = 5
       schedules = [
         {
+          display_name = "Working hours"
           schedule_settings = {
             start : "08:00"
             end : "20:00"
@@ -190,6 +192,7 @@ resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rot
           ]
         },
         {
+          display_name = "Night hours"
           schedule_settings = {
             start : "20:00"
             end : "08:00"

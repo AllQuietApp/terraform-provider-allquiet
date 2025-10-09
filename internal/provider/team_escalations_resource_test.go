@@ -380,6 +380,7 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 			repeats_stop_mode = "resolved"
 			schedules = [
 			  {
+				display_name = "Working weekdays schedule"
 				schedule_settings = {
 				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
 				}

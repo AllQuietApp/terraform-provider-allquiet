@@ -48,6 +48,7 @@ type teamEscalationsTimeFilter struct {
 }
 
 type teamEscalationsSchedule struct {
+	DisplayName      *string                   `json:"displayName"`
 	ScheduleSettings *scheduleSettings         `json:"scheduleSettings"`
 	RotationSettings *rotationSettings         `json:"rotationSettings"`
 	Rotations        []teamEscalationsRotation `json:"rotations"`
@@ -119,7 +120,9 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 	schedules := make([]teamEscalationsSchedule, len(tier.Schedules))
 	for i, schedule := range tier.Schedules {
 
-		schedules[i] = teamEscalationsSchedule{}
+		schedules[i] = teamEscalationsSchedule{
+			DisplayName: schedule.DisplayName.ValueStringPointer(),
+		}
 
 		if schedule.ScheduleSettings != nil {
 			selectedDays := ListToStringArray(schedule.ScheduleSettings.SelectedDays)

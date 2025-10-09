@@ -57,6 +57,7 @@ type TeamEscalationsTimeFilterModel struct {
 }
 
 type TeamEscalationsScheduleModel struct {
+	DisplayName      types.String                          `tfsdk:"display_name"`
 	ScheduleSettings *TeamEscalationsScheduleSettingsModel `tfsdk:"schedule_settings"`
 	RotationSettings *TeamEscalationsRotationSettingsModel `tfsdk:"rotation_settings"`
 	Rotations        []TeamEscalationsRotationModel        `tfsdk:"rotations"`
@@ -270,6 +271,10 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 							Required: true,
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
+									"display_name": schema.StringAttribute{
+										Optional:            true,
+										MarkdownDescription: "Optional display name of the schedule.",
+									},
 									"rotations": schema.ListNestedAttribute{
 										Required: true,
 										NestedObject: schema.NestedAttributeObject{
@@ -575,6 +580,7 @@ func mapTeamEscalationsSchedulesResponseToData(ctx context.Context, teamEscalati
 	schedules := make([]TeamEscalationsScheduleModel, 0, len(teamEscalationsSchedule))
 	for _, schedule := range teamEscalationsSchedule {
 		schedules = append(schedules, TeamEscalationsScheduleModel{
+			DisplayName:      types.StringPointerValue(schedule.DisplayName),
 			ScheduleSettings: mapTeamEscalationsScheduleSettingsResponseToData(ctx, schedule.ScheduleSettings),
 			RotationSettings: mapTeamEscalationsRotationSettingsResponseToData(schedule.RotationSettings),
 			Rotations:        mapTeamEscalationsRotationsResponseToData(schedule.Rotations),
