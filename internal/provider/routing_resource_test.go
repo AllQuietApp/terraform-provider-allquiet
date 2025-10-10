@@ -146,6 +146,7 @@ resource "allquiet_routing" "test_with_snooze_relative" {
 	  },
 	  {
 		conditions = {
+		  attributes_match_type = "any"
 		  attributes = [
 			{
 			  name = "source"
@@ -182,6 +183,7 @@ resource "allquiet_routing" "test_with_snooze_absolute" {
 	  },
 	  {
 		conditions = {
+		  attributes_match_type = "all"
 		  attributes = [
 			{
 			  name = "source"

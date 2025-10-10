@@ -233,11 +233,17 @@ resource "allquiet_routing" "example_9" {
   rules = [
     {
       conditions = {
+        attributes_match_type = "any"
         attributes = [
           {
             name     = "Project",
             operator = "=",
             value    = "Pre Sales"
+          },
+          {
+            name     = "Project",
+            operator = "=",
+            value    = "After Sales"
           }
         ]
       },
@@ -331,6 +337,7 @@ Optional:
 Optional:
 
 - `attributes` (Attributes List) (see [below for nested schema](#nestedatt--rules--conditions--attributes))
+- `attributes_match_type` (String) The match type for the attributes. Possible values are: all, any
 - `date_restriction` (Attributes) (see [below for nested schema](#nestedatt--rules--conditions--date_restriction))
 - `integrations` (List of String) Integration IDs
 - `intents` (List of String) Intents. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed

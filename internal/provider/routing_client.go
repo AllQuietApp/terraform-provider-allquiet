@@ -23,13 +23,14 @@ type routingRule struct {
 }
 
 type routingRuleConditions struct {
-	Statuses        *[]string                   `json:"statuses"`
-	Severities      *[]string                   `json:"severities"`
-	Integrations    *[]string                   `json:"integrations"`
-	Intents         *[]string                   `json:"intents"`
-	Attributes      []routingRuleAttribute      `json:"attributes"`
-	DateRestriction *routingRuleDateRestriction `json:"dateRestriction"`
-	Schedule        *routingRuleSchedule        `json:"schedule"`
+	Statuses            *[]string                   `json:"statuses"`
+	Severities          *[]string                   `json:"severities"`
+	Integrations        *[]string                   `json:"integrations"`
+	Intents             *[]string                   `json:"intents"`
+	Attributes          []routingRuleAttribute      `json:"attributes"`
+	AttributesMatchType *string                     `json:"attributesMatchType"`
+	DateRestriction     *routingRuleDateRestriction `json:"dateRestriction"`
+	Schedule            *routingRuleSchedule        `json:"schedule"`
 }
 
 type routingRuleAttribute struct {
@@ -111,13 +112,14 @@ func mapRoutingRuleConditions(conditions *RoutingRuleConditionsModel) *routingRu
 	}
 
 	return &routingRuleConditions{
-		Statuses:        ListToStringArray(conditions.Statuses),
-		Severities:      ListToStringArray(conditions.Severities),
-		Integrations:    ListToStringArray(conditions.Integrations),
-		Intents:         ListToStringArray(conditions.Intents),
-		Attributes:      mapRoutingRuleAttributes(conditions.Attributes),
-		DateRestriction: mapRoutingRuleDateRestriction(conditions.DateRestriction),
-		Schedule:        mapRoutingRuleSchedule(conditions.Schedule),
+		Statuses:            ListToStringArray(conditions.Statuses),
+		Severities:          ListToStringArray(conditions.Severities),
+		Integrations:        ListToStringArray(conditions.Integrations),
+		Intents:             ListToStringArray(conditions.Intents),
+		Attributes:          mapRoutingRuleAttributes(conditions.Attributes),
+		AttributesMatchType: conditions.AttributesMatchType.ValueStringPointer(),
+		DateRestriction:     mapRoutingRuleDateRestriction(conditions.DateRestriction),
+		Schedule:            mapRoutingRuleSchedule(conditions.Schedule),
 	}
 }
 

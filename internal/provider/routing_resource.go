@@ -51,13 +51,14 @@ type RoutingRuleModel struct {
 }
 
 type RoutingRuleConditionsModel struct {
-	Statuses        types.List                            `tfsdk:"statuses"`
-	Severities      types.List                            `tfsdk:"severities"`
-	Integrations    types.List                            `tfsdk:"integrations"`
-	Intents         types.List                            `tfsdk:"intents"`
-	Attributes      []RoutingRuleConditionsAttributeModel `tfsdk:"attributes"`
-	DateRestriction *DateRestrictionModel                 `tfsdk:"date_restriction"`
-	Schedule        *ScheduleModel                        `tfsdk:"schedule"`
+	Statuses            types.List                            `tfsdk:"statuses"`
+	Severities          types.List                            `tfsdk:"severities"`
+	Integrations        types.List                            `tfsdk:"integrations"`
+	Intents             types.List                            `tfsdk:"intents"`
+	Attributes          []RoutingRuleConditionsAttributeModel `tfsdk:"attributes"`
+	AttributesMatchType types.String                          `tfsdk:"attributes_match_type"`
+	DateRestriction     *DateRestrictionModel                 `tfsdk:"date_restriction"`
+	Schedule            *ScheduleModel                        `tfsdk:"schedule"`
 }
 
 type RoutingRuleConditionsAttributeModel struct {
@@ -170,6 +171,11 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(IntentValidator("Not a valid intent")),
 									},
+								},
+								"attributes_match_type": schema.StringAttribute{
+									Optional:            true,
+									MarkdownDescription: "The match type for the attributes. Possible values are: " + strings.Join(ValidAttributesMatchTypes, ", "),
+									Validators:          []validator.String{stringvalidator.OneOf(ValidAttributesMatchTypes...)},
 								},
 								"attributes": schema.ListNestedAttribute{
 									Optional: true,
@@ -530,13 +536,14 @@ func mapRoutingRuleConditionsResponseToModel(ctx context.Context, conditions *ro
 	}
 
 	return &RoutingRuleConditionsModel{
-		Statuses:        MapNullableList(ctx, conditions.Statuses),
-		Severities:      MapNullableList(ctx, conditions.Severities),
-		Integrations:    MapNullableList(ctx, conditions.Integrations),
-		Intents:         MapNullableList(ctx, conditions.Intents),
-		Attributes:      mapRoutingRuleConditionsAttributeResponseToModel(conditions.Attributes),
-		DateRestriction: mapRoutingRuleDateRestrictionResponseToModel(conditions.DateRestriction),
-		Schedule:        mapRoutingRuleScheduleResponseToModel(ctx, conditions.Schedule),
+		Statuses:            MapNullableList(ctx, conditions.Statuses),
+		Severities:          MapNullableList(ctx, conditions.Severities),
+		Integrations:        MapNullableList(ctx, conditions.Integrations),
+		Intents:             MapNullableList(ctx, conditions.Intents),
+		Attributes:          mapRoutingRuleConditionsAttributeResponseToModel(conditions.Attributes),
+		AttributesMatchType: types.StringPointerValue(conditions.AttributesMatchType),
+		DateRestriction:     mapRoutingRuleDateRestrictionResponseToModel(conditions.DateRestriction),
+		Schedule:            mapRoutingRuleScheduleResponseToModel(ctx, conditions.Schedule),
 	}
 }
 

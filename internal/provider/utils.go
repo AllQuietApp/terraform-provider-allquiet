@@ -259,6 +259,8 @@ var ValidMaintenanceWindowTypes = []string{"maintenance", "muted"}
 
 var ValidOperators = []string{"=", "!=", "contains", "!contains"}
 
+var ValidAttributesMatchTypes = []string{"all", "any"}
+
 var ValidRotationModes = []string{"explicit", "auto"}
 
 var ValidCustomRepeatUnits = []string{"months", "weeks", "days", "hours"}

@@ -218,11 +218,17 @@ resource "allquiet_routing" "example_9" {
   rules = [
     {
       conditions = {
+        attributes_match_type = "any"
         attributes = [
           {
             name     = "Project",
             operator = "=",
             value    = "Pre Sales"
+          },
+          {
+            name     = "Project",
+            operator = "=",
+            value    = "After Sales"
           }
         ]
       },
