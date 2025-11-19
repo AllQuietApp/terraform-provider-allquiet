@@ -35,6 +35,7 @@ type OnCallOverride struct {
 type OnCallOverrideModel struct {
 	Id                 types.String `tfsdk:"id"`
 	UserId             types.String `tfsdk:"user_id"`
+	TeamId             types.String `tfsdk:"team_id"`
 	Type               types.String `tfsdk:"type"`
 	Start              types.String `tfsdk:"start"`
 	End                types.String `tfsdk:"end"`
@@ -67,6 +68,11 @@ func (r *OnCallOverride) Schema(ctx context.Context, req resource.SchemaRequest,
 			"user_id": schema.StringAttribute{
 				MarkdownDescription: "The user id of the user",
 				Required:            true,
+			},
+			"team_id": schema.StringAttribute{
+				MarkdownDescription: "The team id to scope the override to. When specified, the override applies only to the specified team.",
+				Optional:            true,
+				Validators:          []validator.String{GuidValidator("Not a valid GUID")},
 			},
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Type of the override. Possible values are: " + strings.Join(ValidOnCallOverrideTypes, ", "),
@@ -214,6 +220,7 @@ func (r *OnCallOverride) ImportState(ctx context.Context, req resource.ImportSta
 func mapOnCallOverrideResponseToModel(ctx context.Context, response *onCallOverrideResponse, data *OnCallOverrideModel) {
 	data.Id = types.StringValue(response.Id)
 	data.UserId = types.StringValue(response.UserId)
+	data.TeamId = types.StringPointerValue(response.TeamId)
 	data.Type = types.StringValue(response.Type)
 	data.Start = types.StringValue(response.Start)
 	data.End = types.StringValue(response.End)

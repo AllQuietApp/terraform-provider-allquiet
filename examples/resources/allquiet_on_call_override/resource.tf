@@ -23,3 +23,16 @@ resource "allquiet_on_call_override" "millie_brown_override2" {
   end                  = "2025-11-01T00:00:00Z"
   replacement_user_ids = [allquiet_user.taylor_swift.id]
 }
+
+resource "allquiet_team" "example_team" {
+  display_name = "Example Team"
+}
+
+resource "allquiet_on_call_override" "team_scoped_override" {
+  user_id              = allquiet_user.millie_brown.id
+  team_id              = allquiet_team.example_team.id
+  type                 = "offline"
+  start                = "2025-12-01T00:00:00Z"
+  end                  = "2025-12-02T00:00:00Z"
+  replacement_user_ids = [allquiet_user.taylor_swift.id]
+}

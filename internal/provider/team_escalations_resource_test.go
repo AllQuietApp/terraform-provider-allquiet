@@ -33,6 +33,7 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.selected_days.0"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.from"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.until"),
+					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_round_robin", "escalation_tiers.0.schedules.0.round_robin_settings.round_robin_size", "3"),
 				),
 			},
 			// ImportState testing
@@ -50,6 +51,7 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.1"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats_after_minutes"),
+					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_round_robin", "escalation_tiers.0.schedules.0.round_robin_settings.round_robin_size", "5"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -78,6 +80,11 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		time_zone_id = "America/Los_Angeles"
 	  }
 
+	  resource "allquiet_team" "my_team_round_robin" {
+		display_name = "My team with round robin"
+		time_zone_id = "America/Los_Angeles"
+	  }
+
 	  resource "allquiet_team" "engineering" {
 		display_name = "Engineering"
 		time_zone_id = "America/Los_Angeles"
@@ -91,6 +98,18 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 	  
 	  resource "allquiet_team_membership" "my_team_kolmogorov" {
 		team_id = allquiet_team.my_team.id
+		user_id = allquiet_user.kolmogorov.id
+		role    = "Member"
+	  }
+
+	  resource "allquiet_team_membership" "my_team_round_robin_galois" {
+		team_id = allquiet_team.my_team_round_robin.id
+		user_id = allquiet_user.galois.id
+		role    = "Administrator"
+	  }
+	  
+	  resource "allquiet_team_membership" "my_team_round_robin_kolmogorov" {
+		team_id = allquiet_team.my_team_round_robin.id
 		user_id = allquiet_user.kolmogorov.id
 		role    = "Member"
 	  }
@@ -219,6 +238,39 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 		]
 	  }
 
+	  resource "allquiet_team_escalations" "my_team_with_round_robin" {
+		team_id = allquiet_team.my_team_round_robin.id
+		escalation_tiers = [
+		  {
+			auto_escalation_enabled = true
+			auto_escalation_after_minutes = 5
+			auto_escalation_severities = ["Critical", "Warning"]
+			schedules = [
+			  {
+				schedule_settings = {
+				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				}
+				round_robin_settings = {
+				  round_robin_size = 3
+				}
+				rotations = [
+				  {
+					members = [
+					  {
+						team_membership_id = allquiet_team_membership.my_team_round_robin_galois.id
+					  },
+					  {
+						team_membership_id = allquiet_team_membership.my_team_round_robin_kolmogorov.id
+					  }
+					]
+				  }
+				]
+			  }
+			]
+		  }
+		]
+	  }
+
 
 	  resource "allquiet_team_escalations" "my_team_with_empty_members" {
 		team_id = allquiet_team.my_team2.id
@@ -291,6 +343,11 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 		display_name = "My team with weekend rotation"
 		time_zone_id = "America/Los_Angeles"
 	  }
+
+	  resource "allquiet_team" "my_team_round_robin" {
+		display_name = "My team with round robin"
+		time_zone_id = "America/Los_Angeles"
+	  }
 	  
 	  resource "allquiet_team_membership" "my_team_galois" {
 		team_id = allquiet_team.my_team.id
@@ -306,6 +363,18 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 	  
 	  resource "allquiet_team_membership" "my_team2_gauss" {
 		team_id = allquiet_team.my_team2.id
+		user_id = allquiet_user.gauss.id
+		role    = "Member"
+	  }
+
+	  resource "allquiet_team_membership" "my_team_round_robin_galois" {
+		team_id = allquiet_team.my_team_round_robin.id
+		user_id = allquiet_user.galois.id
+		role    = "Administrator"
+	  }
+	  
+	  resource "allquiet_team_membership" "my_team_round_robin_gauss" {
+		team_id = allquiet_team.my_team_round_robin.id
 		user_id = allquiet_user.gauss.id
 		role    = "Member"
 	  }
@@ -358,6 +427,39 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 					members = [
 					  {
 						team_membership_id = allquiet_team_membership.my_team_galois.id
+					  }
+					]
+				  }
+				]
+			  }
+			]
+		  }
+		]
+	  }
+
+	  resource "allquiet_team_escalations" "my_team_with_round_robin" {
+		team_id = allquiet_team.my_team_round_robin.id
+		escalation_tiers = [
+		  {
+			auto_escalation_enabled = true
+			auto_escalation_after_minutes = 5
+			auto_escalation_severities = ["Critical", "Warning"]
+			schedules = [
+			  {
+				schedule_settings = {
+				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				}
+				round_robin_settings = {
+				  round_robin_size = 5
+				}
+				rotations = [
+				  {
+					members = [
+					  {
+						team_membership_id = allquiet_team_membership.my_team_round_robin_galois.id
+					  },
+					  {
+						team_membership_id = allquiet_team_membership.my_team_round_robin_gauss.id
 					  }
 					]
 				  }

@@ -257,7 +257,7 @@ func NotificationChannelValidator(message string) validator.String {
 
 var ValidMaintenanceWindowTypes = []string{"maintenance", "muted"}
 
-var ValidOperators = []string{"=", "!=", "contains", "!contains"}
+var ValidOperators = []string{"=", "!=", "contains", "!contains", ">", ">=", "<", "<="}
 
 var ValidAttributesMatchTypes = []string{"all", "any"}
 
@@ -324,6 +324,18 @@ var ValidHttpMonitoringMethods = []string{"HEAD", "GET", "POST", "PUT", "PATCH",
 
 func HttpMonitoringMethodValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidHttpMonitoringMethods...)
+}
+
+var ValidTimeoutsHttpMonitoringInMilliseconds = []int64{50, 100, 200, 500, 1000, 2000, 5000, 10000, 30000, 60000}
+
+func ValidTimeoutsHttpMonitoringInMillisecondsValidator(message string) validator.Int64 {
+	return int64validator.OneOf(ValidTimeoutsHttpMonitoringInMilliseconds...)
+}
+
+var ValidTimeoutsPingMonitorInMilliseconds = []int64{50, 100, 200, 500, 1000, 2000, 5000}
+
+func ValidTimeoutsPingMonitorInMillisecondsValidator(message string) validator.Int64 {
+	return int64validator.OneOf(ValidTimeoutsPingMonitorInMilliseconds...)
 }
 
 func AddQueryParam(currentUrl string, key string, value string) string {

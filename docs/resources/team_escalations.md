@@ -659,6 +659,7 @@ Optional:
 
 - `display_name` (String) Optional display name of the schedule.
 - `rotation_settings` (Attributes) Settings for the rotation (see [below for nested schema](#nestedatt--escalation_tiers--schedules--rotation_settings))
+- `round_robin_settings` (Attributes) Settings for round robin alerting. When enabled, incidents are distributed evenly among available responders. (see [below for nested schema](#nestedatt--escalation_tiers--schedules--round_robin_settings))
 - `schedule_settings` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--escalation_tiers--schedules--schedule_settings))
 
 <a id="nestedatt--escalation_tiers--schedules--rotations"></a>
@@ -694,6 +695,14 @@ Optional:
 - `starts_on_date_of_month` (Number) If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'
 - `starts_on_day_of_week` (String) Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'. Possible values are: sun, mon, tue, wed, thu, fri, sat
 - `starts_on_time` (String) If set, starts on time of day. Needs to be set if 'repeats' is 'custom' and 'custom_repeat_unit' is 'hours'. Format: HH:mm
+
+
+<a id="nestedatt--escalation_tiers--schedules--round_robin_settings"></a>
+### Nested Schema for `escalation_tiers.schedules.round_robin_settings`
+
+Optional:
+
+- `round_robin_size` (Number) Number of users to assign per incident when using round robin. Max 100.
 
 
 <a id="nestedatt--escalation_tiers--schedules--schedule_settings"></a>

@@ -271,10 +271,10 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 								},
 							},
 							"timeout_in_milliseconds": schema.Int64Attribute{
-								MarkdownDescription: "The timeout in milliseconds of the http monitoring. Min 50, max 60000.",
+								MarkdownDescription: "The timeout in milliseconds of the http monitoring. Valid values are: " + strings.Join(convertInt64ArrayToStringArray(ValidTimeoutsHttpMonitoringInMilliseconds), ", "),
 								Required:            true,
 								Validators: []validator.Int64{
-									int64validator.Between(50, 60000),
+									ValidTimeoutsHttpMonitoringInMillisecondsValidator("Not a valid timeout in milliseconds"),
 								},
 							},
 							"max_retries": schema.Int64Attribute{
@@ -412,10 +412,10 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 								Required:            true,
 							},
 							"timeout_in_milliseconds": schema.Int64Attribute{
-								MarkdownDescription: "The timeout in milliseconds of the ping monitor. Min 50, max 60000.",
+								MarkdownDescription: "The timeout in milliseconds of the ping monitor. Valid values are: " + strings.Join(convertInt64ArrayToStringArray(ValidTimeoutsPingMonitorInMilliseconds), ", "),
 								Required:            true,
 								Validators: []validator.Int64{
-									int64validator.Between(50, 60000),
+									ValidTimeoutsPingMonitorInMillisecondsValidator("Not a valid timeout in milliseconds"),
 								},
 							},
 							"max_retries": schema.Int64Attribute{

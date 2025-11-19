@@ -11,6 +11,7 @@ import (
 type onCallOverrideResponse struct {
 	Id                 string    `json:"id"`
 	UserId             string    `json:"userId"`
+	TeamId             *string   `json:"teamId"`
 	Type               string    `json:"type"`
 	Start              string    `json:"start"`
 	End                string    `json:"end"`
@@ -19,6 +20,7 @@ type onCallOverrideResponse struct {
 
 type onCallOverrideCreateRequest struct {
 	UserId             string    `json:"userId"`
+	TeamId             *string   `json:"teamId,omitempty"`
 	Type               string    `json:"type"`
 	Start              string    `json:"start"`
 	End                string    `json:"end"`
@@ -29,6 +31,7 @@ func mapOnCallOverrideCreateRequest(plan *OnCallOverrideModel) *onCallOverrideCr
 	var req onCallOverrideCreateRequest
 
 	req.UserId = plan.UserId.ValueString()
+	req.TeamId = plan.TeamId.ValueStringPointer()
 	req.Type = plan.Type.ValueString()
 	req.Start = plan.Start.ValueString()
 	req.End = plan.End.ValueString()

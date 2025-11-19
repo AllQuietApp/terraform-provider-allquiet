@@ -285,3 +285,51 @@ resource "allquiet_routing" "example_11" {
     },
   ]
 }
+
+resource "allquiet_routing" "example_12" {
+  team_id      = allquiet_team.root.id
+  display_name = "Route incidents with priority >= 5 to critical team"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
+  rules = [
+    {
+      conditions = {
+        attributes = [
+          {
+            name     = "priority"
+            operator = ">="
+            value    = "5"
+          }
+        ]
+      },
+      actions = {
+        assign_to_teams = [allquiet_team.infrastructure.id]
+      }
+    },
+  ]
+}
+
+resource "allquiet_routing" "example_13" {
+  team_id      = allquiet_team.root.id
+  display_name = "Route incidents with sub-incidents to escalation team"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
+  rules = [
+    {
+      conditions = {
+        attributes = [
+          {
+            name     = "SubIncidentsCount"
+            operator = ">"
+            value    = "0"
+          }
+        ]
+      },
+      actions = {
+        assign_to_teams = [allquiet_team.infrastructure.id]
+      }
+    },
+  ]
+}

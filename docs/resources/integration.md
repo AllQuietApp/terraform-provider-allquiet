@@ -301,7 +301,7 @@ Required:
 
 - `interval_in_seconds` (Number) The interval in seconds of the http monitoring. Valid values are: 30, 60, 120, 300, 600, 900, 1800, 3600, 86400
 - `method` (String) The method of the http monitoring. Possible values are: HEAD, GET, POST, PUT, PATCH, DELETE
-- `timeout_in_milliseconds` (Number) The timeout in milliseconds of the http monitoring. Min 50, max 60000.
+- `timeout_in_milliseconds` (Number) The timeout in milliseconds of the http monitoring. Valid values are: 50, 100, 200, 500, 1000, 2000, 5000, 10000, 30000, 60000
 - `url` (String) The url of the http monitoring
 
 Optional:
@@ -328,7 +328,7 @@ Required:
 
 - `host` (String) The host of the ping monitor
 - `interval_in_seconds` (Number) The interval in seconds of the ping monitor. Valid values are: 30, 60, 120, 300, 600, 900, 1800, 3600, 86400
-- `timeout_in_milliseconds` (Number) The timeout in milliseconds of the ping monitor. Min 50, max 60000.
+- `timeout_in_milliseconds` (Number) The timeout in milliseconds of the ping monitor. Valid values are: 50, 100, 200, 500, 1000, 2000, 5000
 
 Optional:
 

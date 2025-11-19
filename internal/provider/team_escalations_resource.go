@@ -57,10 +57,15 @@ type TeamEscalationsTimeFilterModel struct {
 }
 
 type TeamEscalationsScheduleModel struct {
-	DisplayName      types.String                          `tfsdk:"display_name"`
-	ScheduleSettings *TeamEscalationsScheduleSettingsModel `tfsdk:"schedule_settings"`
-	RotationSettings *TeamEscalationsRotationSettingsModel `tfsdk:"rotation_settings"`
-	Rotations        []TeamEscalationsRotationModel        `tfsdk:"rotations"`
+	DisplayName        types.String                            `tfsdk:"display_name"`
+	ScheduleSettings   *TeamEscalationsScheduleSettingsModel   `tfsdk:"schedule_settings"`
+	RotationSettings   *TeamEscalationsRotationSettingsModel   `tfsdk:"rotation_settings"`
+	RoundRobinSettings *TeamEscalationsRoundRobinSettingsModel `tfsdk:"round_robin_settings"`
+	Rotations          []TeamEscalationsRotationModel          `tfsdk:"rotations"`
+}
+
+type TeamEscalationsRoundRobinSettingsModel struct {
+	RoundRobinSize types.Int64 `tfsdk:"round_robin_size"`
 }
 
 type TeamEscalationsRotationModel struct {
@@ -346,6 +351,19 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 											},
 										},
 									},
+									"round_robin_settings": schema.SingleNestedAttribute{
+										MarkdownDescription: "Settings for round robin alerting. When enabled, incidents are distributed evenly among available responders.",
+										Optional:            true,
+										Attributes: map[string]schema.Attribute{
+											"round_robin_size": schema.Int64Attribute{
+												Optional:            true,
+												MarkdownDescription: "Number of users to assign per incident when using round robin. Max 100.",
+												Validators: []validator.Int64{
+													int64validator.Between(1, 100),
+												},
+											},
+										},
+									},
 									"rotation_settings": schema.SingleNestedAttribute{
 										MarkdownDescription: "Settings for the rotation",
 										Optional:            true,
@@ -580,10 +598,11 @@ func mapTeamEscalationsSchedulesResponseToData(ctx context.Context, teamEscalati
 	schedules := make([]TeamEscalationsScheduleModel, 0, len(teamEscalationsSchedule))
 	for _, schedule := range teamEscalationsSchedule {
 		schedules = append(schedules, TeamEscalationsScheduleModel{
-			DisplayName:      types.StringPointerValue(schedule.DisplayName),
-			ScheduleSettings: mapTeamEscalationsScheduleSettingsResponseToData(ctx, schedule.ScheduleSettings),
-			RotationSettings: mapTeamEscalationsRotationSettingsResponseToData(schedule.RotationSettings),
-			Rotations:        mapTeamEscalationsRotationsResponseToData(schedule.Rotations),
+			DisplayName:        types.StringPointerValue(schedule.DisplayName),
+			ScheduleSettings:   mapTeamEscalationsScheduleSettingsResponseToData(ctx, schedule.ScheduleSettings),
+			RotationSettings:   mapTeamEscalationsRotationSettingsResponseToData(schedule.RotationSettings),
+			RoundRobinSettings: mapTeamEscalationsRoundRobinSettingsResponseToData(schedule.RoundRobinSettings),
+			Rotations:          mapTeamEscalationsRotationsResponseToData(schedule.Rotations),
 		})
 	}
 	return schedules
@@ -651,4 +670,13 @@ func mapTeamEscalationsWeeklySchedulesResponseToData(ctx context.Context, weekly
 		})
 	}
 	return &weeklySchedulesData
+}
+
+func mapTeamEscalationsRoundRobinSettingsResponseToData(roundRobinSettings *roundRobinSettings) *TeamEscalationsRoundRobinSettingsModel {
+	if roundRobinSettings == nil {
+		return nil
+	}
+	return &TeamEscalationsRoundRobinSettingsModel{
+		RoundRobinSize: types.Int64PointerValue(roundRobinSettings.RoundRobinSize),
+	}
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -33,28 +34,33 @@ type StatusPage struct {
 
 // StatusPageModel describes the resource data model.
 type StatusPageModel struct {
-	Id                            types.String                   `tfsdk:"id"`
-	DisplayName                   types.String                   `tfsdk:"display_name"`
-	PublicTitle                   types.String                   `tfsdk:"public_title"`
-	PublicDescription             types.String                   `tfsdk:"public_description"`
-	Slug                          types.String                   `tfsdk:"slug"`
-	Services                      types.List                     `tfsdk:"services"`
-	ServiceGroups                 *[]StatusPageServiceGroupModel `tfsdk:"service_groups"`
-	PublicCompanyUrl              types.String                   `tfsdk:"public_company_url"`
-	PublicCompanyName             types.String                   `tfsdk:"public_company_name"`
-	PublicSupportUrl              types.String                   `tfsdk:"public_support_url"`
-	PublicSupportEmail            types.String                   `tfsdk:"public_support_email"`
-	HistoryInDays                 types.Int64                    `tfsdk:"history_in_days"`
-	TimeZoneId                    types.String                   `tfsdk:"time_zone_id"`
-	DisablePublicSubscription     types.Bool                     `tfsdk:"disable_public_subscription"`
-	PublicSeverityMappingMinor    types.String                   `tfsdk:"public_severity_mapping_minor"`
-	PublicSeverityMappingWarning  types.String                   `tfsdk:"public_severity_mapping_warning"`
-	PublicSeverityMappingCritical types.String                   `tfsdk:"public_severity_mapping_critical"`
-	BannerBackgroundColor         types.String                   `tfsdk:"banner_background_color"`
-	BannerBackgroundColorDarkMode types.String                   `tfsdk:"banner_background_color_dark_mode"`
-	BannerTextColor               types.String                   `tfsdk:"banner_text_color"`
-	BannerTextColorDarkMode       types.String                   `tfsdk:"banner_text_color_dark_mode"`
-	CustomHostSettings            *CustomHostSettings            `tfsdk:"custom_host_settings"`
+	Id                                types.String                   `tfsdk:"id"`
+	DisplayName                       types.String                   `tfsdk:"display_name"`
+	PublicTitle                       types.String                   `tfsdk:"public_title"`
+	PublicDescription                 types.String                   `tfsdk:"public_description"`
+	Slug                              types.String                   `tfsdk:"slug"`
+	Services                          types.List                     `tfsdk:"services"`
+	ServiceGroups                     *[]StatusPageServiceGroupModel `tfsdk:"service_groups"`
+	PublicCompanyUrl                  types.String                   `tfsdk:"public_company_url"`
+	PublicCompanyName                 types.String                   `tfsdk:"public_company_name"`
+	PublicSupportUrl                  types.String                   `tfsdk:"public_support_url"`
+	PublicSupportEmail                types.String                   `tfsdk:"public_support_email"`
+	HistoryInDays                     types.Int64                    `tfsdk:"history_in_days"`
+	TimeZoneId                        types.String                   `tfsdk:"time_zone_id"`
+	DisablePublicSubscription         types.Bool                     `tfsdk:"disable_public_subscription"`
+	PublicSeverityMappingMinor        types.String                   `tfsdk:"public_severity_mapping_minor"`
+	PublicSeverityMappingWarning      types.String                   `tfsdk:"public_severity_mapping_warning"`
+	PublicSeverityMappingCritical     types.String                   `tfsdk:"public_severity_mapping_critical"`
+	BannerBackgroundColor             types.String                   `tfsdk:"banner_background_color"`
+	BannerBackgroundColorDarkMode     types.String                   `tfsdk:"banner_background_color_dark_mode"`
+	BannerTextColor                   types.String                   `tfsdk:"banner_text_color"`
+	BannerTextColorDarkMode           types.String                   `tfsdk:"banner_text_color_dark_mode"`
+	CustomHostSettings                *CustomHostSettings            `tfsdk:"custom_host_settings"`
+	DisablePublicPage                 types.Bool                     `tfsdk:"disable_public_page"`
+	DisablePublicJson                 types.Bool                     `tfsdk:"disable_public_json"`
+	PrivateIpFilter                   types.String                   `tfsdk:"private_ip_filter"`
+	PrivateUserAuthenticationRequired types.Bool                     `tfsdk:"private_user_authentication_required"`
+	EnableSMSSubscription             types.Bool                     `tfsdk:"enable_sms_subscription"`
 }
 
 type StatusPageServiceGroupModel struct {
@@ -216,6 +222,30 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 					HexColorValidator("Not a valid hex color"),
 				},
 			},
+			"disable_public_page": schema.BoolAttribute{
+				MarkdownDescription: "Disable public access to the status page. When enabled, the status page will not be publicly accessible.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
+			},
+			"disable_public_json": schema.BoolAttribute{
+				MarkdownDescription: "Disable public access to the status page JSON API. When enabled, the JSON API endpoint will not be publicly accessible.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
+			},
+			"private_ip_filter": schema.StringAttribute{
+				MarkdownDescription: "Private IP filter (CIDR format) to restrict access to the status page. Only IPs matching the filter will be able to access the page.",
+				Optional:            true,
+			},
+			"private_user_authentication_required": schema.BoolAttribute{
+				MarkdownDescription: "Require user authentication to access the status page. When enabled, users must be authenticated All Quiet users of your organization to view the status page. Private user authentication is not allowed for custom host settings (CNAME).",
+				Optional:            true,
+			},
+			"enable_sms_subscription": schema.BoolAttribute{
+				MarkdownDescription: "Enable SMS subscription for status page updates. Allows users to subscribe to status updates via SMS.",
+				Optional:            true,
+			},
 		},
 	}
 }
@@ -360,6 +390,11 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.BannerTextColorDarkMode = types.StringPointerValue(response.BannerTextColorDarkMode)
 	data.CustomHostSettings = mapCustomHostSettingsResponseToModel(response.CustomHostSettings)
 	data.ServiceGroups = mapStatusPageServiceGroupsResponseToModel(ctx, response.ServiceGroups)
+	data.DisablePublicPage = types.BoolPointerValue(response.DisablePublicPage)
+	data.DisablePublicJson = types.BoolPointerValue(response.DisablePublicJson)
+	data.PrivateUserAuthenticationRequired = types.BoolPointerValue(response.PrivateUserAuthenticationRequired)
+	data.EnableSMSSubscription = types.BoolPointerValue(response.EnableSMSSubscription)
+	data.PrivateIpFilter = types.StringPointerValue(response.PrivateIpFilter)
 }
 
 func mapStatusPageServiceGroupsResponseToModel(ctx context.Context, response *[]statusPageServiceGroupResponse) *[]StatusPageServiceGroupModel {

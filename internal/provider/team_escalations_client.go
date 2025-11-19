@@ -48,10 +48,15 @@ type teamEscalationsTimeFilter struct {
 }
 
 type teamEscalationsSchedule struct {
-	DisplayName      *string                   `json:"displayName"`
-	ScheduleSettings *scheduleSettings         `json:"scheduleSettings"`
-	RotationSettings *rotationSettings         `json:"rotationSettings"`
-	Rotations        []teamEscalationsRotation `json:"rotations"`
+	DisplayName       *string                   `json:"displayName"`
+	ScheduleSettings  *scheduleSettings         `json:"scheduleSettings"`
+	RotationSettings  *rotationSettings         `json:"rotationSettings"`
+	RoundRobinSettings *roundRobinSettings      `json:"roundRobinSettings"`
+	Rotations         []teamEscalationsRotation `json:"rotations"`
+}
+
+type roundRobinSettings struct {
+	RoundRobinSize *int64 `json:"roundRobinSize"`
 }
 
 type teamEscalationsRotation struct {
@@ -122,6 +127,12 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 
 		schedules[i] = teamEscalationsSchedule{
 			DisplayName: schedule.DisplayName.ValueStringPointer(),
+		}
+
+		if schedule.RoundRobinSettings != nil {
+			schedules[i].RoundRobinSettings = &roundRobinSettings{
+				RoundRobinSize: schedule.RoundRobinSettings.RoundRobinSize.ValueInt64Pointer(),
+			}
 		}
 
 		if schedule.ScheduleSettings != nil {

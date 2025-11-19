@@ -64,8 +64,8 @@ func testAccOnCallOverridesDataSourceConfig(displayName, email, displayName2, em
 		resource "allquiet_on_call_override" "user2_override1" {
 			user_id = allquiet_user.user2.id
 			type = "online"
-			start = "2025-10-01T00:00:00Z"
-			end = "2025-11-01T00:00:00Z"
+			start = "2025-11-01T00:00:00Z"
+			end = "2025-12-01T00:00:00Z"
 			replacement_user_ids = [allquiet_user.user1.id]
 		}
 

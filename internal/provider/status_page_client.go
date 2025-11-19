@@ -31,6 +31,11 @@ type statusPageResponse struct {
 	BannerTextColorDarkMode       *string
 	CustomHostSettings            *customHostSettingsResponse
 	ServiceGroups                 *[]statusPageServiceGroupResponse
+	DisablePublicPage             *bool
+	DisablePublicJson             *bool
+	PrivateIpFilter               *string
+	PrivateUserAuthenticationRequired *bool
+	EnableSMSSubscription         *bool
 }
 
 type statusPageServiceGroupResponse struct {
@@ -73,6 +78,11 @@ type statusPageCreateRequest struct {
 	BannerTextColorDarkMode       *string                          `json:"bannerTextColorDarkMode"`
 	CustomHostSettings            *customHostSettingsRequest       `json:"customHostSettings"`
 	ServiceGroups                 *[]statusPageServiceGroupRequest `json:"serviceGroups"`
+	DisablePublicPage             *bool                            `json:"disablePublicPage"`
+	DisablePublicJson             *bool                            `json:"disablePublicJson"`
+	PrivateIpFilter               *string                          `json:"privateIpFilter"`
+	PrivateUserAuthenticationRequired *bool                        `json:"privateUserAuthenticationRequired"`
+	EnableSMSSubscription         *bool                            `json:"enableSMSSubscription"`
 }
 
 type customHostSettingsRequest struct {
@@ -102,6 +112,11 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		BannerTextColorDarkMode:       plan.BannerTextColorDarkMode.ValueStringPointer(),
 		CustomHostSettings:            mapCustomHostSettingsRequestToModel(plan.CustomHostSettings),
 		ServiceGroups:                 mapStatusPageServiceGroupsRequestToModel(plan.ServiceGroups),
+		DisablePublicPage:             plan.DisablePublicPage.ValueBoolPointer(),
+		DisablePublicJson:             plan.DisablePublicJson.ValueBoolPointer(),
+		PrivateIpFilter:               plan.PrivateIpFilter.ValueStringPointer(),
+		PrivateUserAuthenticationRequired: plan.PrivateUserAuthenticationRequired.ValueBoolPointer(),
+		EnableSMSSubscription:         plan.EnableSMSSubscription.ValueBoolPointer(),
 	}
 }
 

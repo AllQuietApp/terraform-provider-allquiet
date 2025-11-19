@@ -99,4 +99,29 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
   ]
 }
 
+resource "allquiet_status_page" "private_status_page" {
+  slug                                 = "private-status-page-test"
+  display_name                         = "Private Status Page"
+  public_title                         = "Private Status Page"
+  public_description                   = "Internal status page for team members only"
+  history_in_days                      = 30
+  disable_public_subscription          = false
+  disable_public_page                  = true
+  disable_public_json                  = true
+  private_ip_filter                    = "52.95.245.0/24,203.0.113.0/24"
+  private_user_authentication_required = true
+  enable_sms_subscription              = false
+
+  time_zone_id = "Europe/Amsterdam"
+  service_groups = [
+    {
+      public_display_name = "Internal Services"
+      public_description  = "Internal services and integrations"
+      services = [
+        allquiet_service.shipping_api.id
+      ]
+    }
+  ]
+}
+
 
