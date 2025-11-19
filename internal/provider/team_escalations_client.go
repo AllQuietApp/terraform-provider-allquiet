@@ -48,11 +48,11 @@ type teamEscalationsTimeFilter struct {
 }
 
 type teamEscalationsSchedule struct {
-	DisplayName       *string                   `json:"displayName"`
-	ScheduleSettings  *scheduleSettings         `json:"scheduleSettings"`
-	RotationSettings  *rotationSettings         `json:"rotationSettings"`
-	RoundRobinSettings *roundRobinSettings      `json:"roundRobinSettings"`
-	Rotations         []teamEscalationsRotation `json:"rotations"`
+	DisplayName        *string                   `json:"displayName"`
+	ScheduleSettings   *scheduleSettings         `json:"scheduleSettings"`
+	RotationSettings   *rotationSettings         `json:"rotationSettings"`
+	RoundRobinSettings *roundRobinSettings       `json:"roundRobinSettings"`
+	Rotations          []teamEscalationsRotation `json:"rotations"`
 }
 
 type roundRobinSettings struct {

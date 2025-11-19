@@ -9,33 +9,33 @@ import (
 )
 
 type statusPageResponse struct {
-	Id                            string
-	DisplayName                   string
-	PublicTitle                   string
-	PublicDescription             *string
-	Slug                          *string
-	ServiceIds                    *[]string
-	PublicCompanyUrl              *string
-	PublicCompanyName             *string
-	PublicSupportUrl              *string
-	PublicSupportEmail            *string
-	HistoryInDays                 int64
-	TimeZoneId                    *string
-	DisablePublicSubscription     bool
-	PublicSeverityMappingMinor    *string
-	PublicSeverityMappingWarning  *string
-	PublicSeverityMappingCritical *string
-	BannerBackgroundColor         *string
-	BannerBackgroundColorDarkMode *string
-	BannerTextColor               *string
-	BannerTextColorDarkMode       *string
-	CustomHostSettings            *customHostSettingsResponse
-	ServiceGroups                 *[]statusPageServiceGroupResponse
-	DisablePublicPage             *bool
-	DisablePublicJson             *bool
-	PrivateIpFilter               *string
+	Id                                string
+	DisplayName                       string
+	PublicTitle                       string
+	PublicDescription                 *string
+	Slug                              *string
+	ServiceIds                        *[]string
+	PublicCompanyUrl                  *string
+	PublicCompanyName                 *string
+	PublicSupportUrl                  *string
+	PublicSupportEmail                *string
+	HistoryInDays                     int64
+	TimeZoneId                        *string
+	DisablePublicSubscription         bool
+	PublicSeverityMappingMinor        *string
+	PublicSeverityMappingWarning      *string
+	PublicSeverityMappingCritical     *string
+	BannerBackgroundColor             *string
+	BannerBackgroundColorDarkMode     *string
+	BannerTextColor                   *string
+	BannerTextColorDarkMode           *string
+	CustomHostSettings                *customHostSettingsResponse
+	ServiceGroups                     *[]statusPageServiceGroupResponse
+	DisablePublicPage                 *bool
+	DisablePublicJson                 *bool
+	PrivateIpFilter                   *string
 	PrivateUserAuthenticationRequired *bool
-	EnableSMSSubscription         *bool
+	EnableSMSSubscription             *bool
 }
 
 type statusPageServiceGroupResponse struct {
@@ -57,32 +57,32 @@ type statusPageServiceGroupRequest struct {
 }
 
 type statusPageCreateRequest struct {
-	DisplayName                   string                           `json:"displayName"`
-	PublicTitle                   string                           `json:"publicTitle"`
-	PublicDescription             *string                          `json:"publicDescription"`
-	Slug                          *string                          `json:"slug"`
-	ServiceIds                    *[]string                        `json:"serviceIds"`
-	PublicCompanyUrl              *string                          `json:"publicCompanyUrl"`
-	PublicCompanyName             *string                          `json:"publicCompanyName"`
-	PublicSupportUrl              *string                          `json:"publicSupportUrl"`
-	PublicSupportEmail            *string                          `json:"publicSupportEmail"`
-	HistoryInDays                 int64                            `json:"historyInDays"`
-	TimeZoneId                    *string                          `json:"timeZoneId"`
-	DisablePublicSubscription     bool                             `json:"disablePublicSubscription"`
-	PublicSeverityMappingMinor    *string                          `json:"publicSeverityMappingMinor"`
-	PublicSeverityMappingWarning  *string                          `json:"publicSeverityMappingWarning"`
-	PublicSeverityMappingCritical *string                          `json:"publicSeverityMappingCritical"`
-	BannerBackgroundColor         *string                          `json:"bannerBackgroundColor"`
-	BannerBackgroundColorDarkMode *string                          `json:"bannerBackgroundColorDarkMode"`
-	BannerTextColor               *string                          `json:"bannerTextColor"`
-	BannerTextColorDarkMode       *string                          `json:"bannerTextColorDarkMode"`
-	CustomHostSettings            *customHostSettingsRequest       `json:"customHostSettings"`
-	ServiceGroups                 *[]statusPageServiceGroupRequest `json:"serviceGroups"`
-	DisablePublicPage             *bool                            `json:"disablePublicPage"`
-	DisablePublicJson             *bool                            `json:"disablePublicJson"`
-	PrivateIpFilter               *string                          `json:"privateIpFilter"`
-	PrivateUserAuthenticationRequired *bool                        `json:"privateUserAuthenticationRequired"`
-	EnableSMSSubscription         *bool                            `json:"enableSMSSubscription"`
+	DisplayName                       string                           `json:"displayName"`
+	PublicTitle                       string                           `json:"publicTitle"`
+	PublicDescription                 *string                          `json:"publicDescription"`
+	Slug                              *string                          `json:"slug"`
+	ServiceIds                        *[]string                        `json:"serviceIds"`
+	PublicCompanyUrl                  *string                          `json:"publicCompanyUrl"`
+	PublicCompanyName                 *string                          `json:"publicCompanyName"`
+	PublicSupportUrl                  *string                          `json:"publicSupportUrl"`
+	PublicSupportEmail                *string                          `json:"publicSupportEmail"`
+	HistoryInDays                     int64                            `json:"historyInDays"`
+	TimeZoneId                        *string                          `json:"timeZoneId"`
+	DisablePublicSubscription         bool                             `json:"disablePublicSubscription"`
+	PublicSeverityMappingMinor        *string                          `json:"publicSeverityMappingMinor"`
+	PublicSeverityMappingWarning      *string                          `json:"publicSeverityMappingWarning"`
+	PublicSeverityMappingCritical     *string                          `json:"publicSeverityMappingCritical"`
+	BannerBackgroundColor             *string                          `json:"bannerBackgroundColor"`
+	BannerBackgroundColorDarkMode     *string                          `json:"bannerBackgroundColorDarkMode"`
+	BannerTextColor                   *string                          `json:"bannerTextColor"`
+	BannerTextColorDarkMode           *string                          `json:"bannerTextColorDarkMode"`
+	CustomHostSettings                *customHostSettingsRequest       `json:"customHostSettings"`
+	ServiceGroups                     *[]statusPageServiceGroupRequest `json:"serviceGroups"`
+	DisablePublicPage                 *bool                            `json:"disablePublicPage"`
+	DisablePublicJson                 *bool                            `json:"disablePublicJson"`
+	PrivateIpFilter                   *string                          `json:"privateIpFilter"`
+	PrivateUserAuthenticationRequired *bool                            `json:"privateUserAuthenticationRequired"`
+	EnableSMSSubscription             *bool                            `json:"enableSMSSubscription"`
 }
 
 type customHostSettingsRequest struct {
@@ -91,32 +91,32 @@ type customHostSettingsRequest struct {
 
 func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest {
 	return &statusPageCreateRequest{
-		DisplayName:                   plan.DisplayName.ValueString(),
-		PublicTitle:                   plan.PublicTitle.ValueString(),
-		PublicDescription:             plan.PublicDescription.ValueStringPointer(),
-		Slug:                          plan.Slug.ValueStringPointer(),
-		ServiceIds:                    ListToStringArray(plan.Services),
-		PublicCompanyUrl:              plan.PublicCompanyUrl.ValueStringPointer(),
-		PublicCompanyName:             plan.PublicCompanyName.ValueStringPointer(),
-		PublicSupportUrl:              plan.PublicSupportUrl.ValueStringPointer(),
-		PublicSupportEmail:            plan.PublicSupportEmail.ValueStringPointer(),
-		HistoryInDays:                 plan.HistoryInDays.ValueInt64(),
-		TimeZoneId:                    plan.TimeZoneId.ValueStringPointer(),
-		DisablePublicSubscription:     plan.DisablePublicSubscription.ValueBool(),
-		PublicSeverityMappingMinor:    plan.PublicSeverityMappingMinor.ValueStringPointer(),
-		PublicSeverityMappingWarning:  plan.PublicSeverityMappingWarning.ValueStringPointer(),
-		PublicSeverityMappingCritical: plan.PublicSeverityMappingCritical.ValueStringPointer(),
-		BannerBackgroundColor:         plan.BannerBackgroundColor.ValueStringPointer(),
-		BannerBackgroundColorDarkMode: plan.BannerBackgroundColorDarkMode.ValueStringPointer(),
-		BannerTextColor:               plan.BannerTextColor.ValueStringPointer(),
-		BannerTextColorDarkMode:       plan.BannerTextColorDarkMode.ValueStringPointer(),
-		CustomHostSettings:            mapCustomHostSettingsRequestToModel(plan.CustomHostSettings),
-		ServiceGroups:                 mapStatusPageServiceGroupsRequestToModel(plan.ServiceGroups),
-		DisablePublicPage:             plan.DisablePublicPage.ValueBoolPointer(),
-		DisablePublicJson:             plan.DisablePublicJson.ValueBoolPointer(),
-		PrivateIpFilter:               plan.PrivateIpFilter.ValueStringPointer(),
+		DisplayName:                       plan.DisplayName.ValueString(),
+		PublicTitle:                       plan.PublicTitle.ValueString(),
+		PublicDescription:                 plan.PublicDescription.ValueStringPointer(),
+		Slug:                              plan.Slug.ValueStringPointer(),
+		ServiceIds:                        ListToStringArray(plan.Services),
+		PublicCompanyUrl:                  plan.PublicCompanyUrl.ValueStringPointer(),
+		PublicCompanyName:                 plan.PublicCompanyName.ValueStringPointer(),
+		PublicSupportUrl:                  plan.PublicSupportUrl.ValueStringPointer(),
+		PublicSupportEmail:                plan.PublicSupportEmail.ValueStringPointer(),
+		HistoryInDays:                     plan.HistoryInDays.ValueInt64(),
+		TimeZoneId:                        plan.TimeZoneId.ValueStringPointer(),
+		DisablePublicSubscription:         plan.DisablePublicSubscription.ValueBool(),
+		PublicSeverityMappingMinor:        plan.PublicSeverityMappingMinor.ValueStringPointer(),
+		PublicSeverityMappingWarning:      plan.PublicSeverityMappingWarning.ValueStringPointer(),
+		PublicSeverityMappingCritical:     plan.PublicSeverityMappingCritical.ValueStringPointer(),
+		BannerBackgroundColor:             plan.BannerBackgroundColor.ValueStringPointer(),
+		BannerBackgroundColorDarkMode:     plan.BannerBackgroundColorDarkMode.ValueStringPointer(),
+		BannerTextColor:                   plan.BannerTextColor.ValueStringPointer(),
+		BannerTextColorDarkMode:           plan.BannerTextColorDarkMode.ValueStringPointer(),
+		CustomHostSettings:                mapCustomHostSettingsRequestToModel(plan.CustomHostSettings),
+		ServiceGroups:                     mapStatusPageServiceGroupsRequestToModel(plan.ServiceGroups),
+		DisablePublicPage:                 plan.DisablePublicPage.ValueBoolPointer(),
+		DisablePublicJson:                 plan.DisablePublicJson.ValueBoolPointer(),
+		PrivateIpFilter:                   plan.PrivateIpFilter.ValueStringPointer(),
 		PrivateUserAuthenticationRequired: plan.PrivateUserAuthenticationRequired.ValueBoolPointer(),
-		EnableSMSSubscription:         plan.EnableSMSSubscription.ValueBoolPointer(),
+		EnableSMSSubscription:             plan.EnableSMSSubscription.ValueBoolPointer(),
 	}
 }
 
