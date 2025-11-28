@@ -36,6 +36,9 @@ type statusPageResponse struct {
 	PrivateIpFilter                   *string
 	PrivateUserAuthenticationRequired *bool
 	EnableSMSSubscription             *bool
+	BodyBackgroundColor               *string
+	BodyBackgroundColorDarkMode       *string
+	DecimalPlaces                     *int64
 }
 
 type statusPageServiceGroupResponse struct {
@@ -133,6 +136,9 @@ type statusPageCreateRequest struct {
 	PrivateIpFilter                   *string                          `json:"privateIpFilter"`
 	PrivateUserAuthenticationRequired *bool                            `json:"privateUserAuthenticationRequired"`
 	EnableSMSSubscription             *bool                            `json:"enableSMSSubscription"`
+	BodyBackgroundColor               *string                          `json:"bodyBackgroundColor"`
+	BodyBackgroundColorDarkMode       *string                          `json:"bodyBackgroundColorDarkMode"`
+	DecimalPlaces                     *int64                           `json:"decimalPlaces"`
 }
 
 type customHostSettingsRequest struct {
@@ -167,6 +173,9 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		PrivateIpFilter:                   plan.PrivateIpFilter.ValueStringPointer(),
 		PrivateUserAuthenticationRequired: plan.PrivateUserAuthenticationRequired.ValueBoolPointer(),
 		EnableSMSSubscription:             plan.EnableSMSSubscription.ValueBoolPointer(),
+		BodyBackgroundColor:               plan.BodyBackgroundColor.ValueStringPointer(),
+		BodyBackgroundColorDarkMode:       plan.BodyBackgroundColorDarkMode.ValueStringPointer(),
+		DecimalPlaces:                     plan.DecimalPlaces.ValueInt64Pointer(),
 	}
 }
 

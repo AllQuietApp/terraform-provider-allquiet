@@ -78,6 +78,9 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
   banner_background_color_dark_mode = "#447788"
   banner_text_color                 = "#ffffff"
   banner_text_color_dark_mode       = "#ffffff"
+  decimal_places                      = 2
+  body_background_color               = "#ffffff"
+  body_background_color_dark_mode     = "#000000"
 
   time_zone_id = "Europe/Amsterdam"
   service_groups = [

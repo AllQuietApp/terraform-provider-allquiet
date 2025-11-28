@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -62,6 +63,9 @@ type StatusPageModel struct {
 	PrivateIpFilter                   types.String                   `tfsdk:"private_ip_filter"`
 	PrivateUserAuthenticationRequired types.Bool                     `tfsdk:"private_user_authentication_required"`
 	EnableSMSSubscription             types.Bool                     `tfsdk:"enable_sms_subscription"`
+	BodyBackgroundColor               types.String                   `tfsdk:"body_background_color"`
+	BodyBackgroundColorDarkMode       types.String                   `tfsdk:"body_background_color_dark_mode"`
+	DecimalPlaces                     types.Int64                    `tfsdk:"decimal_places"`
 }
 
 type StatusPageServiceGroupModel struct {
@@ -446,6 +450,27 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 				MarkdownDescription: "Enable SMS subscription for status page updates. Allows users to subscribe to status updates via SMS.",
 				Optional:            true,
 			},
+			"body_background_color": schema.StringAttribute{
+				MarkdownDescription: "The body background color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"body_background_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The body background color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"decimal_places": schema.Int64Attribute{
+				MarkdownDescription: "The number of decimal places to display on the status page. Must be between 0 and 8.",
+				Optional:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(0, 8),
+				},
+			},
 		},
 	}
 }
@@ -595,6 +620,9 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.PrivateUserAuthenticationRequired = types.BoolPointerValue(response.PrivateUserAuthenticationRequired)
 	data.EnableSMSSubscription = types.BoolPointerValue(response.EnableSMSSubscription)
 	data.PrivateIpFilter = types.StringPointerValue(response.PrivateIpFilter)
+	data.BodyBackgroundColor = types.StringPointerValue(response.BodyBackgroundColor)
+	data.BodyBackgroundColorDarkMode = types.StringPointerValue(response.BodyBackgroundColorDarkMode)
+	data.DecimalPlaces = types.Int64PointerValue(response.DecimalPlaces)
 }
 
 func mapStatusPageServiceGroupsResponseToModel(ctx context.Context, response *[]statusPageServiceGroupResponse) *[]StatusPageServiceGroupModel {
