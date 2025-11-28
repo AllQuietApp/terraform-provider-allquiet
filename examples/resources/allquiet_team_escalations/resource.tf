@@ -265,7 +265,10 @@ resource "allquiet_team_escalations" "my_team_escalations_with_hourly_rotation" 
             custom_repeat_unit  = "hours"
             custom_repeat_value = 6
             starts_on_time      = "09:00"
-            effective_from      = "2024-07-10"
+          }
+          schedule_settings = {
+            effective_from = "2025-11-23"
+            effective_until = "2025-12-31"
           }
           rotations = [
             {

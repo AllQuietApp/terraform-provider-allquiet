@@ -46,7 +46,57 @@ type statusPageServiceGroupResponse struct {
 }
 
 type customHostSettingsResponse struct {
-	Host string `json:"host"`
+	Host                                   string                                  `json:"host"`
+	CloudFlareCreateCustomHostNameResponse *cloudFlareCreateCustomHostNameResponse `json:"cloudFlareCreateCustomHostNameResponse"`
+}
+
+type cloudFlareCreateCustomHostNameResponse struct {
+	Errors   *[]cloudFlareResponseInfo           `json:"errors"`
+	Messages *[]cloudFlareResponseInfo           `json:"messages"`
+	Success  bool                                `json:"success"`
+	Result   *createCustomHostNameResponseResult `json:"result"`
+}
+
+type cloudFlareResponseInfo struct {
+	Code    int     `json:"code"`
+	Message *string `json:"message"`
+}
+
+type createCustomHostNameResponseResult struct {
+	Id                        string                                       `json:"id"`
+	Hostname                  string                                       `json:"hostname"`
+	Status                    string                                       `json:"status"`
+	OwnershipVerification     *customHostSettingsOwnershipVerification     `json:"ownershipVerification"`
+	OwnershipVerificationHttp *customHostSettingsOwnershipVerificationHttp `json:"ownershipVerificationHttp"`
+	VerificationErrors        *[]string                                    `json:"verificationErrors"`
+	Ssl                       *customHostSettingsSsl                       `json:"ssl"`
+}
+
+type customHostSettingsOwnershipVerification struct {
+	Type  *string `json:"type"`
+	Name  *string `json:"name"`
+	Value *string `json:"value"`
+}
+
+type customHostSettingsOwnershipVerificationHttp struct {
+	HttpBody *string `json:"httpBody"`
+	HttpUrl  *string `json:"httpUrl"`
+}
+
+type customHostSettingsSsl struct {
+	Id                *string                                  `json:"id"`
+	Method            *string                                  `json:"method"`
+	Status            *string                                  `json:"status"`
+	ValidationErrors  *[]string                                `json:"validationErrors"`
+	ValidationRecords *[]customHostSettingsSslValidationRecord `json:"validationRecords"`
+}
+
+type customHostSettingsSslValidationRecord struct {
+	Emails   *[]string `json:"emails"`
+	HttpBody *string   `json:"httpBody"`
+	HttpUrl  *string   `json:"httpUrl"`
+	TxtName  *string   `json:"txtName"`
+	TxtValue *string   `json:"txtValue"`
 }
 
 type statusPageServiceGroupRequest struct {

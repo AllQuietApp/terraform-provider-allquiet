@@ -34,6 +34,8 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.from"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.until"),
 					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_round_robin", "escalation_tiers.0.schedules.0.round_robin_settings.round_robin_size", "3"),
+					resource.TestCheckNoResourceAttr("allquiet_team_escalations.my_team_with_empty_members", "escalation_tiers.0.schedules.0.schedule_settings.effective_from"),
+					resource.TestCheckNoResourceAttr("allquiet_team_escalations.my_team_with_empty_members", "escalation_tiers.0.schedules.0.schedule_settings.effective_until"),
 				),
 			},
 			// ImportState testing
@@ -52,6 +54,8 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats_after_minutes"),
 					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_round_robin", "escalation_tiers.0.schedules.0.round_robin_settings.round_robin_size", "5"),
+					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_empty_members", "escalation_tiers.0.schedules.0.schedule_settings.effective_from", "2025-11-23"),
+					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_empty_members", "escalation_tiers.0.schedules.0.schedule_settings.effective_until", "2025-12-31"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -150,7 +154,6 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 					auto_rotation_size      = null
 					custom_repeat_unit      = null
 					custom_repeat_value     = null
-					effective_from          = "2025-06-11"
 					repeats                 = "weekly"
 					rotation_mode           = "explicit"
 					starts_on_date_of_month = null
@@ -174,6 +177,7 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 					},
 				]
 				schedule_settings = {
+					effective_from          = "2025-06-11"
 					weekly_schedules = null
 				}
 				},
@@ -484,6 +488,8 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 			  {
 				display_name = "Working weekdays schedule"
 				schedule_settings = {
+					effective_from = "2025-11-23"
+					effective_until = "2025-12-31"
 				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
 				}
 				rotations = [

@@ -72,6 +72,8 @@ type scheduleSettings struct {
 	End             *string           `json:"end"`
 	SelectedDays    *[]string         `json:"selectedDays"`
 	WeeklySchedules *[]weeklySchedule `json:"weeklySchedules"`
+	EffectiveFrom   *string           `json:"effectiveFrom"`
+	EffectiveUntil  *string           `json:"effectiveUntil"`
 }
 
 type weeklySchedule struct {
@@ -143,6 +145,8 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 				End:             schedule.ScheduleSettings.End.ValueStringPointer(),
 				SelectedDays:    selectedDays,
 				WeeklySchedules: mapTeamEscalationsWeeklySchedulesToRequest(schedule.ScheduleSettings.WeeklySchedules),
+				EffectiveFrom:   schedule.ScheduleSettings.EffectiveFrom.ValueStringPointer(),
+				EffectiveUntil:  schedule.ScheduleSettings.EffectiveUntil.ValueStringPointer(),
 			}
 		}
 

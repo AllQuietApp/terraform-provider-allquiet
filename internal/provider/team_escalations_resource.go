@@ -81,6 +81,8 @@ type TeamEscalationsScheduleSettingsModel struct {
 	End             types.String                          `tfsdk:"end"`
 	SelectedDays    types.List                            `tfsdk:"selected_days"`
 	WeeklySchedules *[]TeamEscalationsWeeklyScheduleModel `tfsdk:"weekly_schedules"`
+	EffectiveFrom   types.String                          `tfsdk:"effective_from"`
+	EffectiveUntil  types.String                          `tfsdk:"effective_until"`
 }
 
 type TeamEscalationsWeeklyScheduleModel struct {
@@ -349,6 +351,22 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 													},
 												},
 											},
+											"effective_from": schema.StringAttribute{
+												Optional:            true,
+												MarkdownDescription: "If sets, the schedule will be effective from the given date in ISO 8601 format",
+												Validators: []validator.String{stringvalidator.RegexMatches(
+													regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`),
+													"must contain ISO date matching the pattern '^\\d{4}-\\d{2}-\\d{2}$'",
+												)},
+											},
+											"effective_until": schema.StringAttribute{
+												Optional:            true,
+												MarkdownDescription: "If sets, the schedule will be effective until the given date in ISO 8601 format",
+												Validators: []validator.String{stringvalidator.RegexMatches(
+													regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`),
+													"must contain ISO date matching the pattern '^\\d{4}-\\d{2}-\\d{2}$'",
+												)},
+											},
 										},
 									},
 									"round_robin_settings": schema.SingleNestedAttribute{
@@ -405,6 +423,7 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 													regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`),
 													"must contain ISO date matching the pattern '^\\d{4}-\\d{2}-\\d{2}$'",
 												)},
+												DeprecationMessage: "Use effective_from and effective_until in `schedule_settings` instead",
 											},
 											"rotation_mode": schema.StringAttribute{
 												Optional:            true,
@@ -652,6 +671,8 @@ func mapTeamEscalationsScheduleSettingsResponseToData(ctx context.Context, sched
 	return &TeamEscalationsScheduleSettingsModel{
 		Start:           types.StringPointerValue(scheduleSettings.Start),
 		End:             types.StringPointerValue(scheduleSettings.End),
+		EffectiveFrom:   types.StringPointerValue(scheduleSettings.EffectiveFrom),
+		EffectiveUntil:  types.StringPointerValue(scheduleSettings.EffectiveUntil),
 		SelectedDays:    MapNullableList(ctx, scheduleSettings.SelectedDays),
 		WeeklySchedules: mapTeamEscalationsWeeklySchedulesResponseToData(ctx, scheduleSettings.WeeklySchedules),
 	}

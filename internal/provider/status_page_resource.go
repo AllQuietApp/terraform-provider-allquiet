@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -71,7 +72,57 @@ type StatusPageServiceGroupModel struct {
 }
 
 type CustomHostSettings struct {
-	Host types.String `tfsdk:"host"`
+	Host                                   types.String `tfsdk:"host"`
+	CloudFlareCreateCustomHostNameResponse types.Object `tfsdk:"cloudflare_create_custom_hostname_response"`
+}
+
+type CloudFlareCreateCustomHostNameResponse struct {
+	Errors   types.List                          `tfsdk:"errors"`
+	Messages types.List                          `tfsdk:"messages"`
+	Success  types.Bool                          `tfsdk:"success"`
+	Result   *CreateCustomHostNameResponseResult `tfsdk:"result"`
+}
+
+type CloudFlareResponseInfo struct {
+	Code    types.Int64  `tfsdk:"code"`
+	Message types.String `tfsdk:"message"`
+}
+
+type CreateCustomHostNameResponseResult struct {
+	Id                        types.String                                 `tfsdk:"id"`
+	Hostname                  types.String                                 `tfsdk:"hostname"`
+	Status                    types.String                                 `tfsdk:"status"`
+	OwnershipVerification     *CustomHostSettingsOwnershipVerification     `tfsdk:"ownership_verification"`
+	OwnershipVerificationHttp *CustomHostSettingsOwnershipVerificationHttp `tfsdk:"ownership_verification_http"`
+	VerificationErrors        types.List                                   `tfsdk:"verification_errors"`
+	Ssl                       *CustomHostSettingsSsl                       `tfsdk:"ssl"`
+}
+
+type CustomHostSettingsOwnershipVerification struct {
+	Type  types.String `tfsdk:"type"`
+	Name  types.String `tfsdk:"name"`
+	Value types.String `tfsdk:"value"`
+}
+
+type CustomHostSettingsOwnershipVerificationHttp struct {
+	HttpBody types.String `tfsdk:"http_body"`
+	HttpUrl  types.String `tfsdk:"http_url"`
+}
+
+type CustomHostSettingsSsl struct {
+	Id                types.String `tfsdk:"id"`
+	Method            types.String `tfsdk:"method"`
+	Status            types.String `tfsdk:"status"`
+	ValidationErrors  types.List   `tfsdk:"validation_errors"`
+	ValidationRecords types.List   `tfsdk:"validation_records"`
+}
+
+type CustomHostSettingsSslValidationRecord struct {
+	Emails   types.List   `tfsdk:"emails"`
+	HttpBody types.String `tfsdk:"http_body"`
+	HttpUrl  types.String `tfsdk:"http_url"`
+	TxtName  types.String `tfsdk:"txt_name"`
+	TxtValue types.String `tfsdk:"txt_value"`
 }
 
 func (r *StatusPage) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -114,6 +165,155 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 					"host": schema.StringAttribute{
 						MarkdownDescription: "The host of the status page",
 						Required:            true,
+					},
+					"cloudflare_create_custom_hostname_response": schema.SingleNestedAttribute{
+						MarkdownDescription: "The CloudFlare custom hostname response containing verification and SSL details",
+						Computed:            true,
+						Attributes: map[string]schema.Attribute{
+							"errors": schema.ListNestedAttribute{
+								MarkdownDescription: "List of errors from CloudFlare",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"code": schema.Int64Attribute{
+											MarkdownDescription: "Error code",
+											Computed:            true,
+										},
+										"message": schema.StringAttribute{
+											MarkdownDescription: "Error message",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"messages": schema.ListNestedAttribute{
+								MarkdownDescription: "List of messages from CloudFlare",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"code": schema.Int64Attribute{
+											MarkdownDescription: "Message code",
+											Computed:            true,
+										},
+										"message": schema.StringAttribute{
+											MarkdownDescription: "Message text",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"success": schema.BoolAttribute{
+								MarkdownDescription: "Whether the request was successful",
+								Computed:            true,
+							},
+							"result": schema.SingleNestedAttribute{
+								MarkdownDescription: "The result containing custom hostname details",
+								Computed:            true,
+								Attributes: map[string]schema.Attribute{
+									"id": schema.StringAttribute{
+										MarkdownDescription: "The ID of the custom hostname",
+										Computed:            true,
+									},
+									"hostname": schema.StringAttribute{
+										MarkdownDescription: "The hostname of the custom hostname",
+										Computed:            true,
+									},
+									"status": schema.StringAttribute{
+										MarkdownDescription: "The status of the custom hostname",
+										Computed:            true,
+									},
+									"ownership_verification": schema.SingleNestedAttribute{
+										MarkdownDescription: "The ownership verification details for the custom hostname",
+										Computed:            true,
+										Attributes: map[string]schema.Attribute{
+											"type": schema.StringAttribute{
+												MarkdownDescription: "The type of ownership verification",
+												Computed:            true,
+											},
+											"name": schema.StringAttribute{
+												MarkdownDescription: "The name for ownership verification",
+												Computed:            true,
+											},
+											"value": schema.StringAttribute{
+												MarkdownDescription: "The value for ownership verification",
+												Computed:            true,
+											},
+										},
+									},
+									"ownership_verification_http": schema.SingleNestedAttribute{
+										MarkdownDescription: "The HTTP ownership verification details for the custom hostname",
+										Computed:            true,
+										Attributes: map[string]schema.Attribute{
+											"http_body": schema.StringAttribute{
+												MarkdownDescription: "The HTTP body for ownership verification",
+												Computed:            true,
+											},
+											"http_url": schema.StringAttribute{
+												MarkdownDescription: "The HTTP URL for ownership verification",
+												Computed:            true,
+											},
+										},
+									},
+									"verification_errors": schema.ListAttribute{
+										MarkdownDescription: "List of verification errors for the custom hostname",
+										Computed:            true,
+										ElementType:         types.StringType,
+									},
+									"ssl": schema.SingleNestedAttribute{
+										MarkdownDescription: "The SSL configuration for the custom hostname",
+										Computed:            true,
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												MarkdownDescription: "The SSL ID",
+												Computed:            true,
+											},
+											"method": schema.StringAttribute{
+												MarkdownDescription: "The SSL method",
+												Computed:            true,
+											},
+											"status": schema.StringAttribute{
+												MarkdownDescription: "The SSL status",
+												Computed:            true,
+											},
+											"validation_errors": schema.ListAttribute{
+												MarkdownDescription: "List of SSL validation errors",
+												Computed:            true,
+												ElementType:         types.StringType,
+											},
+											"validation_records": schema.ListNestedAttribute{
+												MarkdownDescription: "List of SSL validation records",
+												Computed:            true,
+												NestedObject: schema.NestedAttributeObject{
+													Attributes: map[string]schema.Attribute{
+														"emails": schema.ListAttribute{
+															MarkdownDescription: "List of emails for validation",
+															Computed:            true,
+															ElementType:         types.StringType,
+														},
+														"http_body": schema.StringAttribute{
+															MarkdownDescription: "The HTTP body for validation",
+															Computed:            true,
+														},
+														"http_url": schema.StringAttribute{
+															MarkdownDescription: "The HTTP URL for validation",
+															Computed:            true,
+														},
+														"txt_name": schema.StringAttribute{
+															MarkdownDescription: "The TXT record name for validation",
+															Computed:            true,
+														},
+														"txt_value": schema.StringAttribute{
+															MarkdownDescription: "The TXT record value for validation",
+															Computed:            true,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -388,7 +588,7 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.BannerBackgroundColorDarkMode = types.StringPointerValue(response.BannerBackgroundColorDarkMode)
 	data.BannerTextColor = types.StringPointerValue(response.BannerTextColor)
 	data.BannerTextColorDarkMode = types.StringPointerValue(response.BannerTextColorDarkMode)
-	data.CustomHostSettings = mapCustomHostSettingsResponseToModel(response.CustomHostSettings)
+	data.CustomHostSettings = mapCustomHostSettingsResponseToModel(ctx, response.CustomHostSettings)
 	data.ServiceGroups = mapStatusPageServiceGroupsResponseToModel(ctx, response.ServiceGroups)
 	data.DisablePublicPage = types.BoolPointerValue(response.DisablePublicPage)
 	data.DisablePublicJson = types.BoolPointerValue(response.DisablePublicJson)
@@ -414,12 +614,276 @@ func mapStatusPageServiceGroupsResponseToModel(ctx context.Context, response *[]
 	return &serviceGroups
 }
 
-func mapCustomHostSettingsResponseToModel(response *customHostSettingsResponse) *CustomHostSettings {
+func mapCustomHostSettingsResponseToModel(ctx context.Context, response *customHostSettingsResponse) *CustomHostSettings {
 	if response == nil {
 		return nil
 	}
 
-	return &CustomHostSettings{
+	result := &CustomHostSettings{
 		Host: types.StringValue(response.Host),
 	}
+
+	if response.CloudFlareCreateCustomHostNameResponse != nil {
+		result.CloudFlareCreateCustomHostNameResponse = mapCloudFlareCreateCustomHostNameResponseToModel(ctx, response.CloudFlareCreateCustomHostNameResponse)
+	} else {
+		// Set to null if not present
+		result.CloudFlareCreateCustomHostNameResponse = types.ObjectNull(getCloudFlareCreateCustomHostNameResponseObjectType().AttrTypes)
+	}
+
+	return result
+}
+
+func getCloudFlareCreateCustomHostNameResponseObjectType() types.ObjectType {
+	return types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"errors":   types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"code": types.Int64Type, "message": types.StringType}}},
+			"messages": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"code": types.Int64Type, "message": types.StringType}}},
+			"success":  types.BoolType,
+			"result": types.ObjectType{AttrTypes: map[string]attr.Type{
+				"id":                          types.StringType,
+				"hostname":                    types.StringType,
+				"status":                      types.StringType,
+				"ownership_verification":      types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType, "name": types.StringType, "value": types.StringType}},
+				"ownership_verification_http": types.ObjectType{AttrTypes: map[string]attr.Type{"http_body": types.StringType, "http_url": types.StringType}},
+				"verification_errors":         types.ListType{ElemType: types.StringType},
+				"ssl": types.ObjectType{AttrTypes: map[string]attr.Type{
+					"id":                types.StringType,
+					"method":            types.StringType,
+					"status":            types.StringType,
+					"validation_errors": types.ListType{ElemType: types.StringType},
+					"validation_records": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
+						"emails":    types.ListType{ElemType: types.StringType},
+						"http_body": types.StringType,
+						"http_url":  types.StringType,
+						"txt_name":  types.StringType,
+						"txt_value": types.StringType,
+					}}},
+				}},
+			}},
+		},
+	}
+}
+
+func mapCloudFlareCreateCustomHostNameResponseToModel(ctx context.Context, response *cloudFlareCreateCustomHostNameResponse) types.Object {
+	objectType := getCloudFlareCreateCustomHostNameResponseObjectType()
+	attrValues := make(map[string]attr.Value)
+
+	// Map Errors
+	errorObjectType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"code":    types.Int64Type,
+			"message": types.StringType,
+		},
+	}
+	if response.Errors != nil {
+		errorObjects := make([]types.Object, len(*response.Errors))
+		for i, err := range *response.Errors {
+			obj, _ := types.ObjectValue(errorObjectType.AttrTypes, map[string]attr.Value{
+				"code":    types.Int64Value(int64(err.Code)),
+				"message": types.StringPointerValue(err.Message),
+			})
+			errorObjects[i] = obj
+		}
+		errorList, _ := types.ListValueFrom(ctx, errorObjectType, errorObjects)
+		attrValues["errors"] = errorList
+	} else {
+		attrValues["errors"] = types.ListNull(errorObjectType)
+	}
+
+	// Map Messages
+	if response.Messages != nil {
+		messageObjects := make([]types.Object, len(*response.Messages))
+		for i, msg := range *response.Messages {
+			obj, _ := types.ObjectValue(errorObjectType.AttrTypes, map[string]attr.Value{
+				"code":    types.Int64Value(int64(msg.Code)),
+				"message": types.StringPointerValue(msg.Message),
+			})
+			messageObjects[i] = obj
+		}
+		messageList, _ := types.ListValueFrom(ctx, errorObjectType, messageObjects)
+		attrValues["messages"] = messageList
+	} else {
+		attrValues["messages"] = types.ListNull(errorObjectType)
+	}
+
+	// Map Success
+	attrValues["success"] = types.BoolValue(response.Success)
+
+	// Map Result
+	if response.Result != nil {
+		resultObj := mapCreateCustomHostNameResponseResultToObject(ctx, response.Result)
+		attrValues["result"] = resultObj
+	} else {
+		attrValues["result"] = types.ObjectNull(map[string]attr.Type{
+			"id":                          types.StringType,
+			"hostname":                    types.StringType,
+			"status":                      types.StringType,
+			"ownership_verification":      types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType, "name": types.StringType, "value": types.StringType}},
+			"ownership_verification_http": types.ObjectType{AttrTypes: map[string]attr.Type{"http_body": types.StringType, "http_url": types.StringType}},
+			"verification_errors":         types.ListType{ElemType: types.StringType},
+			"ssl": types.ObjectType{AttrTypes: map[string]attr.Type{
+				"id":                types.StringType,
+				"method":            types.StringType,
+				"status":            types.StringType,
+				"validation_errors": types.ListType{ElemType: types.StringType},
+				"validation_records": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
+					"emails":    types.ListType{ElemType: types.StringType},
+					"http_body": types.StringType,
+					"http_url":  types.StringType,
+					"txt_name":  types.StringType,
+					"txt_value": types.StringType,
+				}}},
+			}},
+		})
+	}
+
+	obj, _ := types.ObjectValue(objectType.AttrTypes, attrValues)
+	return obj
+}
+
+func mapCreateCustomHostNameResponseResultToObject(ctx context.Context, result *createCustomHostNameResponseResult) types.Object {
+	resultAttrTypes := map[string]attr.Type{
+		"id":                          types.StringType,
+		"hostname":                    types.StringType,
+		"status":                      types.StringType,
+		"ownership_verification":      types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType, "name": types.StringType, "value": types.StringType}},
+		"ownership_verification_http": types.ObjectType{AttrTypes: map[string]attr.Type{"http_body": types.StringType, "http_url": types.StringType}},
+		"verification_errors":         types.ListType{ElemType: types.StringType},
+		"ssl": types.ObjectType{AttrTypes: map[string]attr.Type{
+			"id":                types.StringType,
+			"method":            types.StringType,
+			"status":            types.StringType,
+			"validation_errors": types.ListType{ElemType: types.StringType},
+			"validation_records": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
+				"emails":    types.ListType{ElemType: types.StringType},
+				"http_body": types.StringType,
+				"http_url":  types.StringType,
+				"txt_name":  types.StringType,
+				"txt_value": types.StringType,
+			}}},
+		}},
+	}
+	resultAttrValues := make(map[string]attr.Value)
+
+	resultAttrValues["id"] = types.StringValue(result.Id)
+	resultAttrValues["hostname"] = types.StringValue(result.Hostname)
+	resultAttrValues["status"] = types.StringValue(result.Status)
+
+	// Ownership verification
+	if result.OwnershipVerification != nil {
+		ownershipVerificationObj, _ := types.ObjectValue(map[string]attr.Type{"type": types.StringType, "name": types.StringType, "value": types.StringType}, map[string]attr.Value{
+			"type":  types.StringPointerValue(result.OwnershipVerification.Type),
+			"name":  types.StringPointerValue(result.OwnershipVerification.Name),
+			"value": types.StringPointerValue(result.OwnershipVerification.Value),
+		})
+		resultAttrValues["ownership_verification"] = ownershipVerificationObj
+	} else {
+		resultAttrValues["ownership_verification"] = types.ObjectNull(map[string]attr.Type{"type": types.StringType, "name": types.StringType, "value": types.StringType})
+	}
+
+	// Ownership verification HTTP
+	if result.OwnershipVerificationHttp != nil {
+		ownershipVerificationHttpObj, _ := types.ObjectValue(map[string]attr.Type{"http_body": types.StringType, "http_url": types.StringType}, map[string]attr.Value{
+			"http_body": types.StringPointerValue(result.OwnershipVerificationHttp.HttpBody),
+			"http_url":  types.StringPointerValue(result.OwnershipVerificationHttp.HttpUrl),
+		})
+		resultAttrValues["ownership_verification_http"] = ownershipVerificationHttpObj
+	} else {
+		resultAttrValues["ownership_verification_http"] = types.ObjectNull(map[string]attr.Type{"http_body": types.StringType, "http_url": types.StringType})
+	}
+
+	// Verification errors
+	if result.VerificationErrors != nil {
+		resultAttrValues["verification_errors"] = MapNullableList(ctx, result.VerificationErrors)
+	} else {
+		resultAttrValues["verification_errors"] = types.ListNull(types.StringType)
+	}
+
+	// SSL
+	if result.Ssl != nil {
+		sslObj := mapSslToObject(ctx, result.Ssl)
+		resultAttrValues["ssl"] = sslObj
+	} else {
+		resultAttrValues["ssl"] = types.ObjectNull(map[string]attr.Type{
+			"id":                types.StringType,
+			"method":            types.StringType,
+			"status":            types.StringType,
+			"validation_errors": types.ListType{ElemType: types.StringType},
+			"validation_records": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
+				"emails":    types.ListType{ElemType: types.StringType},
+				"http_body": types.StringType,
+				"http_url":  types.StringType,
+				"txt_name":  types.StringType,
+				"txt_value": types.StringType,
+			}}},
+		})
+	}
+
+	resultObj, _ := types.ObjectValue(resultAttrTypes, resultAttrValues)
+	return resultObj
+}
+
+func mapSslToObject(ctx context.Context, ssl *customHostSettingsSsl) types.Object {
+	sslAttrTypes := map[string]attr.Type{
+		"id":                types.StringType,
+		"method":            types.StringType,
+		"status":            types.StringType,
+		"validation_errors": types.ListType{ElemType: types.StringType},
+		"validation_records": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
+			"emails":    types.ListType{ElemType: types.StringType},
+			"http_body": types.StringType,
+			"http_url":  types.StringType,
+			"txt_name":  types.StringType,
+			"txt_value": types.StringType,
+		}}},
+	}
+	sslAttrValues := make(map[string]attr.Value)
+
+	sslAttrValues["id"] = types.StringPointerValue(ssl.Id)
+	sslAttrValues["method"] = types.StringPointerValue(ssl.Method)
+	sslAttrValues["status"] = types.StringPointerValue(ssl.Status)
+
+	if ssl.ValidationErrors != nil {
+		sslAttrValues["validation_errors"] = MapNullableList(ctx, ssl.ValidationErrors)
+	} else {
+		sslAttrValues["validation_errors"] = types.ListNull(types.StringType)
+	}
+
+	if ssl.ValidationRecords != nil {
+		validationRecordObjectType := types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"emails":    types.ListType{ElemType: types.StringType},
+				"http_body": types.StringType,
+				"http_url":  types.StringType,
+				"txt_name":  types.StringType,
+				"txt_value": types.StringType,
+			},
+		}
+		validationRecordObjects := make([]types.Object, len(*ssl.ValidationRecords))
+		for i, record := range *ssl.ValidationRecords {
+			recordObj, _ := types.ObjectValue(validationRecordObjectType.AttrTypes, map[string]attr.Value{
+				"emails":    MapNullableList(ctx, record.Emails),
+				"http_body": types.StringPointerValue(record.HttpBody),
+				"http_url":  types.StringPointerValue(record.HttpUrl),
+				"txt_name":  types.StringPointerValue(record.TxtName),
+				"txt_value": types.StringPointerValue(record.TxtValue),
+			})
+			validationRecordObjects[i] = recordObj
+		}
+		validationRecordsList, _ := types.ListValueFrom(ctx, validationRecordObjectType, validationRecordObjects)
+		sslAttrValues["validation_records"] = validationRecordsList
+	} else {
+		sslAttrValues["validation_records"] = types.ListNull(types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"emails":    types.ListType{ElemType: types.StringType},
+				"http_body": types.StringType,
+				"http_url":  types.StringType,
+				"txt_name":  types.StringType,
+				"txt_value": types.StringType,
+			},
+		})
+	}
+
+	sslObj, _ := types.ObjectValue(sslAttrTypes, sslAttrValues)
+	return sslObj
 }
