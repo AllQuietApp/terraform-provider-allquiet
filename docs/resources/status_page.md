@@ -33,23 +33,35 @@ resource "allquiet_service" "shipping_api" {
 
 
 resource "allquiet_status_page" "public_status_page" {
-  slug                              = "public-status-page-test"
-  display_name                      = "Public Status Page"
-  public_title                      = "Public Status Page"
-  public_description                = "Here, we'll inform you about the status of our services"
-  history_in_days                   = 30
-  disable_public_subscription       = false
-  public_company_url                = "https://www.allquiet.app"
-  public_company_name               = "AllQuiet"
-  public_support_url                = "https://www.allquiet.app/support"
-  public_support_email              = "support@allquiet.app"
-  public_severity_mapping_minor     = "Minor"
-  public_severity_mapping_warning   = "Warning"
-  public_severity_mapping_critical  = "Critical"
-  banner_background_color           = "#000000"
-  banner_background_color_dark_mode = "#447788"
-  banner_text_color                 = "#ffffff"
-  banner_text_color_dark_mode       = "#ffffff"
+  slug                                 = "public-status-page-test"
+  display_name                         = "Public Status Page"
+  public_title                         = "Public Status Page"
+  public_description                   = "Here, we'll inform you about the status of our services"
+  history_in_days                      = 30
+  disable_public_subscription          = false
+  public_company_url                   = "https://www.allquiet.app"
+  public_company_name                  = "AllQuiet"
+  public_support_url                   = "https://www.allquiet.app/support"
+  public_support_email                 = "support@allquiet.app"
+  public_severity_mapping_minor        = "Minor"
+  public_severity_mapping_warning      = "Warning"
+  public_severity_mapping_critical     = "Critical"
+  banner_background_color              = "#000000"
+  banner_background_color_dark_mode    = "#447788"
+  banner_text_color                    = "#ffffff"
+  banner_text_color_dark_mode          = "#ffffff"
+  body_background_color                = "#f5f5f5"
+  body_background_color_dark_mode      = "#111111"
+  secondary_background_color           = "#e0e0e0"
+  secondary_background_color_dark_mode = "#222222"
+  primary_text_color                   = "#111111"
+  primary_text_color_dark_mode         = "#f5f5f5"
+  secondary_text_color                 = "#333333"
+  secondary_text_color_dark_mode       = "#cccccc"
+  button_background_color              = "#0066cc"
+  button_background_color_dark_mode    = "#3399ff"
+  button_text_color                    = "#ffffff"
+  button_text_color_dark_mode          = "#ffffff"
 
   time_zone_id = "Europe/Amsterdam"
   service_groups = [
@@ -77,22 +89,35 @@ resource "allquiet_status_page" "public_status_page_with_custom_host_settings" {
   custom_host_settings = {
     host = "status-page-test-resource.allquiet.com"
   }
-  display_name                      = "Public Status Page with Custom Host Settings"
-  public_title                      = "Public Status Page with Custom Host Settings"
-  public_description                = "Here, we'll inform you about the status of our services"
-  history_in_days                   = 30
-  disable_public_subscription       = false
-  public_company_url                = "https://www.allquiet.app"
-  public_company_name               = "AllQuiet"
-  public_support_url                = "https://www.allquiet.app/support"
-  public_support_email              = "support@allquiet.app"
-  public_severity_mapping_minor     = "Minor"
-  public_severity_mapping_warning   = "Warning"
-  public_severity_mapping_critical  = "Critical"
-  banner_background_color           = "#000000"
-  banner_background_color_dark_mode = "#447788"
-  banner_text_color                 = "#ffffff"
-  banner_text_color_dark_mode       = "#ffffff"
+  display_name                         = "Public Status Page with Custom Host Settings"
+  public_title                         = "Public Status Page with Custom Host Settings"
+  public_description                   = "Here, we'll inform you about the status of our services"
+  history_in_days                      = 30
+  disable_public_subscription          = false
+  public_company_url                   = "https://www.allquiet.app"
+  public_company_name                  = "AllQuiet"
+  public_support_url                   = "https://www.allquiet.app/support"
+  public_support_email                 = "support@allquiet.app"
+  public_severity_mapping_minor        = "Minor"
+  public_severity_mapping_warning      = "Warning"
+  public_severity_mapping_critical     = "Critical"
+  banner_background_color              = "#000000"
+  banner_background_color_dark_mode    = "#447788"
+  banner_text_color                    = "#ffffff"
+  banner_text_color_dark_mode          = "#ffffff"
+  body_background_color                = "#ffffff"
+  body_background_color_dark_mode      = "#000000"
+  secondary_background_color           = "#e0e0e0"
+  secondary_background_color_dark_mode = "#222222"
+  primary_text_color                   = "#111111"
+  primary_text_color_dark_mode         = "#f5f5f5"
+  secondary_text_color                 = "#333333"
+  secondary_text_color_dark_mode       = "#cccccc"
+  button_background_color              = "#0066cc"
+  button_background_color_dark_mode    = "#3399ff"
+  button_text_color                    = "#ffffff"
+  button_text_color_dark_mode          = "#ffffff"
+  decimal_places                       = 2
 
   time_zone_id = "Europe/Amsterdam"
   service_groups = [
@@ -156,16 +181,19 @@ resource "allquiet_status_page" "private_status_page" {
 - `banner_background_color_dark_mode` (String) The banner background color dark mode of the status page. Must be a valid hex color.
 - `banner_text_color` (String) The banner text color of the status page. Must be a valid hex color.
 - `banner_text_color_dark_mode` (String) The banner text color dark mode of the status page. Must be a valid hex color.
- - `body_background_color` (String) The body background color of the status page. Must be a valid hex color.
- - `body_background_color_dark_mode` (String) The body background color dark mode of the status page. Must be a valid hex color.
- - `button_background_color` (String) The button background color of the status page. Must be a valid hex color.
- - `button_background_color_dark_mode` (String) The button background color dark mode of the status page. Must be a valid hex color.
- - `button_text_color` (String) The button text color of the status page. Must be a valid hex color.
- - `button_text_color_dark_mode` (String) The button text color dark mode of the status page. Must be a valid hex color.
+- `body_background_color` (String) The body background color of the status page. Must be a valid hex color.
+- `body_background_color_dark_mode` (String) The body background color dark mode of the status page. Must be a valid hex color.
+- `button_background_color` (String) The button background color of the status page. Must be a valid hex color.
+- `button_background_color_dark_mode` (String) The button background color dark mode of the status page. Must be a valid hex color.
+- `button_text_color` (String) The button text color of the status page. Must be a valid hex color.
+- `button_text_color_dark_mode` (String) The button text color dark mode of the status page. Must be a valid hex color.
 - `custom_host_settings` (Attributes) The custom host settings of the status page (CNAME). Provide slug or custom host settings. (see [below for nested schema](#nestedatt--custom_host_settings))
+- `decimal_places` (Number) The number of decimal places to display on the status page. Must be between 0 and 8.
 - `disable_public_json` (Boolean) Disable public access to the status page JSON API. When enabled, the JSON API endpoint will not be publicly accessible.
 - `disable_public_page` (Boolean) Disable public access to the status page. When enabled, the status page will not be publicly accessible.
 - `enable_sms_subscription` (Boolean) Enable SMS subscription for status page updates. Allows users to subscribe to status updates via SMS.
+- `primary_text_color` (String) The primary text color of the status page. Must be a valid hex color.
+- `primary_text_color_dark_mode` (String) The primary text color dark mode of the status page. Must be a valid hex color.
 - `private_ip_filter` (String) Private IP filter (CIDR format) to restrict access to the status page. Only IPs matching the filter will be able to access the page.
 - `private_user_authentication_required` (Boolean) Require user authentication to access the status page. When enabled, users must be authenticated All Quiet users of your organization to view the status page. Private user authentication is not allowed for custom host settings (CNAME).
 - `public_company_name` (String) The public company name of the status page
@@ -176,12 +204,10 @@ resource "allquiet_status_page" "private_status_page" {
 - `public_severity_mapping_warning` (String) The public severity mapping warning of the status page
 - `public_support_email` (String) The public support email of the status page
 - `public_support_url` (String) The public support url of the status page
- - `secondary_background_color` (String) The secondary background color of the status page. Must be a valid hex color.
- - `secondary_background_color_dark_mode` (String) The secondary background color dark mode of the status page. Must be a valid hex color.
- - `primary_text_color` (String) The primary text color of the status page. Must be a valid hex color.
- - `primary_text_color_dark_mode` (String) The primary text color dark mode of the status page. Must be a valid hex color.
- - `secondary_text_color` (String) The secondary text color of the status page. Must be a valid hex color.
- - `secondary_text_color_dark_mode` (String) The secondary text color dark mode of the status page. Must be a valid hex color.
+- `secondary_background_color` (String) The secondary background color of the status page. Must be a valid hex color.
+- `secondary_background_color_dark_mode` (String) The secondary background color dark mode of the status page. Must be a valid hex color.
+- `secondary_text_color` (String) The secondary text color of the status page. Must be a valid hex color.
+- `secondary_text_color_dark_mode` (String) The secondary text color dark mode of the status page. Must be a valid hex color.
 - `service_groups` (Attributes List) The service groups of the status page (see [below for nested schema](#nestedatt--service_groups))
 - `services` (List of String, Deprecated) The service ids of the status page
 - `slug` (String) The slug of the status page. Provide slug or custom host settings.
@@ -197,6 +223,96 @@ resource "allquiet_status_page" "private_status_page" {
 Required:
 
 - `host` (String) The host of the status page
+
+Read-Only:
+
+- `cloudflare_create_custom_hostname_response` (Attributes) The CloudFlare custom hostname response containing verification and SSL details (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response))
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response`
+
+Read-Only:
+
+- `errors` (Attributes List) List of errors from CloudFlare (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--errors))
+- `messages` (Attributes List) List of messages from CloudFlare (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--messages))
+- `result` (Attributes) The result containing custom hostname details (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result))
+- `success` (Boolean) Whether the request was successful
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--errors"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.errors`
+
+Read-Only:
+
+- `code` (Number) Error code
+- `message` (String) Error message
+
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--messages"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.messages`
+
+Read-Only:
+
+- `code` (Number) Message code
+- `message` (String) Message text
+
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.result`
+
+Read-Only:
+
+- `hostname` (String) The hostname of the custom hostname
+- `id` (String) The ID of the custom hostname
+- `ownership_verification` (Attributes) The ownership verification details for the custom hostname (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ownership_verification))
+- `ownership_verification_http` (Attributes) The HTTP ownership verification details for the custom hostname (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ownership_verification_http))
+- `ssl` (Attributes) The SSL configuration for the custom hostname (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ssl))
+- `status` (String) The status of the custom hostname
+- `verification_errors` (List of String) List of verification errors for the custom hostname
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ownership_verification"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification`
+
+Read-Only:
+
+- `name` (String) The name for ownership verification
+- `type` (String) The type of ownership verification
+- `value` (String) The value for ownership verification
+
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ownership_verification_http"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification_http`
+
+Read-Only:
+
+- `http_body` (String) The HTTP body for ownership verification
+- `http_url` (String) The HTTP URL for ownership verification
+
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ssl"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl`
+
+Read-Only:
+
+- `id` (String) The SSL ID
+- `method` (String) The SSL method
+- `status` (String) The SSL status
+- `validation_errors` (List of String) List of SSL validation errors
+- `validation_records` (Attributes List) List of SSL validation records (see [below for nested schema](#nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ssl--validation_records))
+
+<a id="nestedatt--custom_host_settings--cloudflare_create_custom_hostname_response--result--ssl--validation_records"></a>
+### Nested Schema for `custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.validation_records`
+
+Read-Only:
+
+- `emails` (List of String) List of emails for validation
+- `http_body` (String) The HTTP body for validation
+- `http_url` (String) The HTTP URL for validation
+- `txt_name` (String) The TXT record name for validation
+- `txt_value` (String) The TXT record value for validation
+
+
+
+
 
 
 <a id="nestedatt--service_groups"></a>

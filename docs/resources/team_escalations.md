@@ -278,7 +278,10 @@ resource "allquiet_team_escalations" "my_team_escalations_with_hourly_rotation" 
             custom_repeat_unit  = "hours"
             custom_repeat_value = 6
             starts_on_time      = "09:00"
-            effective_from      = "2024-07-10"
+          }
+          schedule_settings = {
+            effective_from  = "2025-11-23"
+            effective_until = "2025-12-31"
           }
           rotations = [
             {
@@ -690,7 +693,7 @@ Optional:
 - `auto_rotation_size` (Number) The size of the rotation
 - `custom_repeat_unit` (String) In what interval unit the rotation should repeat. Needs to be set if 'repeats' is 'custom'. Possible values are: months, weeks, days, hours
 - `custom_repeat_value` (Number) How often the rotation should repeat. Needs to be set if 'repeats' is 'custom'
-- `effective_from` (String) If sets, the rotation will be effective from the given date in ISO 8601 format
+- `effective_from` (String, Deprecated) If sets, the rotation will be effective from the given date in ISO 8601 format
 - `rotation_mode` (String) The mode of the rotation. Possible values are: explicit, auto
 - `starts_on_date_of_month` (Number) If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'
 - `starts_on_day_of_week` (String) Starts on day of the week. Needs to be set if 'repeats' is not 'monthly'. Possible values are: sun, mon, tue, wed, thu, fri, sat
@@ -710,6 +713,8 @@ Optional:
 
 Optional:
 
+- `effective_from` (String) If sets, the schedule will be effective from the given date in ISO 8601 format
+- `effective_until` (String) If sets, the schedule will be effective until the given date in ISO 8601 format
 - `end` (String, Deprecated) End time of the schedule. Format: HH:mm
 - `selected_days` (List of String, Deprecated) Selected days of the week. Possible values are: sun, mon, tue, wed, thu, fri, sat
 - `start` (String, Deprecated) Start time of the schedule. Format: HH:mm
