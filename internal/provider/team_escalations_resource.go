@@ -398,8 +398,8 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 											},
 											"starts_on_date_of_month": schema.Int64Attribute{
 												Optional:            true,
-												MarkdownDescription: "If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'",
-												Validators:          []validator.Int64{int64validator.Between(1, 31)},
+												MarkdownDescription: "Zero-based, so the first day of the month is 0. If set, starts on date of the month. Needs to be set if 'repeats' is 'monthly'",
+												Validators:          []validator.Int64{int64validator.Between(0, 30)},
 											},
 											"starts_on_time": schema.StringAttribute{
 												Optional:            true,

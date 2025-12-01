@@ -66,7 +66,11 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
       schedules = [
         {
           schedule_settings = {
-            selected_days = ["mon", "tue", "wed", "thu", "fri"]
+            weekly_schedules = [
+              {
+                selected_days = ["mon", "tue", "wed", "thu", "fri"]
+              }
+            ]
           }
           rotations = [
             {
@@ -91,7 +95,11 @@ resource "allquiet_team_escalations" "my_team_escalations_with_weekend_rotation"
         {
           display_name = "Weekend schedule"
           schedule_settings = {
-            selected_days = ["sat", "sun"]
+            weekly_schedules = [
+              {
+                selected_days = ["sat", "sun"]
+              }
+            ]
           }
           rotation_settings = {
             repeats               = "weekly"
@@ -169,8 +177,12 @@ resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rot
         {
           display_name = "Working hours"
           schedule_settings = {
-            start : "08:00"
-            end : "20:00"
+            weekly_schedules = [
+              {
+                from  = "08:00"
+                until = "20:00"
+              }
+            ]
           }
           rotations = [
             {
@@ -194,8 +206,12 @@ resource "allquiet_team_escalations" "my_team_escalations_with_day_and_night_rot
         {
           display_name = "Night hours"
           schedule_settings = {
-            start : "20:00"
-            end : "08:00"
+            weekly_schedules = [
+              {
+                from  = "20:00"
+                until = "08:00"
+              }
+            ]
           }
           rotation_settings = {
             repeats               = "weekly"

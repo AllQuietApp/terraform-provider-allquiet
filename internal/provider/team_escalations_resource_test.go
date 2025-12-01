@@ -222,7 +222,11 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 			schedules = [
 			  {
 				schedule_settings = {
-				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				  weekly_schedules = [
+					{
+					  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+					}
+				  ]
 				}
 				rotations = [
 				  {
@@ -252,7 +256,11 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 			schedules = [
 			  {
 				schedule_settings = {
-				  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+				  weekly_schedules = [
+					{
+					  selected_days = ["mon", "tue", "wed", "thu", "fri"]
+					}
+				  ]
 				}
 				round_robin_settings = {
 				  round_robin_size = 3
