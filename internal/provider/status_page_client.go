@@ -38,6 +38,16 @@ type statusPageResponse struct {
 	EnableSMSSubscription             *bool
 	BodyBackgroundColor               *string
 	BodyBackgroundColorDarkMode       *string
+	SecondaryBackgroundColor          *string
+	SecondaryBackgroundColorDarkMode  *string
+	PrimaryTextColor                  *string
+	PrimaryTextColorDarkMode          *string
+	SecondaryTextColor                *string
+	SecondaryTextColorDarkMode        *string
+	ButtonBackgroundColor             *string
+	ButtonBackgroundColorDarkMode     *string
+	ButtonTextColor                   *string
+	ButtonTextColorDarkMode           *string
 	DecimalPlaces                     *int64
 }
 
@@ -138,6 +148,16 @@ type statusPageCreateRequest struct {
 	EnableSMSSubscription             *bool                            `json:"enableSMSSubscription"`
 	BodyBackgroundColor               *string                          `json:"bodyBackgroundColor"`
 	BodyBackgroundColorDarkMode       *string                          `json:"bodyBackgroundColorDarkMode"`
+	SecondaryBackgroundColor          *string                          `json:"secondaryBackgroundColor"`
+	SecondaryBackgroundColorDarkMode  *string                          `json:"secondaryBackgroundColorDarkMode"`
+	PrimaryTextColor                  *string                          `json:"primaryTextColor"`
+	PrimaryTextColorDarkMode          *string                          `json:"primaryTextColorDarkMode"`
+	SecondaryTextColor                *string                          `json:"secondaryTextColor"`
+	SecondaryTextColorDarkMode        *string                          `json:"secondaryTextColorDarkMode"`
+	ButtonBackgroundColor             *string                          `json:"buttonBackgroundColor"`
+	ButtonBackgroundColorDarkMode     *string                          `json:"buttonBackgroundColorDarkMode"`
+	ButtonTextColor                   *string                          `json:"buttonTextColor"`
+	ButtonTextColorDarkMode           *string                          `json:"buttonTextColorDarkMode"`
 	DecimalPlaces                     *int64                           `json:"decimalPlaces"`
 }
 
@@ -175,6 +195,16 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		EnableSMSSubscription:             plan.EnableSMSSubscription.ValueBoolPointer(),
 		BodyBackgroundColor:               plan.BodyBackgroundColor.ValueStringPointer(),
 		BodyBackgroundColorDarkMode:       plan.BodyBackgroundColorDarkMode.ValueStringPointer(),
+		SecondaryBackgroundColor:          plan.SecondaryBackgroundColor.ValueStringPointer(),
+		SecondaryBackgroundColorDarkMode:  plan.SecondaryBackgroundColorDarkMode.ValueStringPointer(),
+		PrimaryTextColor:                  plan.PrimaryTextColor.ValueStringPointer(),
+		PrimaryTextColorDarkMode:          plan.PrimaryTextColorDarkMode.ValueStringPointer(),
+		SecondaryTextColor:                plan.SecondaryTextColor.ValueStringPointer(),
+		SecondaryTextColorDarkMode:        plan.SecondaryTextColorDarkMode.ValueStringPointer(),
+		ButtonBackgroundColor:             plan.ButtonBackgroundColor.ValueStringPointer(),
+		ButtonBackgroundColorDarkMode:     plan.ButtonBackgroundColorDarkMode.ValueStringPointer(),
+		ButtonTextColor:                   plan.ButtonTextColor.ValueStringPointer(),
+		ButtonTextColorDarkMode:           plan.ButtonTextColorDarkMode.ValueStringPointer(),
 		DecimalPlaces:                     plan.DecimalPlaces.ValueInt64Pointer(),
 	}
 }

@@ -156,6 +156,12 @@ resource "allquiet_status_page" "private_status_page" {
 - `banner_background_color_dark_mode` (String) The banner background color dark mode of the status page. Must be a valid hex color.
 - `banner_text_color` (String) The banner text color of the status page. Must be a valid hex color.
 - `banner_text_color_dark_mode` (String) The banner text color dark mode of the status page. Must be a valid hex color.
+ - `body_background_color` (String) The body background color of the status page. Must be a valid hex color.
+ - `body_background_color_dark_mode` (String) The body background color dark mode of the status page. Must be a valid hex color.
+ - `button_background_color` (String) The button background color of the status page. Must be a valid hex color.
+ - `button_background_color_dark_mode` (String) The button background color dark mode of the status page. Must be a valid hex color.
+ - `button_text_color` (String) The button text color of the status page. Must be a valid hex color.
+ - `button_text_color_dark_mode` (String) The button text color dark mode of the status page. Must be a valid hex color.
 - `custom_host_settings` (Attributes) The custom host settings of the status page (CNAME). Provide slug or custom host settings. (see [below for nested schema](#nestedatt--custom_host_settings))
 - `disable_public_json` (Boolean) Disable public access to the status page JSON API. When enabled, the JSON API endpoint will not be publicly accessible.
 - `disable_public_page` (Boolean) Disable public access to the status page. When enabled, the status page will not be publicly accessible.
@@ -170,6 +176,12 @@ resource "allquiet_status_page" "private_status_page" {
 - `public_severity_mapping_warning` (String) The public severity mapping warning of the status page
 - `public_support_email` (String) The public support email of the status page
 - `public_support_url` (String) The public support url of the status page
+ - `secondary_background_color` (String) The secondary background color of the status page. Must be a valid hex color.
+ - `secondary_background_color_dark_mode` (String) The secondary background color dark mode of the status page. Must be a valid hex color.
+ - `primary_text_color` (String) The primary text color of the status page. Must be a valid hex color.
+ - `primary_text_color_dark_mode` (String) The primary text color dark mode of the status page. Must be a valid hex color.
+ - `secondary_text_color` (String) The secondary text color of the status page. Must be a valid hex color.
+ - `secondary_text_color_dark_mode` (String) The secondary text color dark mode of the status page. Must be a valid hex color.
 - `service_groups` (Attributes List) The service groups of the status page (see [below for nested schema](#nestedatt--service_groups))
 - `services` (List of String, Deprecated) The service ids of the status page
 - `slug` (String) The slug of the status page. Provide slug or custom host settings.

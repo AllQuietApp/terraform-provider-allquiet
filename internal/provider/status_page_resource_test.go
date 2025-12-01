@@ -25,23 +25,50 @@ func TestAccStatusPageResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: testAccStatusPageResourceConfig("Status Page One", slug, host),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("allquiet_status_page.test", "display_name", "Status Page One"),
-					resource.TestCheckResourceAttr("allquiet_status_page.test", "public_title", "Status Page One"),
-					resource.TestCheckResourceAttr("allquiet_status_page.test", "public_description", "Payment APIs and integrations"),
-					resource.TestCheckResourceAttr("allquiet_status_page.test", "history_in_days", "30"),
-					resource.TestCheckResourceAttr("allquiet_status_page.test", "disable_public_subscription", "false"),
-					resource.TestCheckResourceAttr("allquiet_status_page.test_custom_host_settings", "custom_host_settings.host", host),
-					resource.TestCheckResourceAttr("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.success", "true"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.hostname"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.id"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification.name"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification.type"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification.value"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.id"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.method"),
-					resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.status"),
-				),
+				Check: func() resource.TestCheckFunc {
+					checks := []resource.TestCheckFunc{
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "display_name", "Status Page One"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "public_title", "Status Page One"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "public_description", "Payment APIs and integrations"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "history_in_days", "30"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "disable_public_subscription", "false"),
+						// Color attributes
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "banner_background_color", "#000000"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "banner_background_color_dark_mode", "#447788"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "banner_text_color", "#ffffff"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "banner_text_color_dark_mode", "#ffffff"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "body_background_color", "#ffffff"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "body_background_color_dark_mode", "#000000"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "secondary_background_color", "#e0e0e0"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "secondary_background_color_dark_mode", "#222222"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "primary_text_color", "#111111"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "primary_text_color_dark_mode", "#f5f5f5"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "secondary_text_color", "#333333"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "secondary_text_color_dark_mode", "#cccccc"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "button_background_color", "#0066cc"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "button_background_color_dark_mode", "#3399ff"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "button_text_color", "#ffffff"),
+						resource.TestCheckResourceAttr("allquiet_status_page.test", "button_text_color_dark_mode", "#ffffff"),
+					}
+
+					if GetAccTestEnv() == "prod" {
+						checks = append(checks,
+
+							resource.TestCheckResourceAttr("allquiet_status_page.test_custom_host_settings", "custom_host_settings.host", host),
+							resource.TestCheckResourceAttr("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.success", "true"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.hostname"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.id"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification.name"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification.type"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ownership_verification.value"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.id"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.method"),
+							resource.TestCheckResourceAttrSet("allquiet_status_page.test_custom_host_settings", "custom_host_settings.cloudflare_create_custom_hostname_response.result.ssl.status"),
+						)
+					}
+
+					return resource.ComposeAggregateTestCheckFunc(checks...)
+				}(),
 			},
 			// ImportState testing
 			{
@@ -86,6 +113,23 @@ func TestAccStatusPageResourceWithGroups(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "public_description", "Payment APIs and integrations"),
 					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "history_in_days", "30"),
 					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "disable_public_subscription", "false"),
+					// Color attributes
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "banner_background_color", "#000000"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "banner_background_color_dark_mode", "#447788"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "banner_text_color", "#ffffff"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "banner_text_color_dark_mode", "#ffffff"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "body_background_color", "#ffffff"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "body_background_color_dark_mode", "#000000"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "secondary_background_color", "#e0e0e0"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "secondary_background_color_dark_mode", "#222222"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "primary_text_color", "#111111"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "primary_text_color_dark_mode", "#f5f5f5"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "secondary_text_color", "#333333"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "secondary_text_color_dark_mode", "#cccccc"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "button_background_color", "#0066cc"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "button_background_color_dark_mode", "#3399ff"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "button_text_color", "#ffffff"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_with_groups", "button_text_color_dark_mode", "#ffffff"),
 				),
 			},
 			// ImportState testing
@@ -154,6 +198,18 @@ resource "allquiet_status_page" "test" {
   banner_background_color_dark_mode = "#447788"
   banner_text_color = "#ffffff"
   banner_text_color_dark_mode = "#ffffff"
+  body_background_color = "#ffffff"
+  body_background_color_dark_mode = "#000000"
+  secondary_background_color = "#e0e0e0"
+  secondary_background_color_dark_mode = "#222222"
+  primary_text_color = "#111111"
+  primary_text_color_dark_mode = "#f5f5f5"
+  secondary_text_color = "#333333"
+  secondary_text_color_dark_mode = "#cccccc"
+  button_background_color = "#0066cc"
+  button_background_color_dark_mode = "#3399ff"
+  button_text_color = "#ffffff"
+  button_text_color_dark_mode = "#ffffff"
   slug = %[2]q
 }
 resource "allquiet_status_page" "test_custom_host_settings" {
@@ -166,6 +222,18 @@ resource "allquiet_status_page" "test_custom_host_settings" {
   banner_background_color_dark_mode = "#447788"
   banner_text_color = "#ffffff"
   banner_text_color_dark_mode = "#ffffff"
+  body_background_color = "#ffffff"
+  body_background_color_dark_mode = "#000000"
+  secondary_background_color = "#e0e0e0"
+  secondary_background_color_dark_mode = "#222222"
+  primary_text_color = "#111111"
+  primary_text_color_dark_mode = "#f5f5f5"
+  secondary_text_color = "#333333"
+  secondary_text_color_dark_mode = "#cccccc"
+  button_background_color = "#0066cc"
+  button_background_color_dark_mode = "#3399ff"
+  button_text_color = "#ffffff"
+  button_text_color_dark_mode = "#ffffff"
   custom_host_settings = {
     host = %[3]q
   }
@@ -197,6 +265,18 @@ resource "allquiet_status_page" "test_with_groups" {
   banner_background_color_dark_mode = "#447788"
   banner_text_color = "#ffffff"
   banner_text_color_dark_mode = "#ffffff"
+  body_background_color = "#ffffff"
+  body_background_color_dark_mode = "#000000"
+  secondary_background_color = "#e0e0e0"
+  secondary_background_color_dark_mode = "#222222"
+  primary_text_color = "#111111"
+  primary_text_color_dark_mode = "#f5f5f5"
+  secondary_text_color = "#333333"
+  secondary_text_color_dark_mode = "#cccccc"
+  button_background_color = "#0066cc"
+  button_background_color_dark_mode = "#3399ff"
+  button_text_color = "#ffffff"
+  button_text_color_dark_mode = "#ffffff"
   slug = %[2]q
   service_groups = [
     {

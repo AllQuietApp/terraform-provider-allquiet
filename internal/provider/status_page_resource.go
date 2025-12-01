@@ -65,6 +65,16 @@ type StatusPageModel struct {
 	EnableSMSSubscription             types.Bool                     `tfsdk:"enable_sms_subscription"`
 	BodyBackgroundColor               types.String                   `tfsdk:"body_background_color"`
 	BodyBackgroundColorDarkMode       types.String                   `tfsdk:"body_background_color_dark_mode"`
+	SecondaryBackgroundColor          types.String                   `tfsdk:"secondary_background_color"`
+	SecondaryBackgroundColorDarkMode  types.String                   `tfsdk:"secondary_background_color_dark_mode"`
+	PrimaryTextColor                  types.String                   `tfsdk:"primary_text_color"`
+	PrimaryTextColorDarkMode          types.String                   `tfsdk:"primary_text_color_dark_mode"`
+	SecondaryTextColor                types.String                   `tfsdk:"secondary_text_color"`
+	SecondaryTextColorDarkMode        types.String                   `tfsdk:"secondary_text_color_dark_mode"`
+	ButtonBackgroundColor             types.String                   `tfsdk:"button_background_color"`
+	ButtonBackgroundColorDarkMode     types.String                   `tfsdk:"button_background_color_dark_mode"`
+	ButtonTextColor                   types.String                   `tfsdk:"button_text_color"`
+	ButtonTextColorDarkMode           types.String                   `tfsdk:"button_text_color_dark_mode"`
 	DecimalPlaces                     types.Int64                    `tfsdk:"decimal_places"`
 }
 
@@ -464,6 +474,76 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 					HexColorValidator("Not a valid hex color"),
 				},
 			},
+			"secondary_background_color": schema.StringAttribute{
+				MarkdownDescription: "The secondary background color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"secondary_background_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The secondary background color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"primary_text_color": schema.StringAttribute{
+				MarkdownDescription: "The primary text color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"primary_text_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The primary text color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"secondary_text_color": schema.StringAttribute{
+				MarkdownDescription: "The secondary text color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"secondary_text_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The secondary text color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"button_background_color": schema.StringAttribute{
+				MarkdownDescription: "The button background color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"button_background_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The button background color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"button_text_color": schema.StringAttribute{
+				MarkdownDescription: "The button text color of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
+			"button_text_color_dark_mode": schema.StringAttribute{
+				MarkdownDescription: "The button text color dark mode of the status page. Must be a valid hex color.",
+				Optional:            true,
+				Validators: []validator.String{
+					HexColorValidator("Not a valid hex color"),
+				},
+			},
 			"decimal_places": schema.Int64Attribute{
 				MarkdownDescription: "The number of decimal places to display on the status page. Must be between 0 and 8.",
 				Optional:            true,
@@ -622,6 +702,16 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.PrivateIpFilter = types.StringPointerValue(response.PrivateIpFilter)
 	data.BodyBackgroundColor = types.StringPointerValue(response.BodyBackgroundColor)
 	data.BodyBackgroundColorDarkMode = types.StringPointerValue(response.BodyBackgroundColorDarkMode)
+	data.SecondaryBackgroundColor = types.StringPointerValue(response.SecondaryBackgroundColor)
+	data.SecondaryBackgroundColorDarkMode = types.StringPointerValue(response.SecondaryBackgroundColorDarkMode)
+	data.PrimaryTextColor = types.StringPointerValue(response.PrimaryTextColor)
+	data.PrimaryTextColorDarkMode = types.StringPointerValue(response.PrimaryTextColorDarkMode)
+	data.SecondaryTextColor = types.StringPointerValue(response.SecondaryTextColor)
+	data.SecondaryTextColorDarkMode = types.StringPointerValue(response.SecondaryTextColorDarkMode)
+	data.ButtonBackgroundColor = types.StringPointerValue(response.ButtonBackgroundColor)
+	data.ButtonBackgroundColorDarkMode = types.StringPointerValue(response.ButtonBackgroundColorDarkMode)
+	data.ButtonTextColor = types.StringPointerValue(response.ButtonTextColor)
+	data.ButtonTextColorDarkMode = types.StringPointerValue(response.ButtonTextColorDarkMode)
 	data.DecimalPlaces = types.Int64PointerValue(response.DecimalPlaces)
 }
 
