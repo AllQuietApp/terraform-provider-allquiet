@@ -19,20 +19,18 @@ func (v emailIntegrationSettingsValidator) MarkdownDescription(ctx context.Conte
 }
 
 func (v emailIntegrationSettingsValidator) ValidateObject(ctx context.Context, request validator.ObjectRequest, response *validator.ObjectResponse) {
-	// Get the type attribute from the parent resource
+	// Get the type attribute from the parent resource.
 	var integrationType types.String
 	diags := request.Config.GetAttribute(ctx, path.Root("type"), &integrationType)
 	if diags.HasError() || integrationType.IsNull() || integrationType.IsUnknown() {
-		// If we can't get the type, skip validation
+		// If we can't get the type, skip validation.
 		return
 	}
 
-	// Only validate if type is "Email"
 	if integrationType.ValueString() != "Email" {
 		return
 	}
 
-	// If integration_settings is null or unknown, require it
 	if request.ConfigValue.IsNull() || request.ConfigValue.IsUnknown() {
 		response.Diagnostics.AddAttributeError(
 			request.Path,
@@ -42,7 +40,6 @@ func (v emailIntegrationSettingsValidator) ValidateObject(ctx context.Context, r
 		return
 	}
 
-	// Check if email is present in integration_settings
 	configValue := request.ConfigValue
 	emailAttr, exists := configValue.Attributes()["email"]
 	if !exists {
@@ -54,7 +51,7 @@ func (v emailIntegrationSettingsValidator) ValidateObject(ctx context.Context, r
 		return
 	}
 
-	// Check if email is null
+	// Check if email is null.
 	if emailAttr.IsNull() {
 		response.Diagnostics.AddAttributeError(
 			request.Path.AtName("email"),
@@ -66,7 +63,7 @@ func (v emailIntegrationSettingsValidator) ValidateObject(ctx context.Context, r
 }
 
 // EmailIntegrationSettings returns a validator that ensures integration_settings.email
-// is specified when the integration type is "Email"
+// is specified when the integration type is "Email".
 func EmailIntegrationSettings() emailIntegrationSettingsValidator {
 	return emailIntegrationSettingsValidator{}
 }
