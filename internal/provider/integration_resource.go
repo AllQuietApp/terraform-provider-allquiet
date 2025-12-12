@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AllQuietApp/terraform-provider-internal/internal/provider/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -254,6 +255,9 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 			"integration_settings": schema.SingleNestedAttribute{
 				MarkdownDescription: "The integration settings of the integration",
 				Optional:            true,
+				Validators: []validator.Object{
+					validators.EmailIntegrationSettings(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"http_monitoring": schema.SingleNestedAttribute{
 						MarkdownDescription: "The http monitoring of the integration",
@@ -608,6 +612,15 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 
 func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integrationSettingsResponse) *IntegrationSettingsModel {
 	if response == nil {
+		return nil
+	}
+
+	// Check if all fields are nil - if so, return nil
+	if response.HttpMonitoring == nil &&
+		response.HeartbeatMonitor == nil &&
+		response.CronjobMonitor == nil &&
+		response.PingMonitor == nil &&
+		response.Email == nil {
 		return nil
 	}
 

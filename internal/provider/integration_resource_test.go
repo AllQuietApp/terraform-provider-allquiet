@@ -52,6 +52,13 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_max_retries", "integration_settings.http_monitoring.max_retries", "0"),
 					resource.TestCheckResourceAttr("allquiet_integration.ping_monitor_with_max_retries", "integration_settings.ping_monitor.max_retries", "5"),
+					resource.TestCheckResourceAttr("allquiet_integration.email", "display_name", "My Email Integration"),
+					resource.TestCheckResourceAttr("allquiet_integration.email", "type", "Email"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.email", "integration_settings.email.email_address"),
+					resource.TestCheckResourceAttr("allquiet_integration.email_with_aliases", "display_name", "My Email Integration"),
+					resource.TestCheckResourceAttr("allquiet_integration.email_with_aliases", "type", "Email"),
+					resource.TestCheckResourceAttr("allquiet_integration.email_with_aliases", "integration_settings.email.aliases.#", "2"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.email_with_aliases", "integration_settings.email.email_address"),
 				),
 			},
 			// ImportState testing
@@ -94,6 +101,13 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_max_retries", "integration_settings.http_monitoring.max_retries", "0"),
 					resource.TestCheckResourceAttr("allquiet_integration.ping_monitor_with_max_retries", "integration_settings.ping_monitor.max_retries", "5"),
+					resource.TestCheckResourceAttr("allquiet_integration.email", "display_name", "My Email Integration"),
+					resource.TestCheckResourceAttr("allquiet_integration.email", "type", "Email"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.email", "integration_settings.email.email_address"),
+					resource.TestCheckResourceAttr("allquiet_integration.email_with_aliases", "display_name", "My Email Integration"),
+					resource.TestCheckResourceAttr("allquiet_integration.email_with_aliases", "type", "Email"),
+					resource.TestCheckResourceAttr("allquiet_integration.email_with_aliases", "integration_settings.email.aliases.#", "2"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.email_with_aliases", "integration_settings.email.email_address"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -300,6 +314,15 @@ resource "allquiet_integration" "ping_monitor_with_max_retries" {
 			severity_down = "Critical"
 			max_retries = 5
 		}
+	}
+}
+
+resource "allquiet_integration" "email" {
+	display_name = "My Email Integration"
+	team_id      = allquiet_team.test.id
+	type         = "Email"
+	integration_settings = {
+		email = {}
 	}
 }
 
