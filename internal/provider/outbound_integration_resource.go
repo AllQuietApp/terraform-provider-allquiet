@@ -43,6 +43,7 @@ type OutboundIntegrationModel struct {
 	SkipUpdatingAfterForwarding types.Bool   `tfsdk:"skip_updating_after_forwarding"`
 
 	TeamConnectionSettings *TeamConnectionSettings `tfsdk:"team_connection_settings"`
+	SlackSettings          *SlackSettings         `tfsdk:"slack_settings"`
 }
 
 func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -100,6 +101,66 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 						Validators: []validator.List{
 							listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
 						},
+					},
+				},
+			},
+			"slack_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "Slack-specific settings for the integration. Only applicable when type is 'Slack'.",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"selected_channel_ids": schema.ListAttribute{
+						MarkdownDescription: "List of Slack channel IDs to send notifications to. Either this or severity_based_channel_settings must be provided, but not both.",
+						Optional:            true,
+						ElementType:         types.StringType,
+					},
+					"severity_based_channel_settings": schema.SingleNestedAttribute{
+						MarkdownDescription: "Severity-based channel settings. Either this or selected_channel_ids must be provided, but not both.",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"selected_channel_ids_minor": schema.ListAttribute{
+								MarkdownDescription: "List of Slack channel IDs for minor severity notifications.",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+							"selected_channel_ids_warning": schema.ListAttribute{
+								MarkdownDescription: "List of Slack channel IDs for warning severity notifications.",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+							"selected_channel_ids_critical": schema.ListAttribute{
+								MarkdownDescription: "List of Slack channel IDs for critical severity notifications.",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+						},
+					},
+					"on_call_reminder_schedule_settings": schema.SingleNestedAttribute{
+						MarkdownDescription: "Schedule settings for on-call reminders.",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"run_time": schema.StringAttribute{
+								MarkdownDescription: "The time to run the reminder in HH:mm format (e.g., '09:00').",
+								Optional:            true,
+							},
+							"days_of_week": schema.ListAttribute{
+								MarkdownDescription: "List of days of the week for the reminder schedule (e.g., ['Monday', 'Wednesday']).",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+						},
+					},
+					"on_call_reminder_channel_ids": schema.ListAttribute{
+						MarkdownDescription: "List of Slack channel IDs for on-call reminders.",
+						Optional:            true,
+						ElementType:         types.StringType,
+					},
+					"tag_on_call_members": schema.BoolAttribute{
+						MarkdownDescription: "If true, tag on-call members in Slack notifications.",
+						Optional:            true,
+					},
+					"is_slack_message_payload_read_only": schema.BoolAttribute{
+						MarkdownDescription: "If true, the Slack message payload will be read-only.",
+						Optional:            true,
 					},
 				},
 			},
@@ -238,4 +299,139 @@ func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outbou
 			TeamIds:            MapNullableList(ctx, response.TeamConnectionSettings.TeamIds),
 		}
 	}
+
+	data.SlackSettings = MapSlackSettingsResponseToModel(ctx, response.SlackSettings)
+}
+
+// SlackSettings is the Terraform model for Slack settings
+type SlackSettings struct {
+	SelectedChannelIds              types.List                        `tfsdk:"selected_channel_ids"`
+	SeverityBasedChannelSettings    *SeverityBasedChannelSettings     `tfsdk:"severity_based_channel_settings"`
+	OnCallReminderScheduleSettings  *ReminderScheduleSettings         `tfsdk:"on_call_reminder_schedule_settings"`
+	OnCallReminderChannelIds        types.List                        `tfsdk:"on_call_reminder_channel_ids"`
+	TagOnCallMembers                types.Bool                        `tfsdk:"tag_on_call_members"`
+	IsSlackMessagePayloadReadOnly   types.Bool                        `tfsdk:"is_slack_message_payload_read_only"`
+}
+
+// SeverityBasedChannelSettings is the Terraform model for severity-based channel settings
+type SeverityBasedChannelSettings struct {
+	SelectedChannelIdsMinor    types.List `tfsdk:"selected_channel_ids_minor"`
+	SelectedChannelIdsWarning  types.List `tfsdk:"selected_channel_ids_warning"`
+	SelectedChannelIdsCritical types.List `tfsdk:"selected_channel_ids_critical"`
+}
+
+// ReminderScheduleSettings is the Terraform model for reminder schedule settings
+type ReminderScheduleSettings struct {
+	RunTime     types.String `tfsdk:"run_time"`      // Format: "HH:mm" (e.g., "09:00")
+	DaysOfWeek  types.List   `tfsdk:"days_of_week"`  // Array of day names
+}
+
+// slackSettings is the client-side response type for Slack settings
+type slackSettings struct {
+	SelectedChannelIds              *[]string                        `json:"selectedChannelIds"`
+	SeverityBasedChannelSettings    *severityBasedChannelSettings    `json:"severityBasedChannelSettings"`
+	OnCallReminderScheduleSettings  *reminderScheduleSettings        `json:"onCallReminderScheduleSettings"`
+	OnCallReminderChannelIds        *[]string                        `json:"onCallReminderChannelIds"`
+	TagOnCallMembers                *bool                           `json:"tagOnCallMembers"`
+	IsSlackMessagePayloadReadOnly   *bool                           `json:"isSlackMessagePayloadReadOnly"`
+}
+
+// severityBasedChannelSettings is the client-side response type for severity-based channel settings
+type severityBasedChannelSettings struct {
+	SelectedChannelIdsMinor    *[]string `json:"selectedChannelIdsMinor"`
+	SelectedChannelIdsWarning  *[]string `json:"selectedChannelIdsWarning"`
+	SelectedChannelIdsCritical *[]string `json:"selectedChannelIdsCritical"`
+}
+
+// reminderScheduleSettings is the client-side response type for reminder schedule settings
+type reminderScheduleSettings struct {
+	RunTime    *string   `json:"runTime"`    // Format: "HH:mm" (e.g., "09:00")
+	DaysOfWeek *[]string `json:"daysOfWeek"` // Array of day names
+}
+
+// MapSlackSettingsToRequest maps the Terraform SlackSettings model to the client request type
+func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
+	if settings == nil {
+		return nil
+	}
+
+	result := &slackSettings{
+		SelectedChannelIds:            ListToStringArray(settings.SelectedChannelIds),
+		OnCallReminderChannelIds:      ListToStringArray(settings.OnCallReminderChannelIds),
+		TagOnCallMembers:              settings.TagOnCallMembers.ValueBoolPointer(),
+		IsSlackMessagePayloadReadOnly: settings.IsSlackMessagePayloadReadOnly.ValueBoolPointer(),
+	}
+
+	if settings.SeverityBasedChannelSettings != nil {
+		result.SeverityBasedChannelSettings = &severityBasedChannelSettings{
+			SelectedChannelIdsMinor:    ListToStringArray(settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
+			SelectedChannelIdsWarning:  ListToStringArray(settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
+			SelectedChannelIdsCritical: ListToStringArray(settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
+		}
+	}
+
+	if settings.OnCallReminderScheduleSettings != nil {
+		var runTime *string
+		if !settings.OnCallReminderScheduleSettings.RunTime.IsNull() && !settings.OnCallReminderScheduleSettings.RunTime.IsUnknown() {
+			runTimeStr := settings.OnCallReminderScheduleSettings.RunTime.ValueString()
+			runTime = &runTimeStr
+		}
+		result.OnCallReminderScheduleSettings = &reminderScheduleSettings{
+			RunTime:    runTime,
+			DaysOfWeek: ListToStringArray(settings.OnCallReminderScheduleSettings.DaysOfWeek),
+		}
+	}
+
+	return result
+}
+
+// MapSlackSettingsResponseToModel maps the client response to the Terraform SlackSettings model
+func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSettings) *SlackSettings {
+	if settings == nil {
+		return nil
+	}
+
+	// Check if the settings object is effectively empty (all fields are null or empty)
+	// This prevents creating an empty object when the API returns default/empty values
+	hasSelectedChannelIds := settings.SelectedChannelIds != nil && len(*settings.SelectedChannelIds) > 0
+	hasSeverityBased := settings.SeverityBasedChannelSettings != nil &&
+		((settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor) > 0) ||
+			(settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning) > 0) ||
+			(settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical) > 0))
+	hasOnCallReminderChannelIds := settings.OnCallReminderChannelIds != nil && len(*settings.OnCallReminderChannelIds) > 0
+	hasOnCallReminderSchedule := settings.OnCallReminderScheduleSettings != nil &&
+		(settings.OnCallReminderScheduleSettings.RunTime != nil || (settings.OnCallReminderScheduleSettings.DaysOfWeek != nil && len(*settings.OnCallReminderScheduleSettings.DaysOfWeek) > 0))
+	hasTagOnCallMembers := settings.TagOnCallMembers != nil
+	hasIsSlackMessagePayloadReadOnly := settings.IsSlackMessagePayloadReadOnly != nil
+
+	// If all fields are empty/null, return nil to keep it consistent with Terraform's null state
+	// This ensures that when slack_settings is not specified in Terraform, it remains null
+	if !hasSelectedChannelIds && !hasSeverityBased && !hasOnCallReminderChannelIds && !hasOnCallReminderSchedule && !hasTagOnCallMembers && !hasIsSlackMessagePayloadReadOnly {
+		return nil
+	}
+
+	result := &SlackSettings{
+		SelectedChannelIds:            MapNullableList(ctx, settings.SelectedChannelIds),
+		OnCallReminderChannelIds:      MapNullableList(ctx, settings.OnCallReminderChannelIds),
+		TagOnCallMembers:              types.BoolPointerValue(settings.TagOnCallMembers),
+		IsSlackMessagePayloadReadOnly: types.BoolPointerValue(settings.IsSlackMessagePayloadReadOnly),
+	}
+
+	if settings.SeverityBasedChannelSettings != nil {
+		result.SeverityBasedChannelSettings = &SeverityBasedChannelSettings{
+			SelectedChannelIdsMinor:    MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
+			SelectedChannelIdsWarning:  MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
+			SelectedChannelIdsCritical: MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
+		}
+	}
+
+	if settings.OnCallReminderScheduleSettings != nil {
+		runTime := types.StringPointerValue(settings.OnCallReminderScheduleSettings.RunTime)
+		result.OnCallReminderScheduleSettings = &ReminderScheduleSettings{
+			RunTime:   runTime,
+			DaysOfWeek: MapNullableList(ctx, settings.OnCallReminderScheduleSettings.DaysOfWeek),
+		}
+	}
+
+	return result
 }

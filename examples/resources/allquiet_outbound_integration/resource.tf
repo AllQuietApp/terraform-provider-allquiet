@@ -43,3 +43,61 @@ resource "allquiet_outbound_integration" "webhook" {
   triggers_only_on_forwarded     = true
   skip_updating_after_forwarding = true
 }
+
+resource "allquiet_outbound_integration" "slack_with_channels" {
+  display_name = "My Slack Integration (With Channels)"
+  team_id      = allquiet_team.root.id
+  type         = "Slack"
+
+  slack_settings = {
+    selected_channel_ids               = ["C1234567890", "C0987654321"]
+    tag_on_call_members                = true
+    is_slack_message_payload_read_only = false
+  }
+}
+
+resource "allquiet_outbound_integration" "slack_with_severity_channels" {
+  display_name = "My Slack Integration (Severity-Based Channels)"
+  team_id      = allquiet_team.root.id
+  type         = "Slack"
+
+  slack_settings = {
+    severity_based_channel_settings = {
+      selected_channel_ids_minor    = ["C1111111111"]
+      selected_channel_ids_warning  = ["C2222222222"]
+      selected_channel_ids_critical = ["C3333333333"]
+    }
+  }
+}
+
+resource "allquiet_outbound_integration" "slack_with_reminders" {
+  display_name = "My Slack Integration (With Reminders)"
+  team_id      = allquiet_team.root.id
+  type         = "Slack"
+
+  slack_settings = {
+    on_call_reminder_schedule_settings = {
+      run_time     = "09:00"
+      days_of_week = ["mon", "wed", "fri"]
+    }
+    on_call_reminder_channel_ids = ["C4444444444"]
+    tag_on_call_members          = true
+  }
+}
+
+resource "allquiet_outbound_integration" "slack_full_config" {
+  display_name = "My Slack Integration (Full Config)"
+  team_id      = allquiet_team.root.id
+  type         = "Slack"
+
+  slack_settings = {
+    selected_channel_ids = ["C5555555555"]
+    on_call_reminder_schedule_settings = {
+      run_time     = "08:00"
+      days_of_week = ["mon", "tue", "wed", "thu", "fri"]
+    }
+    on_call_reminder_channel_ids       = ["C6666666666"]
+    tag_on_call_members                = true
+    is_slack_message_payload_read_only = false
+  }
+}

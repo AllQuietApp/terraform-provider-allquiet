@@ -139,3 +139,154 @@ func testAccOutboundIntegrationResourceExample() string {
 
 	return RandomizeExample(string(dat))
 }
+
+func TestAccOutboundIntegrationResourceSlackSettings(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create Slack integration without settings (should remain null)
+			{
+				Config: testAccOutboundIntegrationSlackSettingsConfig("basic"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_basic", "display_name", "Slack Basic"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_basic", "type", "Slack"),
+					resource.TestCheckNoResourceAttr("allquiet_outbound_integration.slack_basic", "slack_settings"),
+				),
+			},
+			// Create Slack integration with selected_channel_ids
+			{
+				Config: testAccOutboundIntegrationSlackSettingsConfig("with_channels"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "display_name", "Slack With Channels"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "type", "Slack"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.selected_channel_ids.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.selected_channel_ids.0", "channel1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.selected_channel_ids.1", "channel2"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.tag_on_call_members", "true"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.is_slack_message_payload_read_only", "false"),
+				),
+			},
+			// Create Slack integration with severity_based_channel_settings
+			{
+				Config: testAccOutboundIntegrationSlackSettingsConfig("with_severity"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "display_name", "Slack With Severity"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "type", "Slack"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "slack_settings.severity_based_channel_settings.selected_channel_ids_minor.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "slack_settings.severity_based_channel_settings.selected_channel_ids_minor.0", "minor_channel"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "slack_settings.severity_based_channel_settings.selected_channel_ids_warning.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "slack_settings.severity_based_channel_settings.selected_channel_ids_warning.0", "warning_channel"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "slack_settings.severity_based_channel_settings.selected_channel_ids_critical.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_severity", "slack_settings.severity_based_channel_settings.selected_channel_ids_critical.0", "critical_channel"),
+				),
+			},
+			// Create Slack integration with on_call_reminder settings
+			{
+				Config: testAccOutboundIntegrationSlackSettingsConfig("with_reminders"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "display_name", "Slack With Reminders"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "type", "Slack"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_schedule_settings.run_time", "09:00"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_schedule_settings.days_of_week.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_schedule_settings.days_of_week.0", "mon"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_schedule_settings.days_of_week.1", "wed"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_channel_ids.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_channel_ids.0", "reminder1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_reminders", "slack_settings.on_call_reminder_channel_ids.1", "reminder2"),
+				),
+			},
+			// Update: Change from selected_channel_ids to severity_based_channel_settings
+			{
+				Config: testAccOutboundIntegrationSlackSettingsConfig("update_severity"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "display_name", "Slack With Channels"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.severity_based_channel_settings.selected_channel_ids_minor.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.severity_based_channel_settings.selected_channel_ids_minor.0", "minor_channel"),
+					resource.TestCheckNoResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.selected_channel_ids"),
+				),
+			},
+		},
+	})
+}
+
+func testAccOutboundIntegrationSlackSettingsConfig(testType string) string {
+	baseConfig := `
+resource "allquiet_team" "test" {
+  display_name = "Root"
+}
+`
+
+	switch testType {
+	case "basic":
+		return baseConfig + `
+resource "allquiet_outbound_integration" "slack_basic" {
+  display_name = "Slack Basic"
+  team_id      = allquiet_team.test.id
+  type         = "Slack"
+}
+`
+	case "with_channels":
+		return baseConfig + `
+resource "allquiet_outbound_integration" "slack_with_channels" {
+  display_name = "Slack With Channels"
+  team_id      = allquiet_team.test.id
+  type         = "Slack"
+  
+  slack_settings = {
+    selected_channel_ids              = ["channel1", "channel2"]
+    tag_on_call_members               = true
+    is_slack_message_payload_read_only = false
+  }
+}
+`
+	case "with_severity":
+		return baseConfig + `
+resource "allquiet_outbound_integration" "slack_with_severity" {
+  display_name = "Slack With Severity"
+  team_id      = allquiet_team.test.id
+  type         = "Slack"
+  
+  slack_settings = {
+    severity_based_channel_settings = {
+      selected_channel_ids_minor    = ["minor_channel"]
+      selected_channel_ids_warning   = ["warning_channel"]
+      selected_channel_ids_critical  = ["critical_channel"]
+    }
+  }
+}
+`
+	case "with_reminders":
+		return baseConfig + `
+resource "allquiet_outbound_integration" "slack_with_reminders" {
+  display_name = "Slack With Reminders"
+  team_id      = allquiet_team.test.id
+  type         = "Slack"
+  
+  slack_settings = {
+    on_call_reminder_schedule_settings = {
+      run_time    = "09:00"
+      days_of_week = ["mon", "wed"]
+    }
+    on_call_reminder_channel_ids = ["reminder1", "reminder2"]
+  }
+}
+`
+	case "update_severity":
+		return baseConfig + `
+resource "allquiet_outbound_integration" "slack_with_channels" {
+  display_name = "Slack With Channels"
+  team_id      = allquiet_team.test.id
+  type         = "Slack"
+  
+  slack_settings = {
+    severity_based_channel_settings = {
+      selected_channel_ids_minor    = ["minor_channel"]
+    }
+  }
+}
+`
+	default:
+		return baseConfig
+	}
+}

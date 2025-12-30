@@ -16,6 +16,7 @@ type outboundIntegrationResponse struct {
 	TriggersOnlyOnForwarded     *bool
 	SkipUpdatingAfterForwarding *bool
 	TeamConnectionSettings      *teamConnectionSettings
+	SlackSettings               *slackSettings `json:"slackSettings"`
 }
 
 type outboundIntegrationCreateRequest struct {
@@ -25,6 +26,7 @@ type outboundIntegrationCreateRequest struct {
 	TriggersOnlyOnForwarded     *bool                   `json:"triggersOnlyOnForwarded"`
 	SkipUpdatingAfterForwarding *bool                   `json:"skipUpdatingAfterForwarding"`
 	TeamConnectionSettings      *teamConnectionSettings `json:"teamConnectionSettings"`
+	SlackSettings               *slackSettings          `json:"slackSettings"`
 }
 
 func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outboundIntegrationCreateRequest {
@@ -35,6 +37,7 @@ func mapOutboundIntegrationCreateRequest(plan *OutboundIntegrationModel) *outbou
 		TriggersOnlyOnForwarded:     plan.TriggersOnlyOnForwarded.ValueBoolPointer(),
 		SkipUpdatingAfterForwarding: plan.SkipUpdatingAfterForwarding.ValueBoolPointer(),
 		TeamConnectionSettings:      MapTeamConnectionSettingsToRequest(plan.TeamConnectionSettings),
+		SlackSettings:               MapSlackSettingsToRequest(plan.SlackSettings),
 	}
 }
 func (c *AllQuietAPIClient) CreateOutboundIntegrationResource(ctx context.Context, data *OutboundIntegrationModel) (*outboundIntegrationResponse, error) {
