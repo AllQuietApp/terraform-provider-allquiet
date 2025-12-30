@@ -20,7 +20,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &OutboundIntegration{}
 var _ resource.ResourceWithImportState = &OutboundIntegration{}
 
@@ -28,12 +27,10 @@ func NewOutboundIntegration() resource.Resource {
 	return &OutboundIntegration{}
 }
 
-// OutboundIntegration defines the resource implementation.
 type OutboundIntegration struct {
 	client *AllQuietAPIClient
 }
 
-// OutboundIntegrationModel describes the resource data model.
 type OutboundIntegrationModel struct {
 	Id                          types.String `tfsdk:"id"`
 	DisplayName                 types.String `tfsdk:"display_name"`
@@ -52,7 +49,6 @@ func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataR
 
 func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "The `outbound_integration` resource represents an outbound integration in All Quiet. Outbound integrations are used to send alerts to external systems like Slack or Discord.",
 
 		Attributes: map[string]schema.Attribute{
@@ -169,7 +165,6 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 }
 
 func (r *OutboundIntegration) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
 	}
@@ -191,7 +186,6 @@ func (r *OutboundIntegration) Configure(ctx context.Context, req resource.Config
 func (r *OutboundIntegration) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data OutboundIntegrationModel
 
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -213,7 +207,6 @@ func (r *OutboundIntegration) Create(ctx context.Context, req resource.CreateReq
 func (r *OutboundIntegration) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data OutboundIntegrationModel
 
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
@@ -239,7 +232,6 @@ func (r *OutboundIntegration) Read(ctx context.Context, req resource.ReadRequest
 func (r *OutboundIntegration) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data OutboundIntegrationModel
 
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
@@ -262,7 +254,6 @@ func (r *OutboundIntegration) Update(ctx context.Context, req resource.UpdateReq
 func (r *OutboundIntegration) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data OutboundIntegrationModel
 
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
@@ -303,7 +294,6 @@ func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outbou
 	data.SlackSettings = MapSlackSettingsResponseToModel(ctx, response.SlackSettings)
 }
 
-// SlackSettings is the Terraform model for Slack settings
 type SlackSettings struct {
 	SelectedChannelIds              types.List                        `tfsdk:"selected_channel_ids"`
 	SeverityBasedChannelSettings    *SeverityBasedChannelSettings     `tfsdk:"severity_based_channel_settings"`
@@ -313,20 +303,18 @@ type SlackSettings struct {
 	IsSlackMessagePayloadReadOnly   types.Bool                        `tfsdk:"is_slack_message_payload_read_only"`
 }
 
-// SeverityBasedChannelSettings is the Terraform model for severity-based channel settings
+
 type SeverityBasedChannelSettings struct {
 	SelectedChannelIdsMinor    types.List `tfsdk:"selected_channel_ids_minor"`
 	SelectedChannelIdsWarning  types.List `tfsdk:"selected_channel_ids_warning"`
 	SelectedChannelIdsCritical types.List `tfsdk:"selected_channel_ids_critical"`
 }
 
-// ReminderScheduleSettings is the Terraform model for reminder schedule settings
 type ReminderScheduleSettings struct {
-	RunTime     types.String `tfsdk:"run_time"`      // Format: "HH:mm" (e.g., "09:00")
-	DaysOfWeek  types.List   `tfsdk:"days_of_week"`  // Array of day names
+	RunTime     types.String `tfsdk:"run_time"`     
+	DaysOfWeek  types.List   `tfsdk:"days_of_week"`
 }
 
-// slackSettings is the client-side response type for Slack settings
 type slackSettings struct {
 	SelectedChannelIds              *[]string                        `json:"selectedChannelIds"`
 	SeverityBasedChannelSettings    *severityBasedChannelSettings    `json:"severityBasedChannelSettings"`
@@ -336,20 +324,17 @@ type slackSettings struct {
 	IsSlackMessagePayloadReadOnly   *bool                           `json:"isSlackMessagePayloadReadOnly"`
 }
 
-// severityBasedChannelSettings is the client-side response type for severity-based channel settings
 type severityBasedChannelSettings struct {
 	SelectedChannelIdsMinor    *[]string `json:"selectedChannelIdsMinor"`
 	SelectedChannelIdsWarning  *[]string `json:"selectedChannelIdsWarning"`
 	SelectedChannelIdsCritical *[]string `json:"selectedChannelIdsCritical"`
 }
 
-// reminderScheduleSettings is the client-side response type for reminder schedule settings
 type reminderScheduleSettings struct {
-	RunTime    *string   `json:"runTime"`    // Format: "HH:mm" (e.g., "09:00")
-	DaysOfWeek *[]string `json:"daysOfWeek"` // Array of day names
+	RunTime    *string   `json:"runTime"`   
+	DaysOfWeek *[]string `json:"daysOfWeek"`
 }
 
-// MapSlackSettingsToRequest maps the Terraform SlackSettings model to the client request type
 func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
 	if settings == nil {
 		return nil
@@ -385,14 +370,11 @@ func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
 	return result
 }
 
-// MapSlackSettingsResponseToModel maps the client response to the Terraform SlackSettings model
 func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSettings) *SlackSettings {
 	if settings == nil {
 		return nil
 	}
 
-	// Check if the settings object is effectively empty (all fields are null or empty)
-	// This prevents creating an empty object when the API returns default/empty values
 	hasSelectedChannelIds := settings.SelectedChannelIds != nil && len(*settings.SelectedChannelIds) > 0
 	hasSeverityBased := settings.SeverityBasedChannelSettings != nil &&
 		((settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor) > 0) ||
@@ -404,8 +386,6 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 	hasTagOnCallMembers := settings.TagOnCallMembers != nil
 	hasIsSlackMessagePayloadReadOnly := settings.IsSlackMessagePayloadReadOnly != nil
 
-	// If all fields are empty/null, return nil to keep it consistent with Terraform's null state
-	// This ensures that when slack_settings is not specified in Terraform, it remains null
 	if !hasSelectedChannelIds && !hasSeverityBased && !hasOnCallReminderChannelIds && !hasOnCallReminderSchedule && !hasTagOnCallMembers && !hasIsSlackMessagePayloadReadOnly {
 		return nil
 	}
