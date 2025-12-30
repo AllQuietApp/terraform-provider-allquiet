@@ -32,15 +32,14 @@ type OutboundIntegration struct {
 }
 
 type OutboundIntegrationModel struct {
-	Id                          types.String `tfsdk:"id"`
-	DisplayName                 types.String `tfsdk:"display_name"`
-	TeamId                      types.String `tfsdk:"team_id"`
-	Type                        types.String `tfsdk:"type"`
-	TriggersOnlyOnForwarded     types.Bool   `tfsdk:"triggers_only_on_forwarded"`
-	SkipUpdatingAfterForwarding types.Bool   `tfsdk:"skip_updating_after_forwarding"`
-
-	TeamConnectionSettings *TeamConnectionSettings `tfsdk:"team_connection_settings"`
-	SlackSettings          *SlackSettings         `tfsdk:"slack_settings"`
+	Id                          types.String            `tfsdk:"id"`
+	DisplayName                 types.String            `tfsdk:"display_name"`
+	TeamId                      types.String            `tfsdk:"team_id"`
+	Type                        types.String            `tfsdk:"type"`
+	TriggersOnlyOnForwarded     types.Bool              `tfsdk:"triggers_only_on_forwarded"`
+	SkipUpdatingAfterForwarding types.Bool              `tfsdk:"skip_updating_after_forwarding"`
+	TeamConnectionSettings      *TeamConnectionSettings `tfsdk:"team_connection_settings"`
+	SlackSettings               *SlackSettings          `tfsdk:"slack_settings"`
 }
 
 func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -295,14 +294,13 @@ func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outbou
 }
 
 type SlackSettings struct {
-	SelectedChannelIds              types.List                        `tfsdk:"selected_channel_ids"`
-	SeverityBasedChannelSettings    *SeverityBasedChannelSettings     `tfsdk:"severity_based_channel_settings"`
-	OnCallReminderScheduleSettings  *ReminderScheduleSettings         `tfsdk:"on_call_reminder_schedule_settings"`
-	OnCallReminderChannelIds        types.List                        `tfsdk:"on_call_reminder_channel_ids"`
-	TagOnCallMembers                types.Bool                        `tfsdk:"tag_on_call_members"`
-	IsSlackMessagePayloadReadOnly   types.Bool                        `tfsdk:"is_slack_message_payload_read_only"`
+	SelectedChannelIds             types.List                    `tfsdk:"selected_channel_ids"`
+	SeverityBasedChannelSettings   *SeverityBasedChannelSettings `tfsdk:"severity_based_channel_settings"`
+	OnCallReminderScheduleSettings *ReminderScheduleSettings     `tfsdk:"on_call_reminder_schedule_settings"`
+	OnCallReminderChannelIds       types.List                    `tfsdk:"on_call_reminder_channel_ids"`
+	TagOnCallMembers               types.Bool                    `tfsdk:"tag_on_call_members"`
+	IsSlackMessagePayloadReadOnly  types.Bool                    `tfsdk:"is_slack_message_payload_read_only"`
 }
-
 
 type SeverityBasedChannelSettings struct {
 	SelectedChannelIdsMinor    types.List `tfsdk:"selected_channel_ids_minor"`
@@ -311,17 +309,17 @@ type SeverityBasedChannelSettings struct {
 }
 
 type ReminderScheduleSettings struct {
-	RunTime     types.String `tfsdk:"run_time"`     
-	DaysOfWeek  types.List   `tfsdk:"days_of_week"`
+	RunTime    types.String `tfsdk:"run_time"`
+	DaysOfWeek types.List   `tfsdk:"days_of_week"`
 }
 
 type slackSettings struct {
-	SelectedChannelIds              *[]string                        `json:"selectedChannelIds"`
-	SeverityBasedChannelSettings    *severityBasedChannelSettings    `json:"severityBasedChannelSettings"`
-	OnCallReminderScheduleSettings  *reminderScheduleSettings        `json:"onCallReminderScheduleSettings"`
-	OnCallReminderChannelIds        *[]string                        `json:"onCallReminderChannelIds"`
-	TagOnCallMembers                *bool                           `json:"tagOnCallMembers"`
-	IsSlackMessagePayloadReadOnly   *bool                           `json:"isSlackMessagePayloadReadOnly"`
+	SelectedChannelIds             *[]string                     `json:"selectedChannelIds"`
+	SeverityBasedChannelSettings   *severityBasedChannelSettings `json:"severityBasedChannelSettings"`
+	OnCallReminderScheduleSettings *reminderScheduleSettings     `json:"onCallReminderScheduleSettings"`
+	OnCallReminderChannelIds       *[]string                     `json:"onCallReminderChannelIds"`
+	TagOnCallMembers               *bool                         `json:"tagOnCallMembers"`
+	IsSlackMessagePayloadReadOnly  *bool                         `json:"isSlackMessagePayloadReadOnly"`
 }
 
 type severityBasedChannelSettings struct {
@@ -331,7 +329,7 @@ type severityBasedChannelSettings struct {
 }
 
 type reminderScheduleSettings struct {
-	RunTime    *string   `json:"runTime"`   
+	RunTime    *string   `json:"runTime"`
 	DaysOfWeek *[]string `json:"daysOfWeek"`
 }
 
@@ -408,7 +406,7 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 	if settings.OnCallReminderScheduleSettings != nil {
 		runTime := types.StringPointerValue(settings.OnCallReminderScheduleSettings.RunTime)
 		result.OnCallReminderScheduleSettings = &ReminderScheduleSettings{
-			RunTime:   runTime,
+			RunTime:    runTime,
 			DaysOfWeek: MapNullableList(ctx, settings.OnCallReminderScheduleSettings.DaysOfWeek),
 		}
 	}
