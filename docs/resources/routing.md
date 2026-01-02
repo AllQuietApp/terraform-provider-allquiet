@@ -68,6 +68,7 @@ resource "allquiet_routing" "example_1" {
   }
   rules = [
     {
+      display_name = "Route Pre Sales incidents"
       conditions = {
         attributes = [
           {
@@ -83,6 +84,7 @@ resource "allquiet_routing" "example_1" {
     },
 
     {
+      display_name = "Route After Sales incidents"
       conditions = {
         attributes = [
           {
@@ -107,6 +109,7 @@ resource "allquiet_routing" "example_2" {
   }
   rules = [
     {
+      display_name = "Mute Slack for Minor incidents"
       conditions = {
         severities = ["Minor"]
       },
@@ -123,6 +126,7 @@ resource "allquiet_routing" "example_3" {
   display_name = "Auto Resolve non Critical incidents from Custom Webhook"
   rules = [
     {
+      display_name = "Auto resolve non-critical webhook incidents"
       conditions = {
         severities   = ["Minor", "Warning"]
         integrations = [allquiet_integration.custom_webhook.id]
@@ -194,6 +198,7 @@ resource "allquiet_routing" "example_7" {
   display_name = "Auto Forward Critical incidents to Notion"
   rules = [
     {
+      display_name = "Forward Critical incidents to Notion"
       conditions = {
         severities = ["Critical"]
       },
@@ -210,6 +215,7 @@ resource "allquiet_routing" "example_8" {
   display_name = "Auto Affect incidents with 'Project' attribute 'Pre Sales' to service 'Pre Sales'"
   rules = [
     {
+      display_name = "Affect Pre Sales project incidents"
       conditions = {
         attributes = [
           {
@@ -378,6 +384,7 @@ Optional:
 
 - `actions` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--actions))
 - `channels` (Attributes) Settings for the schedule (see [below for nested schema](#nestedatt--rules--channels))
+- `display_name` (String) The display name of the routing rule
 
 <a id="nestedatt--rules--conditions"></a>
 ### Nested Schema for `rules.conditions`

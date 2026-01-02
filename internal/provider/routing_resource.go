@@ -45,9 +45,10 @@ type RoutingModel struct {
 }
 
 type RoutingRuleModel struct {
-	Conditions *RoutingRuleConditionsModel `tfsdk:"conditions"`
-	Actions    *RoutingRuleActionsModel    `tfsdk:"actions"`
-	Channels   *RoutingRuleChannelsModel   `tfsdk:"channels"`
+	DisplayName types.String                `tfsdk:"display_name"`
+	Conditions  *RoutingRuleConditionsModel `tfsdk:"conditions"`
+	Actions     *RoutingRuleActionsModel    `tfsdk:"actions"`
+	Channels    *RoutingRuleChannelsModel   `tfsdk:"channels"`
 }
 
 type RoutingRuleConditionsModel struct {
@@ -136,6 +137,10 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 				Optional: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"display_name": schema.StringAttribute{
+							MarkdownDescription: "The display name of the routing rule",
+							Optional:            true,
+						},
 						"conditions": schema.SingleNestedAttribute{
 							MarkdownDescription: "Settings for the schedule",
 							Required:            true,
@@ -521,9 +526,10 @@ func mapRoutingRuleResponseToModel(ctx context.Context, rules []routingRule) []R
 
 	for _, rule := range rules {
 		result = append(result, RoutingRuleModel{
-			Conditions: mapRoutingRuleConditionsResponseToModel(ctx, rule.Conditions),
-			Actions:    mapRoutingRuleActionsResponseToModel(ctx, rule.Actions),
-			Channels:   mapRoutingRuleChannelsResponseToModel(ctx, rule.Channels),
+			DisplayName: types.StringPointerValue(rule.DisplayName),
+			Conditions:  mapRoutingRuleConditionsResponseToModel(ctx, rule.Conditions),
+			Actions:     mapRoutingRuleActionsResponseToModel(ctx, rule.Actions),
+			Channels:    mapRoutingRuleChannelsResponseToModel(ctx, rule.Channels),
 		})
 	}
 

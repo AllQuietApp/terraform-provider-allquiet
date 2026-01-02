@@ -25,6 +25,8 @@ func TestAccRoutingResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.hide_in_previews", "true"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.0.display_name", "Assign Critical to Test Team"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.1.display_name", "Route Web Incidents to Sales"),
 				),
 			},
 			// ImportState testing
@@ -41,6 +43,8 @@ func TestAccRoutingResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.hide_in_previews", "true"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.0.display_name", "Assign Critical to Test Team"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.1.display_name", "Route Web Incidents to Sales"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -269,6 +273,49 @@ resource "allquiet_routing" "test_with_team_connection_settings_organization_tea
 	   }
 	  },
 	  {
+		conditions = {
+		  attributes = [
+			{
+			  name = "source"
+			  operator = "=" 
+			  value = "web"
+			}
+		  ]
+		},
+		channels = {
+		  notification_channels = ["VoiceCall"]
+		},
+		actions = {
+			set_attributes = [
+			  {
+				  name = "Team"
+				  value = "Sales"
+				  hide_in_previews = true
+			  }
+		  ]
+		}
+	  }
+	]
+  }
+
+resource "allquiet_routing" "test_with_display_names" {
+	display_name = %[1]q
+	team_id = allquiet_team.root.id
+	rules = [
+	  {
+		display_name = "Assign Critical to Test Team"
+		conditions = {
+		  statuses = ["Open"]
+		  severities = ["Critical", "Warning"]
+	   },
+	   channels = {
+	   },
+	   actions = {
+		 assign_to_teams = [allquiet_team.test.id]
+	   }
+	  },
+	  {
+		display_name = "Route Web Incidents to Sales"
 		conditions = {
 		  attributes = [
 			{

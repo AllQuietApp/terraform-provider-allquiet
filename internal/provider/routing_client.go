@@ -17,9 +17,10 @@ type routingResponse struct {
 }
 
 type routingRule struct {
-	Conditions *routingRuleConditions `json:"conditions"`
-	Actions    *routingRuleActions    `json:"actions"`
-	Channels   *routingRuleChannels   `json:"channels"`
+	DisplayName *string                `json:"displayName"`
+	Conditions  *routingRuleConditions `json:"conditions"`
+	Actions     *routingRuleActions    `json:"actions"`
+	Channels    *routingRuleChannels   `json:"channels"`
 }
 
 type routingRuleConditions struct {
@@ -98,9 +99,10 @@ func mapRoutingRules(rules []RoutingRuleModel) []routingRule {
 	result := make([]routingRule, len(rules))
 	for i, rule := range rules {
 		result[i] = routingRule{
-			Conditions: mapRoutingRuleConditions(rule.Conditions),
-			Actions:    mapRoutingRuleActions(rule.Actions),
-			Channels:   mapRoutingRuleChannels(rule.Channels),
+			DisplayName: rule.DisplayName.ValueStringPointer(),
+			Conditions:  mapRoutingRuleConditions(rule.Conditions),
+			Actions:     mapRoutingRuleActions(rule.Actions),
+			Channels:    mapRoutingRuleChannels(rule.Channels),
 		}
 	}
 	return result
