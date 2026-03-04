@@ -656,6 +656,7 @@ Required:
 Optional:
 
 - `auto_assign_to_teams` (List of String) Team IDs that should be auto-assigned to.
+- `auto_assign_to_teams_repeat_alerts` (Boolean) If true, notify all on-call users when auto-assigning to teams (including those previously notified). If false, only newly assigned teams are notified.
 - `auto_assign_to_teams_severities` (List of String) Severities that should trigger auto-assign to teams. Possible values are: Critical, Warning, Minor
 - `auto_assign_to_teams_time_filters` (Attributes List) Time filters in which auto-assign to teams should be triggered. (see [below for nested schema](#nestedatt--escalation_tiers--auto_assign_to_teams_time_filters))
 - `auto_escalation_after_minutes` (Number) Escalation cadence in minutes. After how many minutes the incident should be auto-escalated to the next tier or auto-assigned to teams.

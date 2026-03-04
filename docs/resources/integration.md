@@ -315,6 +315,7 @@ Optional:
 - `headers` (Map of String, Sensitive) The headers of the http monitoring
 - `is_paused` (Boolean) If the http monitoring is paused
 - `max_retries` (Number) The max retries of the ping monitor
+- `override_accepted_status_codes` (List of Number) Optional. If empty, 2xx status codes are accepted. If specified, only the specified HTTP status codes are considered 'up' (e.g. 200, 201, 204, 302). Each value must be between 100 and 599.
 - `severity_degraded` (String) The severity degraded of the http monitoring. Possible values are: Critical, Warning, Minor
 - `severity_down` (String) The severity down of the http monitoring. Possible values are: Critical, Warning, Minor
 - `ssl_certificate_max_age_in_days_degraded` (Number) The ssl certificate max age in days degraded of the http monitoring

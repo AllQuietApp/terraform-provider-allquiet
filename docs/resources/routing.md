@@ -441,6 +441,7 @@ Optional:
 - `add_interaction` (String) Will add an interaction. For instance, you can auto resolve an incident by adding an interaction of intent 'Resolved'. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
 - `affects_services` (List of String) Will affect the specified services. Only with add_interaction 'Affects'.
 - `assign_to_teams` (List of String) Will assign the incident to the specified teams.
+- `assign_to_teams_repeat_alerts` (Boolean) If true, notify all assigned users and teams, including those previously notified. If false, only newly assigned users/teams are notified.
 - `change_severity` (String) Will change the severity of the incident. Possible values are: Critical, Warning, Minor
 - `delay_actions_in_minutes` (Number) Delay actions in minutes
 - `discard` (Boolean) If true will discard and delete the incident
