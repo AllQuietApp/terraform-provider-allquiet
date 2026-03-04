@@ -42,6 +42,7 @@ type routingRuleAttribute struct {
 
 type routingRuleActions struct {
 	AssignToTeams                 *[]string                  `json:"assignToTeams"`
+	AssignToTeamsRepeatAlerts     *bool                      `json:"assignToTeamsRepeatAlerts"`
 	ChangeSeverity                *string                    `json:"changeSeverity"`
 	AddInteraction                *string                    `json:"addInteraction"`
 	RuleFlowControl               *string                    `json:"ruleFlowControl"`
@@ -164,9 +165,10 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 	if actions == nil {
 		return nil
 	}
-
+	assignToTeamsRepeatAlerts := actions.AssignToTeamsRepeatAlerts.ValueBool()
 	return &routingRuleActions{
 		AssignToTeams:                 ListToStringArray(actions.AssignToTeams),
+		AssignToTeamsRepeatAlerts:     &assignToTeamsRepeatAlerts,
 		ChangeSeverity:                actions.ChangeSeverity.ValueStringPointer(),
 		AddInteraction:                actions.AddInteraction.ValueStringPointer(),
 		RuleFlowControl:               actions.RuleFlowControl.ValueStringPointer(),

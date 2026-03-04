@@ -29,6 +29,7 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_time_filters.0.from"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_time_filters.0.until"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams.0"),
+					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_repeat_alerts", "false"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_severities.0"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.selected_days.0"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_time_filters.0.from"),
@@ -51,6 +52,7 @@ func TestAccTeamEscalationsResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.schedules.0.rotations.0.members.0.team_membership_id"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.0"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_escalation_severities.1"),
+					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team", "escalation_tiers.0.auto_assign_to_teams_repeat_alerts", "false"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats"),
 					resource.TestCheckResourceAttrSet("allquiet_team_escalations.my_team", "escalation_tiers.0.repeats_after_minutes"),
 					resource.TestCheckResourceAttr("allquiet_team_escalations.my_team_with_round_robin", "escalation_tiers.0.schedules.0.round_robin_settings.round_robin_size", "5"),
@@ -209,6 +211,7 @@ func testAccTeamEscalationsResourceConfigCreate() string {
 				}
 			],
 			auto_assign_to_teams = [allquiet_team.engineering.id]
+			auto_assign_to_teams_repeat_alerts = false
 			auto_assign_to_teams_severities = ["Critical", "Warning"]
 			auto_assign_to_teams_time_filters = [
 				{
@@ -398,6 +401,7 @@ func testAccTeamEscalationsResourceConfigUpdate() string {
 			auto_escalation_after_minutes = 5
 			auto_escalation_severities = ["Critical", "Warning"]
 			auto_escalation_stop_mode = "acknowledged"
+			auto_assign_to_teams_repeat_alerts = false
 			repeats = 1
 			repeats_after_minutes = 5
 			repeats_stop_mode = "resolved"

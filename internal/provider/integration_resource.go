@@ -76,6 +76,7 @@ type HttpMonitoringModel struct {
 	SeverityDegraded                   types.String `tfsdk:"severity_degraded"`
 	SeverityDown                       types.String `tfsdk:"severity_down"`
 	IsPaused                           types.Bool   `tfsdk:"is_paused"`
+	OverrideAcceptedStatusCodes        types.List   `tfsdk:"override_accepted_status_codes"`
 }
 
 type EmailSettingsModel struct {
@@ -359,6 +360,14 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 									SeverityValidator("Not a valid severity"),
 								},
 							},
+							"override_accepted_status_codes": schema.ListAttribute{
+								MarkdownDescription: "Optional. If empty, 2xx status codes are accepted. If specified, only the specified HTTP status codes are considered 'up' (e.g. 200, 201, 204, 302). Each value must be between 100 and 599.",
+								Optional:            true,
+								ElementType:         types.Int64Type,
+								Validators: []validator.List{
+									listvalidator.ValueInt64sAre(ValidHttpStatusCodesValidator("Each status code must be between 100 and 599")),
+								},
+							},
 						},
 					},
 					"heartbeat_monitor": schema.SingleNestedAttribute{
@@ -625,7 +634,7 @@ func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integr
 	}
 
 	return &IntegrationSettingsModel{
-		HttpMonitoring:   mapHttpMonitoringResponseToModel(response.HttpMonitoring),
+		HttpMonitoring:   mapHttpMonitoringResponseToModel(ctx, response.HttpMonitoring),
 		HeartbeatMonitor: mapHeartbeatMonitorResponseToModel(response.HeartbeatMonitor),
 		CronjobMonitor:   mapCronjobMonitorResponseToModel(response.CronjobMonitor),
 		PingMonitor:      mapPingMonitorResponseToModel(response.PingMonitor),
@@ -687,7 +696,7 @@ func mapCronjobMonitorResponseToModel(response *cronjobMonitorResponse) *Cronjob
 	}
 }
 
-func mapHttpMonitoringResponseToModel(response *httpMonitoringResponse) *HttpMonitoringModel {
+func mapHttpMonitoringResponseToModel(ctx context.Context, response *httpMonitoringResponse) *HttpMonitoringModel {
 	if response == nil {
 		return nil
 	}
@@ -710,6 +719,7 @@ func mapHttpMonitoringResponseToModel(response *httpMonitoringResponse) *HttpMon
 		SSLCertificateMaxAgeInDaysDown:     types.Int64PointerValue(response.SSLCertificateMaxAgeInDaysDown),
 		SeverityDegraded:                   types.StringPointerValue(response.SeverityDegraded),
 		SeverityDown:                       types.StringPointerValue(response.SeverityDown),
+		OverrideAcceptedStatusCodes:        MapIntSliceToNullableList(ctx, response.OverrideAcceptedStatusCodes),
 	}
 }
 func mapHeadersResponseToModel(response *map[string]string) types.Map {

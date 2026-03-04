@@ -22,9 +22,11 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing One"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing One"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.actions.assign_to_teams_repeat_alerts", "true"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.hide_in_previews", "true"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_repeat_alerts_false", "rules.0.actions.assign_to_teams_repeat_alerts", "false"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.0.display_name", "Assign Critical to Test Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.1.display_name", "Route Web Incidents to Sales"),
 				),
@@ -40,9 +42,11 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing Two"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.actions.assign_to_teams_repeat_alerts", "true"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.hide_in_previews", "true"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_repeat_alerts_false", "rules.0.actions.assign_to_teams_repeat_alerts", "false"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.0.display_name", "Assign Critical to Test Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.1.display_name", "Route Web Incidents to Sales"),
 				),
@@ -105,6 +109,7 @@ resource "allquiet_routing" "test" {
 	 },
 	 actions = {
 	   assign_to_teams = [allquiet_team.test.id]
+	   assign_to_teams_repeat_alerts = true
      }
     },
 	{
@@ -297,6 +302,24 @@ resource "allquiet_routing" "test_with_team_connection_settings_organization_tea
 	  }
 	]
   }
+
+resource "allquiet_routing" "test_with_repeat_alerts_false" {
+  display_name = %[1]q
+  team_id = allquiet_team.root.id
+  rules = [
+    {
+      conditions = {
+        statuses = ["Open"]
+        severities = ["Critical"]
+      }
+      channels = {}
+      actions = {
+        assign_to_teams = [allquiet_team.test.id]
+        assign_to_teams_repeat_alerts = false
+      }
+    }
+  ]
+}
 
 resource "allquiet_routing" "test_with_display_names" {
 	display_name = %[1]q

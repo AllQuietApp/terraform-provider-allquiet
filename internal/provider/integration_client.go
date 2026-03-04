@@ -97,6 +97,7 @@ type httpMonitoringResponse struct {
 	SSLCertificateMaxAgeInDaysDown     *int64             `json:"sslCertificateMaxAgeInDaysDown"`
 	SeverityDegraded                   *string            `json:"severityDegraded"`
 	SeverityDown                       *string            `json:"severityDown"`
+	OverrideAcceptedStatusCodes        *[]int             `json:"overrideAcceptedStatusCodes"`
 }
 
 type snoozeSettingsResponse struct {
@@ -193,6 +194,23 @@ func mapCronjobMonitorCreateRequest(plan *CronjobMonitorModel) *cronjobMonitorRe
 	}
 }
 
+func listInt64ToIntSlice(list types.List) *[]int {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+	elems := list.Elements()
+	if len(elems) == 0 {
+		return nil
+	}
+	result := make([]int, len(elems))
+	for i, item := range elems {
+		if v, ok := item.(types.Int64); ok && !v.IsNull() && !v.IsUnknown() {
+			result[i] = int(v.ValueInt64())
+		}
+	}
+	return &result
+}
+
 func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringResponse {
 	if plan == nil {
 		return nil
@@ -216,6 +234,7 @@ func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringRe
 		SSLCertificateMaxAgeInDaysDown:     plan.SSLCertificateMaxAgeInDaysDown.ValueInt64Pointer(),
 		SeverityDegraded:                   plan.SeverityDegraded.ValueStringPointer(),
 		SeverityDown:                       plan.SeverityDown.ValueStringPointer(),
+		OverrideAcceptedStatusCodes:        listInt64ToIntSlice(plan.OverrideAcceptedStatusCodes),
 	}
 }
 

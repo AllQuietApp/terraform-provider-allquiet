@@ -21,18 +21,19 @@ type teamEscalationsCreateRequest struct {
 }
 
 type teamEscalationsTier struct {
-	AutoEscalationEnabled        *bool                        `json:"autoEscalationEnabled"`
-	AutoEscalationAfterMinutes   *int64                       `json:"autoEscalationAfterMinutes"`
-	AutoEscalationStopMode       *string                      `json:"autoEscalationMode"`
-	AutoEscalationSeverities     *[]string                    `json:"autoEscalationSeverities"`
-	AutoEscalationTimeFilters    *[]teamEscalationsTimeFilter `json:"autoEscalationTimeFilters"`
-	AutoAssignToTeams            *[]string                    `json:"autoAssignToTeams"`
-	AutoAssignToTeamsSeverities  *[]string                    `json:"autoAssignToTeamsSeverities"`
-	AutoAssignToTeamsTimeFilters *[]teamEscalationsTimeFilter `json:"autoAssignToTeamsTimeFilters"`
-	Repeats                      *int64                       `json:"repeats"`
-	RepeatsAfterMinutes          *int64                       `json:"repeatsAfterMinutes"`
-	RepeatsStopMode              *string                      `json:"repeatsTierEscalationMode"`
-	Schedules                    []teamEscalationsSchedule    `json:"schedules"`
+	AutoEscalationEnabled         *bool                        `json:"autoEscalationEnabled"`
+	AutoEscalationAfterMinutes    *int64                       `json:"autoEscalationAfterMinutes"`
+	AutoEscalationStopMode        *string                      `json:"autoEscalationMode"`
+	AutoEscalationSeverities      *[]string                    `json:"autoEscalationSeverities"`
+	AutoEscalationTimeFilters     *[]teamEscalationsTimeFilter `json:"autoEscalationTimeFilters"`
+	AutoAssignToTeams             *[]string                    `json:"autoAssignToTeams"`
+	AutoAssignToTeamsRepeatAlerts *bool                        `json:"autoAssignToTeamsRepeatAlerts"`
+	AutoAssignToTeamsSeverities   *[]string                    `json:"autoAssignToTeamsSeverities"`
+	AutoAssignToTeamsTimeFilters  *[]teamEscalationsTimeFilter `json:"autoAssignToTeamsTimeFilters"`
+	Repeats                       *int64                       `json:"repeats"`
+	RepeatsAfterMinutes           *int64                       `json:"repeatsAfterMinutes"`
+	RepeatsStopMode               *string                      `json:"repeatsTierEscalationMode"`
+	Schedules                     []teamEscalationsSchedule    `json:"schedules"`
 }
 
 type tierSettings struct {
@@ -180,18 +181,19 @@ func mapTier(tier TeamEscalationsTierModel) *teamEscalationsTier {
 	}
 
 	return &teamEscalationsTier{
-		AutoEscalationEnabled:        tier.AutoEscalationEnabled.ValueBoolPointer(),
-		AutoEscalationAfterMinutes:   tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
-		AutoEscalationStopMode:       tier.AutoEscalationStopMode.ValueStringPointer(),
-		AutoEscalationSeverities:     ListToStringArray(tier.AutoEscalationSeverities),
-		AutoEscalationTimeFilters:    mapTeamEscalationsTimeFiltersToRequest(tier.AutoEscalationTimeFilters),
-		AutoAssignToTeams:            ListToStringArray(tier.AutoAssignToTeams),
-		AutoAssignToTeamsSeverities:  ListToStringArray(tier.AutoAssignToTeamsSeverities),
-		AutoAssignToTeamsTimeFilters: mapTeamEscalationsTimeFiltersToRequest(tier.AutoAssignToTeamsTimeFilters),
-		Repeats:                      tier.Repeats.ValueInt64Pointer(),
-		RepeatsAfterMinutes:          tier.RepeatsAfterMinutes.ValueInt64Pointer(),
-		RepeatsStopMode:              tier.RepeatsStopMode.ValueStringPointer(),
-		Schedules:                    schedules,
+		AutoEscalationEnabled:         tier.AutoEscalationEnabled.ValueBoolPointer(),
+		AutoEscalationAfterMinutes:    tier.AutoEscalationAfterMinutes.ValueInt64Pointer(),
+		AutoEscalationStopMode:        tier.AutoEscalationStopMode.ValueStringPointer(),
+		AutoEscalationSeverities:      ListToStringArray(tier.AutoEscalationSeverities),
+		AutoEscalationTimeFilters:     mapTeamEscalationsTimeFiltersToRequest(tier.AutoEscalationTimeFilters),
+		AutoAssignToTeams:             ListToStringArray(tier.AutoAssignToTeams),
+		AutoAssignToTeamsRepeatAlerts: tier.AutoAssignToTeamsRepeatAlerts.ValueBoolPointer(),
+		AutoAssignToTeamsSeverities:   ListToStringArray(tier.AutoAssignToTeamsSeverities),
+		AutoAssignToTeamsTimeFilters:  mapTeamEscalationsTimeFiltersToRequest(tier.AutoAssignToTeamsTimeFilters),
+		Repeats:                       tier.Repeats.ValueInt64Pointer(),
+		RepeatsAfterMinutes:           tier.RepeatsAfterMinutes.ValueInt64Pointer(),
+		RepeatsStopMode:               tier.RepeatsStopMode.ValueStringPointer(),
+		Schedules:                     schedules,
 	}
 }
 

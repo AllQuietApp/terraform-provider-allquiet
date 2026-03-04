@@ -51,6 +51,12 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_max_retries", "integration_settings.http_monitoring.max_retries", "0"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.url", "https://example.com/health"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.#", "4"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.0", "200"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.1", "201"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.2", "204"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.3", "302"),
 					resource.TestCheckResourceAttr("allquiet_integration.ping_monitor_with_max_retries", "integration_settings.ping_monitor.max_retries", "5"),
 					resource.TestCheckResourceAttr("allquiet_integration.email", "display_name", "My Email Integration"),
 					resource.TestCheckResourceAttr("allquiet_integration.email", "type", "Email"),
@@ -100,6 +106,11 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.cronjob_monitor", "integration_settings.cronjob_monitor.severity", "Critical"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_max_retries", "integration_settings.http_monitoring.max_retries", "0"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.#", "4"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.0", "200"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.1", "201"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.2", "204"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring_with_accepted_status_codes", "integration_settings.http_monitoring.override_accepted_status_codes.3", "302"),
 					resource.TestCheckResourceAttr("allquiet_integration.ping_monitor_with_max_retries", "integration_settings.ping_monitor.max_retries", "5"),
 					resource.TestCheckResourceAttr("allquiet_integration.email", "display_name", "My Email Integration"),
 					resource.TestCheckResourceAttr("allquiet_integration.email", "type", "Email"),
@@ -253,6 +264,22 @@ resource "allquiet_integration" "http_monitoring_with_max_retries" {
 			authentication_type = "Bearer"
 			bearer_authentication_token = "my-token"
 			max_retries = 0
+		}
+	}
+}
+
+resource "allquiet_integration" "http_monitoring_with_accepted_status_codes" {
+	display_name = "My HTTP Monitoring Integration With Custom Status Codes"
+	team_id = allquiet_team.test.id
+	type = "HttpMonitoring"
+	integration_settings = {
+		http_monitoring = {
+			url = "https://example.com/health"
+			method = "GET"
+			timeout_in_milliseconds = 1000
+			interval_in_seconds = 60
+			authentication_type = "None"
+			override_accepted_status_codes = [200, 201, 204, 302]
 		}
 	}
 }

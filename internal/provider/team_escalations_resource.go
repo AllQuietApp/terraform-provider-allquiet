@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -36,18 +37,19 @@ type TeamEscalations struct {
 }
 
 type TeamEscalationsTierModel struct {
-	AutoEscalationEnabled        types.Bool                        `tfsdk:"auto_escalation_enabled"`
-	AutoEscalationAfterMinutes   types.Int64                       `tfsdk:"auto_escalation_after_minutes"`
-	AutoEscalationStopMode       types.String                      `tfsdk:"auto_escalation_stop_mode"`
-	AutoEscalationSeverities     types.List                        `tfsdk:"auto_escalation_severities"`
-	AutoEscalationTimeFilters    *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_escalation_time_filters"`
-	Repeats                      types.Int64                       `tfsdk:"repeats"`
-	RepeatsAfterMinutes          types.Int64                       `tfsdk:"repeats_after_minutes"`
-	RepeatsStopMode              types.String                      `tfsdk:"repeats_stop_mode"`
-	AutoAssignToTeams            types.List                        `tfsdk:"auto_assign_to_teams"`
-	AutoAssignToTeamsSeverities  types.List                        `tfsdk:"auto_assign_to_teams_severities"`
-	AutoAssignToTeamsTimeFilters *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_assign_to_teams_time_filters"`
-	Schedules                    []TeamEscalationsScheduleModel    `tfsdk:"schedules"`
+	AutoEscalationEnabled         types.Bool                        `tfsdk:"auto_escalation_enabled"`
+	AutoEscalationAfterMinutes    types.Int64                       `tfsdk:"auto_escalation_after_minutes"`
+	AutoEscalationStopMode        types.String                      `tfsdk:"auto_escalation_stop_mode"`
+	AutoEscalationSeverities      types.List                        `tfsdk:"auto_escalation_severities"`
+	AutoEscalationTimeFilters     *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_escalation_time_filters"`
+	Repeats                       types.Int64                       `tfsdk:"repeats"`
+	RepeatsAfterMinutes           types.Int64                       `tfsdk:"repeats_after_minutes"`
+	RepeatsStopMode               types.String                      `tfsdk:"repeats_stop_mode"`
+	AutoAssignToTeams             types.List                        `tfsdk:"auto_assign_to_teams"`
+	AutoAssignToTeamsRepeatAlerts types.Bool                        `tfsdk:"auto_assign_to_teams_repeat_alerts"`
+	AutoAssignToTeamsSeverities   types.List                        `tfsdk:"auto_assign_to_teams_severities"`
+	AutoAssignToTeamsTimeFilters  *[]TeamEscalationsTimeFilterModel `tfsdk:"auto_assign_to_teams_time_filters"`
+	Schedules                     []TeamEscalationsScheduleModel    `tfsdk:"schedules"`
 }
 
 type TeamEscalationsTimeFilterModel struct {
@@ -220,6 +222,12 @@ func (r *TeamEscalations) Schema(ctx context.Context, req resource.SchemaRequest
 							Optional:            true,
 							MarkdownDescription: "Team IDs that should be auto-assigned to.",
 							ElementType:         types.StringType,
+						},
+						"auto_assign_to_teams_repeat_alerts": schema.BoolAttribute{
+							Optional:            true,
+							Computed:            true,
+							Default:             booldefault.StaticBool(true),
+							MarkdownDescription: "If true, notify all on-call users when auto-assigning to teams (including those previously notified). If false, only newly assigned teams are notified.",
 						},
 						"auto_assign_to_teams_severities": schema.ListAttribute{
 							Optional:            true,
@@ -581,18 +589,19 @@ func mapTeamEscalationsTiersResponseToData(ctx context.Context, data []teamEscal
 		}
 
 		tiers = append(tiers, TeamEscalationsTierModel{
-			AutoEscalationEnabled:        types.BoolPointerValue(tier.AutoEscalationEnabled),
-			AutoEscalationAfterMinutes:   autoEscalationAfterMinutes,
-			AutoEscalationStopMode:       types.StringPointerValue(tier.AutoEscalationStopMode),
-			AutoEscalationSeverities:     MapNullableList(ctx, tier.AutoEscalationSeverities),
-			AutoEscalationTimeFilters:    mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoEscalationTimeFilters),
-			AutoAssignToTeams:            MapNullableList(ctx, tier.AutoAssignToTeams),
-			AutoAssignToTeamsSeverities:  MapNullableList(ctx, tier.AutoAssignToTeamsSeverities),
-			AutoAssignToTeamsTimeFilters: mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoAssignToTeamsTimeFilters),
-			Repeats:                      types.Int64PointerValue(tier.Repeats),
-			RepeatsAfterMinutes:          types.Int64PointerValue(tier.RepeatsAfterMinutes),
-			RepeatsStopMode:              types.StringPointerValue(tier.RepeatsStopMode),
-			Schedules:                    mapTeamEscalationsSchedulesResponseToData(ctx, tier.Schedules),
+			AutoEscalationEnabled:         types.BoolPointerValue(tier.AutoEscalationEnabled),
+			AutoEscalationAfterMinutes:    autoEscalationAfterMinutes,
+			AutoEscalationStopMode:        types.StringPointerValue(tier.AutoEscalationStopMode),
+			AutoEscalationSeverities:      MapNullableList(ctx, tier.AutoEscalationSeverities),
+			AutoEscalationTimeFilters:     mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoEscalationTimeFilters),
+			AutoAssignToTeams:             MapNullableList(ctx, tier.AutoAssignToTeams),
+			AutoAssignToTeamsRepeatAlerts: BoolPointerWithDefaultTrue(tier.AutoAssignToTeamsRepeatAlerts),
+			AutoAssignToTeamsSeverities:   MapNullableList(ctx, tier.AutoAssignToTeamsSeverities),
+			AutoAssignToTeamsTimeFilters:  mapTeamEscalationsTimeFiltersToData(ctx, tier.AutoAssignToTeamsTimeFilters),
+			Repeats:                       types.Int64PointerValue(tier.Repeats),
+			RepeatsAfterMinutes:           types.Int64PointerValue(tier.RepeatsAfterMinutes),
+			RepeatsStopMode:               types.StringPointerValue(tier.RepeatsStopMode),
+			Schedules:                     mapTeamEscalationsSchedulesResponseToData(ctx, tier.Schedules),
 		})
 	}
 	return tiers

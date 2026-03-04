@@ -70,6 +70,7 @@ type RoutingRuleConditionsAttributeModel struct {
 
 type RoutingRuleActionsModel struct {
 	AssignToTeams                 types.List                             `tfsdk:"assign_to_teams"`
+	AssignToTeamsRepeatAlerts     types.Bool                             `tfsdk:"assign_to_teams_repeat_alerts"`
 	Discard                       types.Bool                             `tfsdk:"discard"`
 	ChangeSeverity                types.String                           `tfsdk:"change_severity"`
 	AddInteraction                types.String                           `tfsdk:"add_interaction"`
@@ -252,6 +253,12 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
 									},
+								},
+								"assign_to_teams_repeat_alerts": schema.BoolAttribute{
+									Optional:            true,
+									Computed:            true,
+									Default:             booldefault.StaticBool(true),
+									MarkdownDescription: "If true, notify all assigned users and teams, including those previously notified. If false, only newly assigned users/teams are notified.",
 								},
 								"discard": schema.BoolAttribute{
 									Optional:            true,
@@ -598,6 +605,7 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 
 	return &RoutingRuleActionsModel{
 		AssignToTeams:                 MapNullableList(ctx, actions.AssignToTeams),
+		AssignToTeamsRepeatAlerts:     BoolPointerWithDefaultTrue(actions.AssignToTeamsRepeatAlerts),
 		Discard:                       types.BoolValue(actions.Discard),
 		ChangeSeverity:                types.StringPointerValue(actions.ChangeSeverity),
 		AddInteraction:                types.StringPointerValue(actions.AddInteraction),

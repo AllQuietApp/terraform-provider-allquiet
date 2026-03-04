@@ -9,18 +9,25 @@ import (
 )
 
 type serviceResponse struct {
-	Id                     string
-	DisplayName            string
-	PublicTitle            string
-	PublicDescription      *string
-	Templates              *[]serviceTemplate
-	TeamConnectionSettings *teamConnectionSettings
+	Id                     string                  `json:"id"`
+	DisplayName            string                  `json:"displayName"`
+	PublicTitle            string                  `json:"publicTitle"`
+	PublicDescription      *string                 `json:"publicDescription"`
+	Templates              *[]serviceTemplate      `json:"templates"`
+	Integrations           *[]serviceIntegration   `json:"integrations"`
+	TeamConnectionSettings *teamConnectionSettings `json:"teamConnectionSettings"`
 }
 
 type serviceTemplate struct {
-	Id          *string
-	DisplayName string
-	Message     string
+	Id          *string `json:"id"`
+	DisplayName string  `json:"displayName"`
+	Message     string  `json:"message"`
+}
+
+type serviceIntegration struct {
+	Id            *string   `json:"id,omitempty"`
+	IntegrationId string    `json:"integrationId"`
+	Severities    *[]string `json:"severities"`
 }
 
 type serviceCreateRequest struct {
@@ -28,6 +35,7 @@ type serviceCreateRequest struct {
 	PublicTitle            string                  `json:"publicTitle"`
 	PublicDescription      *string                 `json:"publicDescription"`
 	Templates              *[]serviceTemplate      `json:"templates"`
+	Integrations           *[]serviceIntegration   `json:"integrations"`
 	TeamConnectionSettings *teamConnectionSettings `json:"teamConnectionSettings"`
 }
 
@@ -37,8 +45,29 @@ func mapServiceCreateRequest(plan *ServiceModel) *serviceCreateRequest {
 		PublicTitle:            plan.PublicTitle.ValueString(),
 		PublicDescription:      plan.PublicDescription.ValueStringPointer(),
 		Templates:              mapTemplates(plan.Templates),
+		Integrations:           mapServiceIntegrationsToRequest(plan.Integrations),
 		TeamConnectionSettings: MapTeamConnectionSettingsToRequest(plan.TeamConnectionSettings),
 	}
+}
+
+func mapServiceIntegrationsToRequest(integrations *[]ServiceIntegrationModel) *[]serviceIntegration {
+	if integrations == nil {
+		return nil
+	}
+	result := make([]serviceIntegration, len(*integrations))
+	for i, si := range *integrations {
+		idStr := si.Id.ValueString()
+		var id *string
+		if idStr != "" {
+			id = &idStr
+		}
+		result[i] = serviceIntegration{
+			Id:            id,
+			IntegrationId: si.IntegrationId.ValueString(),
+			Severities:    ListToStringArray(si.Severities),
+		}
+	}
+	return &result
 }
 
 func mapTemplates(templates *[]ServiceTemplateModel) *[]serviceTemplate {

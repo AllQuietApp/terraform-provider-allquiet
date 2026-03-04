@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -113,6 +114,31 @@ func mapNullableListWithEmpty(ctx context.Context, stringArray *[]string) types.
 
 func MapNullableList(ctx context.Context, stringArray *[]string) types.List {
 	return mapNullableListWithEmpty(ctx, stringArray)
+}
+
+// BoolPointerWithDefaultTrue returns types.BoolValue(true) when v is nil (API omitted field),
+// otherwise returns the value. Use for optional bool attributes whose schema default is true.
+func BoolPointerWithDefaultTrue(v *bool) types.Bool {
+	if v == nil {
+		return types.BoolValue(true)
+	}
+	return types.BoolValue(*v)
+}
+
+// MapIntSliceToNullableList converts *[]int to types.List of Int64 (for override_accepted_status_codes etc.)
+func MapIntSliceToNullableList(ctx context.Context, intArray *[]int) types.List {
+	if intArray == nil || len(*intArray) == 0 {
+		return types.ListNull(types.Int64Type)
+	}
+	var listElems []attr.Value
+	for _, v := range *intArray {
+		listElems = append(listElems, types.Int64Value(int64(v)))
+	}
+	listVal, diags := types.ListValueFrom(ctx, types.Int64Type, listElems)
+	if diags.HasError() {
+		return types.ListNull(types.Int64Type)
+	}
+	return listVal
 }
 
 type badRequestResponse struct {
@@ -336,6 +362,10 @@ var ValidTimeoutsPingMonitorInMilliseconds = []int64{50, 100, 200, 500, 1000, 20
 
 func ValidTimeoutsPingMonitorInMillisecondsValidator(message string) validator.Int64 {
 	return int64validator.OneOf(ValidTimeoutsPingMonitorInMilliseconds...)
+}
+
+func ValidHttpStatusCodesValidator(message string) validator.Int64 {
+	return int64validator.Between(100, 599)
 }
 
 func AddQueryParam(currentUrl string, key string, value string) string {
