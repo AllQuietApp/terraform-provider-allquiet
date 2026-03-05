@@ -40,6 +40,7 @@ type OutboundIntegrationModel struct {
 	SkipUpdatingAfterForwarding types.Bool              `tfsdk:"skip_updating_after_forwarding"`
 	TeamConnectionSettings      *TeamConnectionSettings `tfsdk:"team_connection_settings"`
 	SlackSettings               *SlackSettings          `tfsdk:"slack_settings"`
+	MattermostSettings          *MattermostSettings     `tfsdk:"mattermost_settings"`
 }
 
 func (r *OutboundIntegration) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -155,6 +156,68 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 					},
 					"is_slack_message_payload_read_only": schema.BoolAttribute{
 						MarkdownDescription: "If true, the Slack message payload will be read-only.",
+						Optional:            true,
+					},
+				},
+			},
+			"mattermost_settings": schema.SingleNestedAttribute{
+				MarkdownDescription: "Mattermost-specific settings for the integration. Only applicable when type is 'Mattermost'.",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"send_incidents_to_mattermost": schema.BoolAttribute{
+						MarkdownDescription: "If true, incidents will be sent to Mattermost.",
+						Required:            true,
+					},
+					"create_incidents_from_mattermost": schema.BoolAttribute{
+						MarkdownDescription: "If true, incidents can be created from Mattermost.",
+						Required:            true,
+					},
+					"base_url": schema.StringAttribute{
+						MarkdownDescription: "The Mattermost server URL (e.g. https://your-mattermost-server.com).",
+						Optional:            true,
+					},
+					"bot_token": schema.StringAttribute{
+						MarkdownDescription: "The Mattermost bot token.",
+						Optional:            true,
+						Sensitive:           true,
+					},
+					"slash_command_token": schema.StringAttribute{
+						MarkdownDescription: "The Mattermost slash command token.",
+						Optional:            true,
+						Sensitive:           true,
+					},
+					"selected_channel_ids": schema.ListAttribute{
+						MarkdownDescription: "List of Mattermost channel IDs to send notifications to. Either this or severity_based_channel_settings must be provided, but not both.",
+						Optional:            true,
+						ElementType:         types.StringType,
+					},
+					"severity_based_channel_settings": schema.SingleNestedAttribute{
+						MarkdownDescription: "Severity-based channel settings. Either this or selected_channel_ids must be provided, but not both.",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"selected_channel_ids_minor": schema.ListAttribute{
+								MarkdownDescription: "List of Mattermost channel IDs for minor severity notifications.",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+							"selected_channel_ids_warning": schema.ListAttribute{
+								MarkdownDescription: "List of Mattermost channel IDs for warning severity notifications.",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+							"selected_channel_ids_critical": schema.ListAttribute{
+								MarkdownDescription: "List of Mattermost channel IDs for critical severity notifications.",
+								Optional:            true,
+								ElementType:         types.StringType,
+							},
+						},
+					},
+					"selected_team_id": schema.StringAttribute{
+						MarkdownDescription: "The Mattermost team ID.",
+						Optional:            true,
+					},
+					"is_message_read_only": schema.BoolAttribute{
+						MarkdownDescription: "If true, the Mattermost message will be read-only.",
 						Optional:            true,
 					},
 				},
@@ -291,6 +354,7 @@ func mapOutboundIntegrationResponseToModel(ctx context.Context, response *outbou
 	}
 
 	data.SlackSettings = MapSlackSettingsResponseToModel(ctx, response.SlackSettings)
+	data.MattermostSettings = MapMattermostSettingsResponseToModel(ctx, response.MattermostSettings)
 }
 
 type SlackSettings struct {
@@ -313,6 +377,24 @@ type ReminderScheduleSettings struct {
 	DaysOfWeek types.List   `tfsdk:"days_of_week"`
 }
 
+type MattermostSettings struct {
+	SendIncidentsToMattermost     types.Bool                              `tfsdk:"send_incidents_to_mattermost"`
+	CreateIncidentsFromMattermost types.Bool                              `tfsdk:"create_incidents_from_mattermost"`
+	BaseUrl                       types.String                            `tfsdk:"base_url"`
+	BotToken                      types.String                            `tfsdk:"bot_token"`
+	SlashCommandToken             types.String                            `tfsdk:"slash_command_token"`
+	SelectedChannelIds            types.List                              `tfsdk:"selected_channel_ids"`
+	SeverityBasedChannelSettings  *MattermostSeverityBasedChannelSettings `tfsdk:"severity_based_channel_settings"`
+	SelectedTeamId                types.String                            `tfsdk:"selected_team_id"`
+	IsMessageReadOnly             types.Bool                              `tfsdk:"is_message_read_only"`
+}
+
+type MattermostSeverityBasedChannelSettings struct {
+	SelectedChannelIdsMinor    types.List `tfsdk:"selected_channel_ids_minor"`
+	SelectedChannelIdsWarning  types.List `tfsdk:"selected_channel_ids_warning"`
+	SelectedChannelIdsCritical types.List `tfsdk:"selected_channel_ids_critical"`
+}
+
 type slackSettings struct {
 	SelectedChannelIds             *[]string                     `json:"selectedChannelIds"`
 	SeverityBasedChannelSettings   *severityBasedChannelSettings `json:"severityBasedChannelSettings"`
@@ -331,6 +413,24 @@ type severityBasedChannelSettings struct {
 type reminderScheduleSettings struct {
 	RunTime    *string   `json:"runTime"`
 	DaysOfWeek *[]string `json:"daysOfWeek"`
+}
+
+type mattermostSettings struct {
+	SendIncidentsToMattermost     *bool                                   `json:"sendIncidentsToMattermost"`
+	CreateIncidentsFromMattermost *bool                                   `json:"createIncidentsFromMattermost"`
+	BaseUrl                       *string                                 `json:"baseUrl"`
+	BotToken                      *string                                 `json:"botToken"`
+	SlashCommandToken             *string                                 `json:"slashCommandToken"`
+	SelectedChannelIds            *[]string                               `json:"selectedChannelIds"`
+	SeverityBasedChannelSettings  *mattermostSeverityBasedChannelSettings `json:"severityBasedChannelSettings"`
+	SelectedTeamId                *string                                 `json:"selectedTeamId"`
+	IsMessageReadOnly             *bool                                   `json:"isMessageReadOnly"`
+}
+
+type mattermostSeverityBasedChannelSettings struct {
+	SelectedChannelIdsMinor    *[]string `json:"selectedChannelIdsMinor"`
+	SelectedChannelIdsWarning  *[]string `json:"selectedChannelIdsWarning"`
+	SelectedChannelIdsCritical *[]string `json:"selectedChannelIdsCritical"`
 }
 
 func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
@@ -362,6 +462,92 @@ func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
 		result.OnCallReminderScheduleSettings = &reminderScheduleSettings{
 			RunTime:    runTime,
 			DaysOfWeek: ListToStringArray(settings.OnCallReminderScheduleSettings.DaysOfWeek),
+		}
+	}
+
+	return result
+}
+
+func MapMattermostSettingsToRequest(settings *MattermostSettings) *mattermostSettings {
+	if settings == nil {
+		return nil
+	}
+
+	result := &mattermostSettings{
+		SendIncidentsToMattermost:     settings.SendIncidentsToMattermost.ValueBoolPointer(),
+		CreateIncidentsFromMattermost: settings.CreateIncidentsFromMattermost.ValueBoolPointer(),
+		IsMessageReadOnly:             settings.IsMessageReadOnly.ValueBoolPointer(),
+	}
+
+	if !settings.BaseUrl.IsNull() && !settings.BaseUrl.IsUnknown() {
+		s := settings.BaseUrl.ValueString()
+		result.BaseUrl = &s
+	}
+	if !settings.BotToken.IsNull() && !settings.BotToken.IsUnknown() {
+		s := settings.BotToken.ValueString()
+		result.BotToken = &s
+	}
+	if !settings.SlashCommandToken.IsNull() && !settings.SlashCommandToken.IsUnknown() {
+		s := settings.SlashCommandToken.ValueString()
+		result.SlashCommandToken = &s
+	}
+	if !settings.SelectedTeamId.IsNull() && !settings.SelectedTeamId.IsUnknown() {
+		s := settings.SelectedTeamId.ValueString()
+		result.SelectedTeamId = &s
+	}
+
+	result.SelectedChannelIds = ListToStringArray(settings.SelectedChannelIds)
+
+	if settings.SeverityBasedChannelSettings != nil {
+		result.SeverityBasedChannelSettings = &mattermostSeverityBasedChannelSettings{
+			SelectedChannelIdsMinor:    ListToStringArray(settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
+			SelectedChannelIdsWarning:  ListToStringArray(settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
+			SelectedChannelIdsCritical: ListToStringArray(settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
+		}
+	}
+
+	return result
+}
+
+func MapMattermostSettingsResponseToModel(ctx context.Context, settings *mattermostSettings) *MattermostSettings {
+	if settings == nil {
+		return nil
+	}
+
+	// Only treat booleans as "has" when true, so API response { sendIncidentsToMattermost: false, ... } with nothing else set maps to nil (plan was null)
+	hasSendIncidents := settings.SendIncidentsToMattermost != nil && *settings.SendIncidentsToMattermost
+	hasCreateIncidents := settings.CreateIncidentsFromMattermost != nil && *settings.CreateIncidentsFromMattermost
+	hasBaseUrl := settings.BaseUrl != nil && *settings.BaseUrl != ""
+	hasBotToken := settings.BotToken != nil && *settings.BotToken != ""
+	hasSlashCommandToken := settings.SlashCommandToken != nil && *settings.SlashCommandToken != ""
+	hasSelectedChannelIds := settings.SelectedChannelIds != nil && len(*settings.SelectedChannelIds) > 0
+	hasSeverityBased := settings.SeverityBasedChannelSettings != nil &&
+		((settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor) > 0) ||
+			(settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning) > 0) ||
+			(settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical != nil && len(*settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical) > 0))
+	hasSelectedTeamId := settings.SelectedTeamId != nil && *settings.SelectedTeamId != ""
+	hasIsMessageReadOnly := settings.IsMessageReadOnly != nil
+
+	if !hasSendIncidents && !hasCreateIncidents && !hasBaseUrl && !hasBotToken && !hasSlashCommandToken && !hasSelectedChannelIds && !hasSeverityBased && !hasSelectedTeamId && !hasIsMessageReadOnly {
+		return nil
+	}
+
+	result := &MattermostSettings{
+		SendIncidentsToMattermost:     types.BoolPointerValue(settings.SendIncidentsToMattermost),
+		CreateIncidentsFromMattermost: types.BoolPointerValue(settings.CreateIncidentsFromMattermost),
+		BaseUrl:                       types.StringPointerValue(settings.BaseUrl),
+		BotToken:                      types.StringPointerValue(settings.BotToken),
+		SlashCommandToken:             types.StringPointerValue(settings.SlashCommandToken),
+		SelectedChannelIds:            MapNullableList(ctx, settings.SelectedChannelIds),
+		SelectedTeamId:                types.StringPointerValue(settings.SelectedTeamId),
+		IsMessageReadOnly:             types.BoolPointerValue(settings.IsMessageReadOnly),
+	}
+
+	if settings.SeverityBasedChannelSettings != nil {
+		result.SeverityBasedChannelSettings = &MattermostSeverityBasedChannelSettings{
+			SelectedChannelIdsMinor:    MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
+			SelectedChannelIdsWarning:  MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
+			SelectedChannelIdsCritical: MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
 		}
 	}
 

@@ -101,3 +101,36 @@ resource "allquiet_outbound_integration" "slack_full_config" {
     is_slack_message_payload_read_only = false
   }
 }
+
+resource "allquiet_outbound_integration" "mattermost" {
+  display_name = "My Mattermost Integration"
+  team_id      = allquiet_team.root.id
+  type         = "Mattermost"
+
+  mattermost_settings = {
+    send_incidents_to_mattermost     = true
+    create_incidents_from_mattermost = false
+    base_url                         = "https://mattermost.com"
+    selected_team_id                 = "your-team-id"
+    selected_channel_ids             = ["channel-id-1", "channel-id-2"]
+    is_message_read_only             = false
+  }
+}
+
+resource "allquiet_outbound_integration" "mattermost_severity_channels" {
+  display_name = "My Mattermost Integration (Severity-Based Channels)"
+  team_id      = allquiet_team.root.id
+  type         = "Mattermost"
+
+  mattermost_settings = {
+    send_incidents_to_mattermost     = true
+    create_incidents_from_mattermost = false
+    base_url                         = "https://mattermost.com"
+    selected_team_id                 = "your-team-id"
+    severity_based_channel_settings = {
+      selected_channel_ids_minor    = ["minor-channel-id"]
+      selected_channel_ids_warning  = ["warning-channel-id"]
+      selected_channel_ids_critical = ["critical-channel-id"]
+    }
+  }
+}
