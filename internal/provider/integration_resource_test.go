@@ -24,6 +24,9 @@ func TestAccIntegrationResource(t *testing.T) {
 				Config: testAccIntegrationResourceConfig("Integration One"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration One"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.0", "prod"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.1", "monitoring"),
 					resource.TestCheckResourceAttrSet("allquiet_integration.test", "webhook_url"),
 
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.0", "mon"),
@@ -44,6 +47,7 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.headers.Content-Type", "application/json"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.ignore_non_http_errors", "true"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.interval_in_sec", "60"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.severity", "Warning"),
@@ -78,6 +82,9 @@ func TestAccIntegrationResource(t *testing.T) {
 				Config: testAccIntegrationResourceConfig("Integration Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration Two"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.0", "prod"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.1", "monitoring"),
 					resource.TestCheckResourceAttrSet("allquiet_integration.test", "webhook_url"),
 
 					resource.TestCheckResourceAttr("allquiet_integration.webhook_snooze_absolute", "snooze_settings.filters.0.selected_days.0", "mon"),
@@ -99,6 +106,7 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.interval_in_seconds", "60"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.ignore_non_http_errors", "true"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.interval_in_sec", "60"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.severity", "Warning"),
@@ -170,6 +178,7 @@ resource "allquiet_integration" "test" {
   display_name = %[1]q
   team_id = allquiet_team.test.id
   type = "Datadog"
+  labels = ["prod", "monitoring"]
 }
 
 resource "allquiet_integration" "webhook_snooze_absolute" {
@@ -247,6 +256,7 @@ resource "allquiet_integration" "http_monitoring" {
 			ssl_certificate_max_age_in_days_down = 10
 			severity_degraded = "Warning"
 			severity_down = "Critical"
+			ignore_non_http_errors = true
 		}
 	}
 }

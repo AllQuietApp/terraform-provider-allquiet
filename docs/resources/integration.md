@@ -239,6 +239,7 @@ locals {
 - `integration_settings` (Attributes) The integration settings of the integration (see [below for nested schema](#nestedatt--integration_settings))
 - `is_in_maintenance` (Boolean) If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `is_muted` (Boolean) If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
+- `labels` (List of String) Labels applied to the integration for filtering and organization
 - `snooze_settings` (Attributes) The snooze settings of the integration (see [below for nested schema](#nestedatt--snooze_settings))
 - `webhook_authentication` (Attributes) The webhook authentication of the integration (see [below for nested schema](#nestedatt--webhook_authentication))
 
@@ -313,6 +314,7 @@ Optional:
 - `body` (String, Sensitive) The body to send in the http request
 - `content_test` (String) The content test of the http monitoring
 - `headers` (Map of String, Sensitive) The headers of the http monitoring
+- `ignore_non_http_errors` (Boolean) When true, connection and transport failures (non-HTTP errors) are ignored and do not trigger incidents
 - `is_paused` (Boolean) If the http monitoring is paused
 - `max_retries` (Number) The max retries of the ping monitor
 - `override_accepted_status_codes` (List of Number) Optional. If empty, 2xx status codes are accepted. If specified, only the specified HTTP status codes are considered 'up' (e.g. 200, 201, 204, 302). Each value must be between 100 and 599.

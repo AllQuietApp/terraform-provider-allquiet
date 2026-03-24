@@ -14,6 +14,7 @@ type integrationResponse struct {
 	Id                    string                         `json:"id"`
 	DisplayName           string                         `json:"displayName"`
 	TeamId                string                         `json:"teamId"`
+	Labels                *[]string                      `json:"labels"`
 	IsMuted               bool                           `json:"isMuted"`
 	IsInMaintenance       bool                           `json:"isInMaintenance"`
 	Type                  string                         `json:"type"`
@@ -26,6 +27,7 @@ type integrationResponse struct {
 type integrationCreateRequest struct {
 	DisplayName           string                         `json:"displayName"`
 	TeamId                string                         `json:"teamId"`
+	Labels                *[]string                      `json:"labels,omitempty"`
 	IsMuted               bool                           `json:"isMuted"`
 	IsInMaintenance       bool                           `json:"isInMaintenance"`
 	Type                  string                         `json:"type"`
@@ -98,6 +100,7 @@ type httpMonitoringResponse struct {
 	SeverityDegraded                   *string            `json:"severityDegraded"`
 	SeverityDown                       *string            `json:"severityDown"`
 	OverrideAcceptedStatusCodes        *[]int             `json:"overrideAcceptedStatusCodes"`
+	IgnoreNonHttpErrors                bool               `json:"ignoreNonHttpErrors"`
 }
 
 type snoozeSettingsResponse struct {
@@ -118,6 +121,7 @@ func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateReque
 	return &integrationCreateRequest{
 		DisplayName:           plan.DisplayName.ValueString(),
 		TeamId:                plan.TeamId.ValueString(),
+		Labels:                ListToStringArray(plan.Labels),
 		IsMuted:               plan.IsMuted.ValueBool(),
 		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
 		Type:                  plan.Type.ValueString(),
@@ -235,6 +239,7 @@ func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringRe
 		SeverityDegraded:                   plan.SeverityDegraded.ValueStringPointer(),
 		SeverityDown:                       plan.SeverityDown.ValueStringPointer(),
 		OverrideAcceptedStatusCodes:        listInt64ToIntSlice(plan.OverrideAcceptedStatusCodes),
+		IgnoreNonHttpErrors:                plan.IgnoreNonHttpErrors.ValueBool(),
 	}
 }
 
@@ -321,6 +326,7 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, plan 
 	request := &integrationCreateRequest{
 		DisplayName:           plan.DisplayName.ValueString(),
 		TeamId:                plan.TeamId.ValueString(),
+		Labels:                ListToStringArray(plan.Labels),
 		IsMuted:               plan.IsMuted.ValueBool(),
 		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
 		Type:                  plan.Type.ValueString(),

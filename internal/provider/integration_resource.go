@@ -41,6 +41,7 @@ type IntegrationModel struct {
 	Id                    types.String                `tfsdk:"id"`
 	DisplayName           types.String                `tfsdk:"display_name"`
 	TeamId                types.String                `tfsdk:"team_id"`
+	Labels                types.List                  `tfsdk:"labels"`
 	IsMuted               types.Bool                  `tfsdk:"is_muted"`
 	IsInMaintenance       types.Bool                  `tfsdk:"is_in_maintenance"`
 	Type                  types.String                `tfsdk:"type"`
@@ -77,6 +78,7 @@ type HttpMonitoringModel struct {
 	SeverityDown                       types.String `tfsdk:"severity_down"`
 	IsPaused                           types.Bool   `tfsdk:"is_paused"`
 	OverrideAcceptedStatusCodes        types.List   `tfsdk:"override_accepted_status_codes"`
+	IgnoreNonHttpErrors                types.Bool   `tfsdk:"ignore_non_http_errors"`
 }
 
 type EmailSettingsModel struct {
@@ -227,6 +229,11 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 				MarkdownDescription: "The type of the integration. See all types here: https://allquiet.app/api/public/v1/inbound-integration/types",
 				Required:            true,
 			},
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Labels applied to the integration for filtering and organization",
+				Optional:            true,
+				ElementType:         types.StringType,
+			},
 			"webhook_url": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "The webhook url of the integration if it is a webhook-like integration e.g. Amazon CloudWatch",
@@ -367,6 +374,12 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 								Validators: []validator.List{
 									listvalidator.ValueInt64sAre(ValidHttpStatusCodesValidator("Each status code must be between 100 and 599")),
 								},
+							},
+							"ignore_non_http_errors": schema.BoolAttribute{
+								MarkdownDescription: "When true, connection and transport failures (non-HTTP errors) are ignored and do not trigger incidents",
+								Optional:            true,
+								Computed:            true,
+								Default:             booldefault.StaticBool(false),
 							},
 						},
 					},
@@ -613,6 +626,7 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 	data.IsMuted = types.BoolValue(response.IsMuted)
 	data.IsInMaintenance = types.BoolValue(response.IsInMaintenance)
 	data.Type = types.StringValue(response.Type)
+	data.Labels = MapNullableList(ctx, response.Labels)
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
 	data.WebhookAuthentication = mapWebhookAuthenticationResponseToModel(response.WebhookAuthentication)
@@ -720,6 +734,7 @@ func mapHttpMonitoringResponseToModel(ctx context.Context, response *httpMonitor
 		SeverityDegraded:                   types.StringPointerValue(response.SeverityDegraded),
 		SeverityDown:                       types.StringPointerValue(response.SeverityDown),
 		OverrideAcceptedStatusCodes:        MapIntSliceToNullableList(ctx, response.OverrideAcceptedStatusCodes),
+		IgnoreNonHttpErrors:                types.BoolValue(response.IgnoreNonHttpErrors),
 	}
 }
 func mapHeadersResponseToModel(response *map[string]string) types.Map {
