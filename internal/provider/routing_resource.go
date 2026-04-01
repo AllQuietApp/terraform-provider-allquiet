@@ -56,6 +56,8 @@ type RoutingRuleConditionsModel struct {
 	Severities          types.List                            `tfsdk:"severities"`
 	Integrations        types.List                            `tfsdk:"integrations"`
 	Intents             types.List                            `tfsdk:"intents"`
+	Labels              types.List                            `tfsdk:"labels"`
+	LabelsMatchType     types.String                          `tfsdk:"labels_match_type"`
 	Attributes          []RoutingRuleConditionsAttributeModel `tfsdk:"attributes"`
 	AttributesMatchType types.String                          `tfsdk:"attributes_match_type"`
 	DateRestriction     *DateRestrictionModel                 `tfsdk:"date_restriction"`
@@ -177,6 +179,16 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(IntentValidator("Not a valid intent")),
 									},
+								},
+								"labels": schema.ListAttribute{
+									Optional:            true,
+									MarkdownDescription: "Labels that must appear on the routing team and/or the source integration of the incident. Use labels_match_type to require all listed labels (AND) or any one (OR).",
+									ElementType:         types.StringType,
+								},
+								"labels_match_type": schema.StringAttribute{
+									Optional:            true,
+									MarkdownDescription: "How labels are combined when multiple are set. Possible values are: " + strings.Join(ValidAttributesMatchTypes, ", "),
+									Validators:          []validator.String{stringvalidator.OneOf(ValidAttributesMatchTypes...)},
 								},
 								"attributes_match_type": schema.StringAttribute{
 									Optional:            true,
@@ -553,6 +565,8 @@ func mapRoutingRuleConditionsResponseToModel(ctx context.Context, conditions *ro
 		Severities:          MapNullableList(ctx, conditions.Severities),
 		Integrations:        MapNullableList(ctx, conditions.Integrations),
 		Intents:             MapNullableList(ctx, conditions.Intents),
+		Labels:              MapNullableList(ctx, conditions.Labels),
+		LabelsMatchType:     types.StringPointerValue(conditions.LabelsMatchType),
 		Attributes:          mapRoutingRuleConditionsAttributeResponseToModel(conditions.Attributes),
 		AttributesMatchType: types.StringPointerValue(conditions.AttributesMatchType),
 		DateRestriction:     mapRoutingRuleDateRestrictionResponseToModel(conditions.DateRestriction),

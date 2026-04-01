@@ -22,6 +22,10 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing One"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing One"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels.0", "prod"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels.1", "monitoring"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels_match_type", "any"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.actions.assign_to_teams_repeat_alerts", "true"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
@@ -42,6 +46,10 @@ func TestAccRoutingResource(t *testing.T) {
 				Config: testAccRoutingResourceConfig("Routing Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_routing.test", "display_name", "Routing Two"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels.0", "prod"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels.1", "monitoring"),
+					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.conditions.labels_match_type", "any"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.0.actions.assign_to_teams_repeat_alerts", "true"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.name", "Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test", "rules.1.actions.set_attributes.0.value", "Sales"),
@@ -90,6 +98,7 @@ func testAccRoutingResourceConfig(display_name string) string {
 	return fmt.Sprintf(`
 resource "allquiet_team" "root" {
   display_name = "Root"
+  labels       = ["prod", "monitoring"]
 }
 
 resource "allquiet_team" "test" {
@@ -104,6 +113,8 @@ resource "allquiet_routing" "test" {
 	  conditions = {
 	    statuses = ["Open"]
 		severities = ["Critical", "Warning"]
+		labels_match_type = "any"
+		labels = ["prod", "monitoring"]
      },
 	 channels = {
 	 },

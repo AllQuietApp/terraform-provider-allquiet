@@ -1,5 +1,6 @@
 resource "allquiet_team" "root" {
   display_name = "Root"
+  labels       = ["prod", "monitoring"]
 }
 
 resource "allquiet_team" "infrastructure" {
@@ -332,6 +333,27 @@ resource "allquiet_routing" "example_13" {
             value    = "0"
           }
         ]
+      },
+      actions = {
+        assign_to_teams = [allquiet_team.infrastructure.id]
+      }
+    },
+  ]
+}
+
+resource "allquiet_routing" "example_14" {
+  team_id      = allquiet_team.root.id
+  display_name = "Route incidents that match team or integration labels"
+  team_connection_settings = {
+    team_connection_mode = "OrganizationTeams"
+  }
+  rules = [
+    {
+      display_name = "Production incidents to infrastructure"
+      conditions = {
+        severities        = ["Critical", "Warning"]
+        labels_match_type = "all"
+        labels            = ["prod", "monitoring"]
       },
       actions = {
         assign_to_teams = [allquiet_team.infrastructure.id]

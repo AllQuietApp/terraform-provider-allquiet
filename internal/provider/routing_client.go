@@ -28,6 +28,8 @@ type routingRuleConditions struct {
 	Severities          *[]string                   `json:"severities"`
 	Integrations        *[]string                   `json:"integrations"`
 	Intents             *[]string                   `json:"intents"`
+	Labels              *[]string                   `json:"labels"`
+	LabelsMatchType     *string                     `json:"labelsMatchType"`
 	Attributes          []routingRuleAttribute      `json:"attributes"`
 	AttributesMatchType *string                     `json:"attributesMatchType"`
 	DateRestriction     *routingRuleDateRestriction `json:"dateRestriction"`
@@ -119,6 +121,8 @@ func mapRoutingRuleConditions(conditions *RoutingRuleConditionsModel) *routingRu
 		Severities:          ListToStringArray(conditions.Severities),
 		Integrations:        ListToStringArray(conditions.Integrations),
 		Intents:             ListToStringArray(conditions.Intents),
+		Labels:              ListToStringArray(conditions.Labels),
+		LabelsMatchType:     conditions.LabelsMatchType.ValueStringPointer(),
 		Attributes:          mapRoutingRuleAttributes(conditions.Attributes),
 		AttributesMatchType: conditions.AttributesMatchType.ValueStringPointer(),
 		DateRestriction:     mapRoutingRuleDateRestriction(conditions.DateRestriction),
