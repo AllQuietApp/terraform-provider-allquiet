@@ -115,6 +115,7 @@ Required:
 
 Optional:
 
+- `expand` (Boolean) When true, after all mapping steps the pipeline value is parsed as JSON; object keys and array indices become separate incident attributes (e.g. Name.key or Name[i]).
 - `hide_in_previews` (Boolean) Whether the attribute is hidden in previews
 - `is_grouping_key` (Boolean) Whether the attribute is a grouping key
 - `is_image` (Boolean) Whether the attribute is an image

@@ -19,8 +19,8 @@ func TestAccIntegrationMappingResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: testAccIntegrationMappingResourceConfig(),
-				Check:  resource.ComposeAggregateTestCheckFunc(
-				//resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration One"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_integration_mapping.test", "attributes_mapping.attributes.3.expand", "true"),
 				),
 			},
 			// ImportState testing
@@ -108,7 +108,15 @@ resource "allquiet_integration_mapping" "test" {
 			{ regex = "\\d+", replace = "$1" },
 			{ map = "->Open" },
 			]	
-		} 		
+		},
+		{
+			name             = "Labels"
+			expand           = true
+			hide_in_previews = true
+			mappings = [
+			{ json_path = "$.jsonBody.commonLabels" }
+			]
+		}
 		]
 	}
 }

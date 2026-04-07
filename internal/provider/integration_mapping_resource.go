@@ -47,6 +47,7 @@ type IntegrationMappingAttributeModel struct {
 	IsImage        types.Bool `tfsdk:"is_image"`
 	HideInPreviews types.Bool `tfsdk:"hide_in_previews"`
 	IsGroupingKey  types.Bool `tfsdk:"is_grouping_key"`
+	Expand         types.Bool `tfsdk:"expand"`
 
 	Mappings []IntegrationMappingMappingModel `tfsdk:"mappings"`
 }
@@ -109,6 +110,10 @@ func (r *IntegrationMapping) Schema(ctx context.Context, req resource.SchemaRequ
 								},
 								"is_grouping_key": schema.BoolAttribute{
 									MarkdownDescription: "Whether the attribute is a grouping key",
+									Optional:            true,
+								},
+								"expand": schema.BoolAttribute{
+									MarkdownDescription: "When true, after all mapping steps the pipeline value is parsed as JSON; object keys and array indices become separate incident attributes (e.g. Name.key or Name[i]).",
 									Optional:            true,
 								},
 								"mappings": schema.ListNestedAttribute{
@@ -280,6 +285,7 @@ func mapIntegrationMappingResponseToModel(response *integrationMappingResponse, 
 		data.AttributesMapping.Attributes[i].IsImage = types.BoolPointerValue(attribute.IsImage)
 		data.AttributesMapping.Attributes[i].HideInPreviews = types.BoolPointerValue(attribute.HideInPreviews)
 		data.AttributesMapping.Attributes[i].IsGroupingKey = types.BoolPointerValue(attribute.IsGroupingKey)
+		data.AttributesMapping.Attributes[i].Expand = types.BoolPointerValue(attribute.Expand)
 
 		data.AttributesMapping.Attributes[i].Mappings = make([]IntegrationMappingMappingModel, len(attribute.Mappings))
 		for j, mapping := range attribute.Mappings {

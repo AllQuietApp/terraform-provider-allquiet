@@ -28,6 +28,7 @@ type attribute struct {
 	IsImage        *bool     `json:"isImage"`
 	HideInPreviews *bool     `json:"hideInPreviews"`
 	IsGroupingKey  *bool     `json:"isGroupingKey"`
+	Expand         *bool     `json:"expand"`
 	Mappings       []mapping `json:"mappings"`
 }
 
@@ -73,6 +74,7 @@ func mapIntegrationMappingCreateRequest(plan *IntegrationMappingModel) *integrat
 		req.AttributesMapping.Attributes[i].IsImage = attribute.IsImage.ValueBoolPointer()
 		req.AttributesMapping.Attributes[i].HideInPreviews = attribute.HideInPreviews.ValueBoolPointer()
 		req.AttributesMapping.Attributes[i].IsGroupingKey = attribute.IsGroupingKey.ValueBoolPointer()
+		req.AttributesMapping.Attributes[i].Expand = attribute.Expand.ValueBoolPointer()
 		req.AttributesMapping.Attributes[i].Mappings = make([]mapping, len(attribute.Mappings))
 
 		for j, m := range attribute.Mappings {
