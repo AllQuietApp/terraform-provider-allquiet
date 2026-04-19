@@ -26,6 +26,12 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &User{}
 var _ resource.ResourceWithImportState = &User{}
+var _ resource.ResourceWithValidateConfig = &User{}
+
+const userIncidentNotificationSettingsRemovalMessage = "incident_notification_settings on allquiet_user has been removed. " +
+	"Use the dedicated allquiet_user_incident_notification_settings resource instead. " +
+	"See https://registry.terraform.io/providers/AllQuietApp/allquiet/latest/docs/resources/user_incident_notification_settings " +
+	"for an example."
 
 func NewUser() resource.Resource {
 	return &User{}
@@ -114,8 +120,11 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 				Computed:            true,
 			},
 			"incident_notification_settings": schema.SingleNestedAttribute{
-				MarkdownDescription: "Settings which channels to use for incident notifications",
-				Optional:            true,
+				MarkdownDescription: "Deprecated: this attribute has been split out into the dedicated `allquiet_user_incident_notification_settings` resource. " +
+					"Setting it on `allquiet_user` is no longer supported and will result in a plan-time error. " +
+					"Existing data on the backend is preserved when you remove this block.",
+				DeprecationMessage: "Use the dedicated allquiet_user_incident_notification_settings resource instead.",
+				Optional:           true,
 				Attributes: map[string]schema.Attribute{
 					"should_send_sms": schema.BoolAttribute{
 						Required:            true,
@@ -219,6 +228,22 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 				},
 			},
 		},
+	}
+}
+
+func (r *User) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data UserModel
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if data.IncidentNotificationSettings != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("incident_notification_settings"),
+			"incident_notification_settings is no longer supported on allquiet_user",
+			userIncidentNotificationSettingsRemovalMessage,
+		)
 	}
 }
 
@@ -345,29 +370,8 @@ func mapUserResponseToModel(ctx context.Context, response *userResponse, data *U
 	data.PhoneNumber = types.StringPointerValue(response.PhoneNumber)
 	data.TimeZoneId = types.StringValue(response.TimeZoneId)
 
-	if response.IncidentNotificationSettings != nil {
-		data.IncidentNotificationSettings = &IncidentNotificationSettingsModel{
-			ShouldSendSMS: types.BoolValue(response.IncidentNotificationSettings.ShouldSendSMS),
-			DelayInMinSMS: types.Int64Value(response.IncidentNotificationSettings.DelayInMinSMS),
-			SeveritiesSMS: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesSMS),
-
-			ShouldCallVoice: types.BoolValue(response.IncidentNotificationSettings.ShouldCallVoice),
-			DelayInMinVoice: types.Int64Value(response.IncidentNotificationSettings.DelayInMinVoice),
-			SeveritiesVoice: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesVoice),
-
-			ShouldSendPush: types.BoolValue(response.IncidentNotificationSettings.ShouldSendPush),
-			DelayInMinPush: types.Int64Value(response.IncidentNotificationSettings.DelayInMinPush),
-			SeveritiesPush: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesPush),
-
-			ShouldSendEmail: types.BoolValue(response.IncidentNotificationSettings.ShouldSendEmail),
-			DelayInMinEmail: types.Int64Value(response.IncidentNotificationSettings.DelayInMinEmail),
-			SeveritiesEmail: MapNullableList(ctx, response.IncidentNotificationSettings.SeveritiesEmail),
-
-			DisabledIntentsEmail: MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsEmail),
-			DisabledIntentsVoice: MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsVoice),
-			DisabledIntentsPush:  MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsPush),
-			DisabledIntentsSMS:   MapNullableList(ctx, response.IncidentNotificationSettings.DisabledIntentsSMS),
-		}
-	}
-
+	// Notification settings are no longer tracked on the user resource. They are owned by
+	// the dedicated allquiet_user_incident_notification_settings resource. We deliberately
+	// drop the field so existing state rolls forward to null on the next refresh/apply.
+	data.IncidentNotificationSettings = nil
 }

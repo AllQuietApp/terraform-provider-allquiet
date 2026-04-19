@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"testing"
 
 	"github.com/google/uuid"
@@ -53,12 +54,6 @@ func TestAccUserResourceExample(t *testing.T) {
 				Config: testAccUserResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_user.millie_brown", "display_name", "Millie Bobby Brown"),
-					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_sms.0", "Resolved"),
-					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_sms.#", "1"),
-					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_voice.0", "Resolved"),
-					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_voice.#", "1"),
-					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_push.#", "0"),
-					resource.TestCheckResourceAttr("allquiet_user.billie_eilish", "incident_notification_settings.disabled_intents_email.#", "0"),
 				),
 			},
 			// ImportState testing
@@ -102,4 +97,36 @@ func testAccUserResourceExample() string {
 	result := RandomizeExample(string(dat))
 
 	return result
+}
+
+func TestAccUserResourceRejectsInlineNotificationSettings(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "allquiet_user" "test" {
+  display_name = "Millie"
+  email        = "acceptance-tests+millie+%s@allquiet.app"
+  incident_notification_settings = {
+    should_send_sms    = true
+    delay_in_min_sms   = 5
+    severities_sms     = ["Critical"]
+    should_call_voice  = false
+    delay_in_min_voice = 0
+    severities_voice   = []
+    should_send_push   = true
+    delay_in_min_push  = 0
+    severities_push    = ["Critical"]
+    should_send_email  = true
+    delay_in_min_email = 0
+    severities_email   = ["Critical"]
+  }
+}
+`, uuid.New().String()),
+				ExpectError: regexp.MustCompile("incident_notification_settings on allquiet_user has been removed"),
+			},
+		},
+	})
 }

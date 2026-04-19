@@ -41,47 +41,19 @@ type incidentNotificationSettingsResponse struct {
 }
 
 type userCreateRequest struct {
-	DisplayName                  string                                `json:"displayName"`
-	Email                        string                                `json:"email"`
-	PhoneNumber                  *string                               `json:"phoneNumber"`
-	TimeZoneId                   string                                `json:"timeZoneId"`
-	IncidentNotificationSettings *incidentNotificationSettingsResponse `json:"incidentNotificationSettings"`
+	DisplayName string  `json:"displayName"`
+	Email       string  `json:"email"`
+	PhoneNumber *string `json:"phoneNumber"`
+	TimeZoneId  string  `json:"timeZoneId"`
 }
 
 func mapUserCreateRequest(plan *UserModel) *userCreateRequest {
-	var req userCreateRequest
-
-	req.DisplayName = plan.DisplayName.ValueString()
-	req.Email = plan.Email.ValueString()
-	req.PhoneNumber = plan.PhoneNumber.ValueStringPointer()
-	req.TimeZoneId = plan.TimeZoneId.ValueString()
-
-	if plan.IncidentNotificationSettings != nil {
-		req.IncidentNotificationSettings = &incidentNotificationSettingsResponse{
-			ShouldSendSMS: plan.IncidentNotificationSettings.ShouldSendSMS.ValueBool(),
-			DelayInMinSMS: plan.IncidentNotificationSettings.DelayInMinSMS.ValueInt64(),
-			SeveritiesSMS: ListToStringArray(plan.IncidentNotificationSettings.SeveritiesSMS),
-
-			ShouldCallVoice: plan.IncidentNotificationSettings.ShouldCallVoice.ValueBool(),
-			DelayInMinVoice: plan.IncidentNotificationSettings.DelayInMinVoice.ValueInt64(),
-			SeveritiesVoice: ListToStringArray(plan.IncidentNotificationSettings.SeveritiesVoice),
-
-			ShouldSendPush: plan.IncidentNotificationSettings.ShouldSendPush.ValueBool(),
-			DelayInMinPush: plan.IncidentNotificationSettings.DelayInMinPush.ValueInt64(),
-			SeveritiesPush: ListToStringArray(plan.IncidentNotificationSettings.SeveritiesPush),
-
-			ShouldSendEmail: plan.IncidentNotificationSettings.ShouldSendEmail.ValueBool(),
-			DelayInMinEmail: plan.IncidentNotificationSettings.DelayInMinEmail.ValueInt64(),
-			SeveritiesEmail: ListToStringArray(plan.IncidentNotificationSettings.SeveritiesEmail),
-
-			DisabledIntentsEmail: ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsEmail),
-			DisabledIntentsVoice: ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsVoice),
-			DisabledIntentsPush:  ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsPush),
-			DisabledIntentsSMS:   ListToNonNullableStringArray(plan.IncidentNotificationSettings.DisabledIntentsSMS),
-		}
+	return &userCreateRequest{
+		DisplayName: plan.DisplayName.ValueString(),
+		Email:       plan.Email.ValueString(),
+		PhoneNumber: plan.PhoneNumber.ValueStringPointer(),
+		TimeZoneId:  plan.TimeZoneId.ValueString(),
 	}
-
-	return &req
 }
 
 func (c *AllQuietAPIClient) CreateUserResource(ctx context.Context, data *UserModel) (*userResponse, error) {

@@ -151,6 +151,7 @@ func (p *AllQuietProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewOrganizationMembership,
 		NewIntegrationMaintenanceWindow,
 		NewOnCallOverride,
+		NewUserIncidentNotificationSettings,
 	}
 }
 
