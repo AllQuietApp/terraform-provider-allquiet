@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -36,46 +37,51 @@ type StatusPage struct {
 
 // StatusPageModel describes the resource data model.
 type StatusPageModel struct {
-	Id                                types.String                   `tfsdk:"id"`
-	DisplayName                       types.String                   `tfsdk:"display_name"`
-	PublicTitle                       types.String                   `tfsdk:"public_title"`
-	PublicDescription                 types.String                   `tfsdk:"public_description"`
-	Slug                              types.String                   `tfsdk:"slug"`
-	Services                          types.List                     `tfsdk:"services"`
-	ServiceGroups                     *[]StatusPageServiceGroupModel `tfsdk:"service_groups"`
-	PublicCompanyUrl                  types.String                   `tfsdk:"public_company_url"`
-	PublicCompanyName                 types.String                   `tfsdk:"public_company_name"`
-	PublicSupportUrl                  types.String                   `tfsdk:"public_support_url"`
-	PublicSupportEmail                types.String                   `tfsdk:"public_support_email"`
-	HistoryInDays                     types.Int64                    `tfsdk:"history_in_days"`
-	TimeZoneId                        types.String                   `tfsdk:"time_zone_id"`
-	DisablePublicSubscription         types.Bool                     `tfsdk:"disable_public_subscription"`
-	PublicSeverityMappingMinor        types.String                   `tfsdk:"public_severity_mapping_minor"`
-	PublicSeverityMappingWarning      types.String                   `tfsdk:"public_severity_mapping_warning"`
-	PublicSeverityMappingCritical     types.String                   `tfsdk:"public_severity_mapping_critical"`
-	BannerBackgroundColor             types.String                   `tfsdk:"banner_background_color"`
-	BannerBackgroundColorDarkMode     types.String                   `tfsdk:"banner_background_color_dark_mode"`
-	BannerTextColor                   types.String                   `tfsdk:"banner_text_color"`
-	BannerTextColorDarkMode           types.String                   `tfsdk:"banner_text_color_dark_mode"`
-	CustomHostSettings                *CustomHostSettings            `tfsdk:"custom_host_settings"`
-	DisablePublicPage                 types.Bool                     `tfsdk:"disable_public_page"`
-	DisablePublicJson                 types.Bool                     `tfsdk:"disable_public_json"`
-	PrivateIpFilter                   types.String                   `tfsdk:"private_ip_filter"`
-	PrivateUserAuthenticationRequired types.Bool                     `tfsdk:"private_user_authentication_required"`
-	EnableSMSSubscription             types.Bool                     `tfsdk:"enable_sms_subscription"`
-	BodyBackgroundColor               types.String                   `tfsdk:"body_background_color"`
-	BodyBackgroundColorDarkMode       types.String                   `tfsdk:"body_background_color_dark_mode"`
-	SecondaryBackgroundColor          types.String                   `tfsdk:"secondary_background_color"`
-	SecondaryBackgroundColorDarkMode  types.String                   `tfsdk:"secondary_background_color_dark_mode"`
-	PrimaryTextColor                  types.String                   `tfsdk:"primary_text_color"`
-	PrimaryTextColorDarkMode          types.String                   `tfsdk:"primary_text_color_dark_mode"`
-	SecondaryTextColor                types.String                   `tfsdk:"secondary_text_color"`
-	SecondaryTextColorDarkMode        types.String                   `tfsdk:"secondary_text_color_dark_mode"`
-	ButtonBackgroundColor             types.String                   `tfsdk:"button_background_color"`
-	ButtonBackgroundColorDarkMode     types.String                   `tfsdk:"button_background_color_dark_mode"`
-	ButtonTextColor                   types.String                   `tfsdk:"button_text_color"`
-	ButtonTextColorDarkMode           types.String                   `tfsdk:"button_text_color_dark_mode"`
-	DecimalPlaces                     types.Int64                    `tfsdk:"decimal_places"`
+	Id                                     types.String                   `tfsdk:"id"`
+	DisplayName                            types.String                   `tfsdk:"display_name"`
+	PublicTitle                            types.String                   `tfsdk:"public_title"`
+	PublicDescription                      types.String                   `tfsdk:"public_description"`
+	Slug                                   types.String                   `tfsdk:"slug"`
+	Services                               types.List                     `tfsdk:"services"`
+	ServiceGroups                          *[]StatusPageServiceGroupModel `tfsdk:"service_groups"`
+	PublicCompanyUrl                       types.String                   `tfsdk:"public_company_url"`
+	PublicCompanyName                      types.String                   `tfsdk:"public_company_name"`
+	PublicSupportUrl                       types.String                   `tfsdk:"public_support_url"`
+	PublicSupportEmail                     types.String                   `tfsdk:"public_support_email"`
+	HistoryInDays                          types.Int64                    `tfsdk:"history_in_days"`
+	TimeZoneId                             types.String                   `tfsdk:"time_zone_id"`
+	PublicDisplayLiveStateOnly             types.Bool                     `tfsdk:"public_display_live_state_only"`
+	PublicHideIncidentDetails              types.Bool                     `tfsdk:"public_hide_incident_details"`
+	PublicHideMaintenances                 types.Bool                     `tfsdk:"public_hide_maintenances"`
+	DisablePublicSubscription              types.Bool                     `tfsdk:"disable_public_subscription"`
+	PublicSeverityMappingMinor             types.String                   `tfsdk:"public_severity_mapping_minor"`
+	PublicSeverityMappingWarning           types.String                   `tfsdk:"public_severity_mapping_warning"`
+	PublicSeverityMappingCritical          types.String                   `tfsdk:"public_severity_mapping_critical"`
+	BannerBackgroundColor                  types.String                   `tfsdk:"banner_background_color"`
+	BannerBackgroundColorDarkMode          types.String                   `tfsdk:"banner_background_color_dark_mode"`
+	BannerTextColor                        types.String                   `tfsdk:"banner_text_color"`
+	BannerTextColorDarkMode                types.String                   `tfsdk:"banner_text_color_dark_mode"`
+	CustomHostSettings                     *CustomHostSettings            `tfsdk:"custom_host_settings"`
+	DisablePublicPage                      types.Bool                     `tfsdk:"disable_public_page"`
+	DisablePublicJson                      types.Bool                     `tfsdk:"disable_public_json"`
+	PrivateIpFilter                        types.String                   `tfsdk:"private_ip_filter"`
+	PrivateUserAuthenticationRequired      types.Bool                     `tfsdk:"private_user_authentication_required"`
+	PasswordProtectionPassword             types.String                   `tfsdk:"password_protection_password"`
+	IsPasswordProtectionPasswordConfigured types.Bool                     `tfsdk:"is_password_protection_configured"`
+	EnableSMSSubscription                  types.Bool                     `tfsdk:"enable_sms_subscription"`
+	BodyBackgroundColor                    types.String                   `tfsdk:"body_background_color"`
+	BodyBackgroundColorDarkMode            types.String                   `tfsdk:"body_background_color_dark_mode"`
+	SecondaryBackgroundColor               types.String                   `tfsdk:"secondary_background_color"`
+	SecondaryBackgroundColorDarkMode       types.String                   `tfsdk:"secondary_background_color_dark_mode"`
+	PrimaryTextColor                       types.String                   `tfsdk:"primary_text_color"`
+	PrimaryTextColorDarkMode               types.String                   `tfsdk:"primary_text_color_dark_mode"`
+	SecondaryTextColor                     types.String                   `tfsdk:"secondary_text_color"`
+	SecondaryTextColorDarkMode             types.String                   `tfsdk:"secondary_text_color_dark_mode"`
+	ButtonBackgroundColor                  types.String                   `tfsdk:"button_background_color"`
+	ButtonBackgroundColorDarkMode          types.String                   `tfsdk:"button_background_color_dark_mode"`
+	ButtonTextColor                        types.String                   `tfsdk:"button_text_color"`
+	ButtonTextColorDarkMode                types.String                   `tfsdk:"button_text_color_dark_mode"`
+	DecimalPlaces                          types.Int64                    `tfsdk:"decimal_places"`
 }
 
 type StatusPageServiceGroupModel struct {
@@ -392,6 +398,24 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 				MarkdownDescription: "The time zone id of the status page",
 				Optional:            true,
 			},
+			"public_display_live_state_only": schema.BoolAttribute{
+				MarkdownDescription: "When true, the public page hides history, graphs, and uptime percentage and shows only the current operational state.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
+			},
+			"public_hide_incident_details": schema.BoolAttribute{
+				MarkdownDescription: "When true, the public page omits incident details and incident history.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
+			},
+			"public_hide_maintenances": schema.BoolAttribute{
+				MarkdownDescription: "When true, the public page hides scheduled and ongoing maintenances.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
+			},
 			"disable_public_subscription": schema.BoolAttribute{
 				MarkdownDescription: "The disable public subscription of the status page",
 				Required:            true,
@@ -455,6 +479,18 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 			"private_user_authentication_required": schema.BoolAttribute{
 				MarkdownDescription: "Require user authentication to access the status page. When enabled, users must be authenticated All Quiet users of your organization to view the status page. Private user authentication is not allowed for custom host settings (CNAME).",
 				Optional:            true,
+			},
+			"password_protection_password": schema.StringAttribute{
+				MarkdownDescription: "Password for public status page access (minimum 6 characters when non-empty). Omit to leave the current password unchanged on update. Use an empty string to clear password protection. The API does not return this value; it remains in Terraform state only.",
+				Optional:            true,
+				Sensitive:           true,
+				Validators: []validator.String{
+					statusPagePasswordProtectionPasswordValidator{},
+				},
+			},
+			"is_password_protection_configured": schema.BoolAttribute{
+				MarkdownDescription: "Whether password protection is configured for the public status page.",
+				Computed:            true,
 			},
 			"enable_sms_subscription": schema.BoolAttribute{
 				MarkdownDescription: "Enable SMS subscription for status page updates. Allows users to subscribe to status updates via SMS.",
@@ -685,6 +721,10 @@ func mapStatusPageResponseToModel(ctx context.Context, response *statusPageRespo
 	data.PublicSupportEmail = types.StringPointerValue(response.PublicSupportEmail)
 	data.HistoryInDays = types.Int64Value(response.HistoryInDays)
 	data.TimeZoneId = types.StringPointerValue(response.TimeZoneId)
+	data.PublicDisplayLiveStateOnly = types.BoolValue(response.PublicDisplayLiveStateOnly)
+	data.PublicHideIncidentDetails = types.BoolValue(response.PublicHideIncidentDetails)
+	data.PublicHideMaintenances = types.BoolValue(response.PublicHideMaintenances)
+	data.IsPasswordProtectionPasswordConfigured = types.BoolValue(response.IsPasswordProtectionPasswordConfigured)
 	data.DisablePublicSubscription = types.BoolValue(response.DisablePublicSubscription)
 	data.PublicSeverityMappingMinor = types.StringPointerValue(response.PublicSeverityMappingMinor)
 	data.PublicSeverityMappingWarning = types.StringPointerValue(response.PublicSeverityMappingWarning)
@@ -1004,4 +1044,31 @@ func mapSslToObject(ctx context.Context, ssl *customHostSettingsSsl) types.Objec
 
 	sslObj, _ := types.ObjectValue(sslAttrTypes, sslAttrValues)
 	return sslObj
+}
+
+type statusPagePasswordProtectionPasswordValidator struct{}
+
+func (v statusPagePasswordProtectionPasswordValidator) Description(_ context.Context) string {
+	return "If set, password must be at least 6 characters, or empty to clear protection on update."
+}
+
+func (v statusPagePasswordProtectionPasswordValidator) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (v statusPagePasswordProtectionPasswordValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		return
+	}
+	s := req.ConfigValue.ValueString()
+	if s == "" {
+		return
+	}
+	if utf8.RuneCountInString(s) < 6 {
+		resp.Diagnostics.AddAttributeError(
+			req.Path,
+			"Invalid password_protection_password",
+			"Password must be at least 6 characters when non-empty.",
+		)
+	}
 }
