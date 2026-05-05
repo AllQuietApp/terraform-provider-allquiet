@@ -6,10 +6,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -34,6 +36,8 @@ type UserIncidentNotificationSettings struct {
 type UserIncidentNotificationSettingsModel struct {
 	Id     types.String `tfsdk:"id"`
 	UserId types.String `tfsdk:"user_id"`
+
+	PhoneNumber types.String `tfsdk:"phone_number"`
 
 	ShouldSendSMS types.Bool  `tfsdk:"should_send_sms"`
 	DelayInMinSMS types.Int64 `tfsdk:"delay_in_min_sms"`
@@ -83,6 +87,18 @@ func (r *UserIncidentNotificationSettings) Schema(ctx context.Context, req resou
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{GuidValidator("user_id must be a valid UUID")},
+			},
+
+			"phone_number": schema.StringAttribute{
+				Optional: true,
+				MarkdownDescription: "Phone number used for SMS and voice notifications, in international format (for example `+12035479055`). " +
+					"Strict ownership: omitting this attribute clears the user's phone number on the backend. " +
+					"While this resource exists the user cannot change their phone number in the All Quiet UI.",
+				Validators: []validator.String{stringvalidator.RegexMatches(
+					regexp.MustCompile(`^\+\d+$`),
+					"must contain phone number in international format matching the pattern '^\\+\\d+$'",
+				)},
+				Sensitive: true,
 			},
 
 			"should_send_sms": schema.BoolAttribute{
@@ -289,6 +305,8 @@ func (r *UserIncidentNotificationSettings) ImportState(ctx context.Context, req 
 func mapUserIncidentNotificationSettingsResponseToModel(ctx context.Context, response *userIncidentNotificationSettingsResponse, data *UserIncidentNotificationSettingsModel) {
 	data.Id = types.StringValue(response.UserId)
 	data.UserId = types.StringValue(response.UserId)
+
+	data.PhoneNumber = types.StringPointerValue(response.PhoneNumber)
 
 	data.ShouldSendSMS = types.BoolPointerValue(response.ShouldSendSMS)
 	data.DelayInMinSMS = types.Int64PointerValue(response.DelayInMinSMS)

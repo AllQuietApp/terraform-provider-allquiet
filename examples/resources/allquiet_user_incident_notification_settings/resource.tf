@@ -6,6 +6,8 @@ resource "allquiet_user" "taylor" {
 resource "allquiet_user_incident_notification_settings" "taylor" {
   user_id = allquiet_user.taylor.id
 
+  phone_number = "+12035479055"
+
   should_send_sms  = true
   delay_in_min_sms = 5
   severities_sms   = ["Critical"]

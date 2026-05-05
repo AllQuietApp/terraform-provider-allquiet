@@ -16,7 +16,6 @@ The user resource represents a user in All Quiet. Users can be members of users 
 resource "allquiet_user" "millie_brown" {
   display_name = "Millie Bobby Brown"
   email        = "acceptance-tests+millie@allquiet.app"
-  phone_number = "+12035479055"
 }
 
 resource "allquiet_user" "taylor" {
@@ -24,7 +23,7 @@ resource "allquiet_user" "taylor" {
   email        = "acceptance-tests+taylor@allquiet.app"
 }
 
-# Incident notification settings have moved to the
+# Phone numbers and incident notification settings have moved to the
 # `allquiet_user_incident_notification_settings` resource. See its example for usage.
 ```
 
@@ -39,7 +38,7 @@ resource "allquiet_user" "taylor" {
 ### Optional
 
 - `incident_notification_settings` (Attributes, Deprecated) Deprecated: this attribute has been split out into the dedicated `allquiet_user_incident_notification_settings` resource. Setting it on `allquiet_user` is no longer supported and will result in a plan-time error. Existing data on the backend is preserved when you remove this block. (see [below for nested schema](#nestedatt--incident_notification_settings))
-- `phone_number` (String, Sensitive) The phone number of the user
+- `phone_number` (String, Sensitive, Deprecated) Deprecated: this attribute has moved to the dedicated `allquiet_user_incident_notification_settings` resource. Setting it on `allquiet_user` is no longer supported and will result in a plan-time error. Existing data on the backend is preserved when you remove this attribute.
 - `time_zone_id` (String) The timezone id, defaults to 'UTC' if not provided. Find all timezone ids [here](https://allquiet.app/api/public/v1/timezone)
 
 ### Read-Only

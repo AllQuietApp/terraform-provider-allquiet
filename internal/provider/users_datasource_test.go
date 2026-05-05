@@ -38,19 +38,16 @@ func testAccUsersDataSourceConfig(displayName, emailPrefix string) string {
 		resource "allquiet_user" "test1" {
 			display_name = "%[1]s 1"
 			email        = "%[2]s+1@allquiet.app"
-			phone_number = "+12035479051"
 		}
 
 		resource "allquiet_user" "test2" {
 			display_name = "%[1]s 2"
 			email        = "%[2]s+2@allquiet.app"
-			phone_number = "+12035479052"
 		}
 
 		resource "allquiet_user" "test3" {
 			display_name = "%[1]s 3"
 			email        = "%[2]s+3@allquiet.app"
-			phone_number = "+12035479053"
 		}
 
 		data "allquiet_users" "test_by_email" {

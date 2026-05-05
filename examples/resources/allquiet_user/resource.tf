@@ -1,7 +1,6 @@
 resource "allquiet_user" "millie_brown" {
   display_name = "Millie Bobby Brown"
   email        = "acceptance-tests+millie@allquiet.app"
-  phone_number = "+12035479055"
 }
 
 resource "allquiet_user" "taylor" {
@@ -9,5 +8,5 @@ resource "allquiet_user" "taylor" {
   email        = "acceptance-tests+taylor@allquiet.app"
 }
 
-# Incident notification settings have moved to the
+# Phone numbers and incident notification settings have moved to the
 # `allquiet_user_incident_notification_settings` resource. See its example for usage.

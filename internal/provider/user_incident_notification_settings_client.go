@@ -11,6 +11,8 @@ import (
 type userIncidentNotificationSettingsResponse struct {
 	UserId string `json:"userId"`
 
+	PhoneNumber *string `json:"phoneNumber"`
+
 	ShouldSendSMS *bool     `json:"shouldSendSMS"`
 	DelayInMinSMS *int64    `json:"delayInMinSMS"`
 	SeveritiesSMS *[]string `json:"severitiesSMS"`
@@ -34,6 +36,8 @@ type userIncidentNotificationSettingsResponse struct {
 }
 
 type userIncidentNotificationSettingsRequest struct {
+	PhoneNumber *string `json:"phoneNumber"`
+
 	ShouldSendSMS bool      `json:"shouldSendSMS"`
 	DelayInMinSMS int64     `json:"delayInMinSMS"`
 	SeveritiesSMS *[]string `json:"severitiesSMS"`
@@ -58,6 +62,8 @@ type userIncidentNotificationSettingsRequest struct {
 
 func mapUserIncidentNotificationSettingsRequest(plan *UserIncidentNotificationSettingsModel) *userIncidentNotificationSettingsRequest {
 	return &userIncidentNotificationSettingsRequest{
+		PhoneNumber: plan.PhoneNumber.ValueStringPointer(),
+
 		ShouldSendSMS: plan.ShouldSendSMS.ValueBool(),
 		DelayInMinSMS: plan.DelayInMinSMS.ValueInt64(),
 		SeveritiesSMS: ListToStringArray(plan.SeveritiesSMS),

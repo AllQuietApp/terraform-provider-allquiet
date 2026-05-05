@@ -79,7 +79,6 @@ func testAccUserResourceConfig(display_name string) string {
 resource "allquiet_user" "test" {
   display_name =  %[1]q
   email = "acceptance-tests+millie+%s@allquiet.app"
-  phone_number = "+12035479055"
 }
 
 `, display_name, uuid.New().String())
@@ -126,6 +125,25 @@ resource "allquiet_user" "test" {
 }
 `, uuid.New().String()),
 				ExpectError: regexp.MustCompile("incident_notification_settings on allquiet_user has been removed"),
+			},
+		},
+	})
+}
+
+func TestAccUserResourceRejectsInlinePhoneNumber(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "allquiet_user" "test" {
+  display_name = "Millie"
+  email        = "acceptance-tests+millie+%s@allquiet.app"
+  phone_number = "+12035479055"
+}
+`, uuid.New().String()),
+				ExpectError: regexp.MustCompile("phone_number on allquiet_user has been removed"),
 			},
 		},
 	})

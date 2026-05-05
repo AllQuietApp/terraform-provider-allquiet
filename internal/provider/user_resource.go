@@ -33,6 +33,12 @@ const userIncidentNotificationSettingsRemovalMessage = "incident_notification_se
 	"See https://registry.terraform.io/providers/AllQuietApp/allquiet/latest/docs/resources/user_incident_notification_settings " +
 	"for an example."
 
+const userPhoneNumberRemovalMessage = "phone_number on allquiet_user has been removed. " +
+	"It is now part of the dedicated allquiet_user_incident_notification_settings resource so SMS and voice notifications " +
+	"stay aligned with notification preferences. " +
+	"See https://registry.terraform.io/providers/AllQuietApp/allquiet/latest/docs/resources/user_incident_notification_settings " +
+	"for an example."
+
 func NewUser() resource.Resource {
 	return &User{}
 }
@@ -105,8 +111,11 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 				Sensitive: true,
 			},
 			"phone_number": schema.StringAttribute{
-				MarkdownDescription: "The phone number of the user",
-				Optional:            true,
+				MarkdownDescription: "Deprecated: this attribute has moved to the dedicated `allquiet_user_incident_notification_settings` resource. " +
+					"Setting it on `allquiet_user` is no longer supported and will result in a plan-time error. " +
+					"Existing data on the backend is preserved when you remove this attribute.",
+				DeprecationMessage: "Use the phone_number attribute on allquiet_user_incident_notification_settings instead.",
+				Optional:           true,
 				Validators: []validator.String{stringvalidator.RegexMatches(
 					regexp.MustCompile(`^\+\d+$`),
 					"must contain phone number in international format matching the pattern '^\\+\\d+$'",
@@ -245,6 +254,14 @@ func (r *User) ValidateConfig(ctx context.Context, req resource.ValidateConfigRe
 			userIncidentNotificationSettingsRemovalMessage,
 		)
 	}
+
+	if !data.PhoneNumber.IsNull() && !data.PhoneNumber.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("phone_number"),
+			"phone_number is no longer supported on allquiet_user",
+			userPhoneNumberRemovalMessage,
+		)
+	}
 }
 
 func (r *User) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -367,11 +384,11 @@ func mapUserResponseToModel(ctx context.Context, response *userResponse, data *U
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.Email = types.StringValue(response.Email)
-	data.PhoneNumber = types.StringPointerValue(response.PhoneNumber)
 	data.TimeZoneId = types.StringValue(response.TimeZoneId)
 
-	// Notification settings are no longer tracked on the user resource. They are owned by
-	// the dedicated allquiet_user_incident_notification_settings resource. We deliberately
-	// drop the field so existing state rolls forward to null on the next refresh/apply.
+	// Phone number and notification settings are owned by the dedicated
+	// allquiet_user_incident_notification_settings resource. Drop them from the
+	// user model so existing state rolls forward to null on the next refresh/apply.
+	data.PhoneNumber = types.StringNull()
 	data.IncidentNotificationSettings = nil
 }

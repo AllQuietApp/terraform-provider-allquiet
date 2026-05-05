@@ -45,6 +45,40 @@ func TestAccUserIncidentNotificationSettingsResource(t *testing.T) {
 	})
 }
 
+func TestAccUserIncidentNotificationSettingsResourcePhoneNumberLifecycle(t *testing.T) {
+	emailToken := uuid.New().String()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccUserIncidentNotificationSettingsResourceConfigWithPhone(emailToken, "+12035479055"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_user_incident_notification_settings.test", "phone_number", "+12035479055"),
+				),
+			},
+			{
+				ResourceName:      "allquiet_user_incident_notification_settings.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccUserIncidentNotificationSettingsResourceConfigWithPhone(emailToken, "+12035550199"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_user_incident_notification_settings.test", "phone_number", "+12035550199"),
+				),
+			},
+			{
+				Config: testAccUserIncidentNotificationSettingsResourceConfigWithoutPhone(emailToken),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckNoResourceAttr("allquiet_user_incident_notification_settings.test", "phone_number"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccUserIncidentNotificationSettingsResourceExample(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -54,6 +88,7 @@ func TestAccUserIncidentNotificationSettingsResourceExample(t *testing.T) {
 				Config: testAccUserIncidentNotificationSettingsResourceExample(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("allquiet_user_incident_notification_settings.taylor", "user_id"),
+					resource.TestCheckResourceAttr("allquiet_user_incident_notification_settings.taylor", "phone_number", "+12035479055"),
 					resource.TestCheckResourceAttr("allquiet_user_incident_notification_settings.billie_eilish", "disabled_intents_sms.#", "1"),
 					resource.TestCheckResourceAttr("allquiet_user_incident_notification_settings.billie_eilish", "disabled_intents_sms.0", "Resolved"),
 					resource.TestCheckResourceAttr("allquiet_user_incident_notification_settings.billie_eilish", "disabled_intents_voice.#", "1"),
@@ -106,6 +141,66 @@ resource "allquiet_user_incident_notification_settings" "test" {
   severities_email   = ["Critical", "Warning", "Minor"]
 }
 `, uuid.New().String(), shouldSendSMS, delayInMinSMS, severitiesList)
+}
+
+func testAccUserIncidentNotificationSettingsResourceConfigWithPhone(emailToken, phoneNumber string) string {
+	return fmt.Sprintf(`
+resource "allquiet_user" "test" {
+  display_name = "Acceptance Tests"
+  email        = "acceptance-tests+notification-settings+%s@allquiet.app"
+}
+
+resource "allquiet_user_incident_notification_settings" "test" {
+  user_id = allquiet_user.test.id
+
+  phone_number = %q
+
+  should_send_sms  = true
+  delay_in_min_sms = 5
+  severities_sms   = ["Critical"]
+
+  should_call_voice  = false
+  delay_in_min_voice = 0
+  severities_voice   = []
+
+  should_send_push  = true
+  delay_in_min_push = 0
+  severities_push   = ["Critical", "Warning"]
+
+  should_send_email  = true
+  delay_in_min_email = 0
+  severities_email   = ["Critical", "Warning", "Minor"]
+}
+`, emailToken, phoneNumber)
+}
+
+func testAccUserIncidentNotificationSettingsResourceConfigWithoutPhone(emailToken string) string {
+	return fmt.Sprintf(`
+resource "allquiet_user" "test" {
+  display_name = "Acceptance Tests"
+  email        = "acceptance-tests+notification-settings+%s@allquiet.app"
+}
+
+resource "allquiet_user_incident_notification_settings" "test" {
+  user_id = allquiet_user.test.id
+
+  should_send_sms  = true
+  delay_in_min_sms = 5
+  severities_sms   = ["Critical"]
+
+  should_call_voice  = false
+  delay_in_min_voice = 0
+  severities_voice   = []
+
+  should_send_push  = true
+  delay_in_min_push = 0
+  severities_push   = ["Critical", "Warning"]
+
+  should_send_email  = true
+  delay_in_min_email = 0
+  severities_email   = ["Critical", "Warning", "Minor"]
+}
+`, emailToken)
 }
 
 func testAccUserIncidentNotificationSettingsResourceExample() string {

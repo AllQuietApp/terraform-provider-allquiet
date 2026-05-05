@@ -53,7 +53,6 @@ func testAccUserDataSourceConfig(displayName, email string) string {
 		resource "allquiet_user" "test" {
 			display_name = %[1]q
 			email        = %[2]q
-			phone_number = "+12035479055"
 		}
 
 		data "allquiet_user" "test_by_email" {

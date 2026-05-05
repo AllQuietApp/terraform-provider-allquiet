@@ -21,6 +21,8 @@ resource "allquiet_user" "taylor" {
 resource "allquiet_user_incident_notification_settings" "taylor" {
   user_id = allquiet_user.taylor.id
 
+  phone_number = "+12035479055"
+
   should_send_sms  = true
   delay_in_min_sms = 5
   severities_sms   = ["Critical"]
@@ -91,6 +93,7 @@ resource "allquiet_user_incident_notification_settings" "billie_eilish" {
 - `disabled_intents_push` (List of String) Disabled intents for Push notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
 - `disabled_intents_sms` (List of String) Disabled intents for SMS notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
 - `disabled_intents_voice` (List of String) Disabled intents for Voice Call notifications. Possible values are: Resolved, Investigated, Escalated, Commented, Unresolved, Assigned, Affects, Forwarded, Archived, Unarchived, Created, Deleted, Updated, Snoozed, Unsnoozed
+- `phone_number` (String, Sensitive) Phone number used for SMS and voice notifications, in international format (for example `+12035479055`). Strict ownership: omitting this attribute clears the user's phone number on the backend. While this resource exists the user cannot change their phone number in the All Quiet UI.
 
 ### Read-Only
 

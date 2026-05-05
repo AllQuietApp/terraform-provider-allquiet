@@ -41,17 +41,15 @@ type incidentNotificationSettingsResponse struct {
 }
 
 type userCreateRequest struct {
-	DisplayName string  `json:"displayName"`
-	Email       string  `json:"email"`
-	PhoneNumber *string `json:"phoneNumber"`
-	TimeZoneId  string  `json:"timeZoneId"`
+	DisplayName string `json:"displayName"`
+	Email       string `json:"email"`
+	TimeZoneId  string `json:"timeZoneId"`
 }
 
 func mapUserCreateRequest(plan *UserModel) *userCreateRequest {
 	return &userCreateRequest{
 		DisplayName: plan.DisplayName.ValueString(),
 		Email:       plan.Email.ValueString(),
-		PhoneNumber: plan.PhoneNumber.ValueStringPointer(),
 		TimeZoneId:  plan.TimeZoneId.ValueString(),
 	}
 }
