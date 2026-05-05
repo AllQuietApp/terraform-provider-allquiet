@@ -9,46 +9,50 @@ import (
 )
 
 type statusPageResponse struct {
-	Id                                string
-	DisplayName                       string
-	PublicTitle                       string
-	PublicDescription                 *string
-	Slug                              *string
-	ServiceIds                        *[]string
-	PublicCompanyUrl                  *string
-	PublicCompanyName                 *string
-	PublicSupportUrl                  *string
-	PublicSupportEmail                *string
-	HistoryInDays                     int64
-	TimeZoneId                        *string
-	DisablePublicSubscription         bool
-	PublicSeverityMappingMinor        *string
-	PublicSeverityMappingWarning      *string
-	PublicSeverityMappingCritical     *string
-	BannerBackgroundColor             *string
-	BannerBackgroundColorDarkMode     *string
-	BannerTextColor                   *string
-	BannerTextColorDarkMode           *string
-	CustomHostSettings                *customHostSettingsResponse
-	ServiceGroups                     *[]statusPageServiceGroupResponse
-	DisablePublicPage                 *bool
-	DisablePublicJson                 *bool
-	PrivateIpFilter                   *string
-	PrivateUserAuthenticationRequired *bool
-	EnableSMSSubscription             *bool
-	BodyBackgroundColor               *string
-	BodyBackgroundColorDarkMode       *string
-	SecondaryBackgroundColor          *string
-	SecondaryBackgroundColorDarkMode  *string
-	PrimaryTextColor                  *string
-	PrimaryTextColorDarkMode          *string
-	SecondaryTextColor                *string
-	SecondaryTextColorDarkMode        *string
-	ButtonBackgroundColor             *string
-	ButtonBackgroundColorDarkMode     *string
-	ButtonTextColor                   *string
-	ButtonTextColorDarkMode           *string
-	DecimalPlaces                     *int64
+	Id                                     string
+	DisplayName                            string
+	PublicTitle                            string
+	PublicDescription                      *string
+	Slug                                   *string
+	ServiceIds                             *[]string
+	PublicCompanyUrl                       *string
+	PublicCompanyName                      *string
+	PublicSupportUrl                       *string
+	PublicSupportEmail                     *string
+	HistoryInDays                          int64
+	TimeZoneId                             *string
+	DisablePublicSubscription              bool
+	PublicSeverityMappingMinor             *string
+	PublicSeverityMappingWarning           *string
+	PublicSeverityMappingCritical          *string
+	BannerBackgroundColor                  *string
+	BannerBackgroundColorDarkMode          *string
+	BannerTextColor                        *string
+	BannerTextColorDarkMode                *string
+	CustomHostSettings                     *customHostSettingsResponse
+	ServiceGroups                          *[]statusPageServiceGroupResponse
+	DisablePublicPage                      *bool
+	DisablePublicJson                      *bool
+	PrivateIpFilter                        *string
+	PrivateUserAuthenticationRequired      *bool
+	EnableSMSSubscription                  *bool
+	BodyBackgroundColor                    *string
+	BodyBackgroundColorDarkMode            *string
+	SecondaryBackgroundColor               *string
+	SecondaryBackgroundColorDarkMode       *string
+	PrimaryTextColor                       *string
+	PrimaryTextColorDarkMode               *string
+	SecondaryTextColor                     *string
+	SecondaryTextColorDarkMode             *string
+	ButtonBackgroundColor                  *string
+	ButtonBackgroundColorDarkMode          *string
+	ButtonTextColor                        *string
+	ButtonTextColorDarkMode                *string
+	DecimalPlaces                          *int64
+	PublicDisplayLiveStateOnly             bool
+	PublicHideIncidentDetails              bool
+	PublicHideMaintenances                 bool
+	IsPasswordProtectionPasswordConfigured bool
 }
 
 type statusPageServiceGroupResponse struct {
@@ -159,6 +163,10 @@ type statusPageCreateRequest struct {
 	ButtonTextColor                   *string                          `json:"buttonTextColor"`
 	ButtonTextColorDarkMode           *string                          `json:"buttonTextColorDarkMode"`
 	DecimalPlaces                     *int64                           `json:"decimalPlaces"`
+	PublicDisplayLiveStateOnly        bool                             `json:"publicDisplayLiveStateOnly"`
+	PublicHideIncidentDetails         bool                             `json:"publicHideIncidentDetails"`
+	PublicHideMaintenances            bool                             `json:"publicHideMaintenances"`
+	PasswordProtectionPassword        *string                          `json:"passwordProtectionPassword,omitempty"`
 }
 
 type customHostSettingsRequest struct {
@@ -206,7 +214,19 @@ func mapStatusPageCreateRequest(plan *StatusPageModel) *statusPageCreateRequest 
 		ButtonTextColor:                   plan.ButtonTextColor.ValueStringPointer(),
 		ButtonTextColorDarkMode:           plan.ButtonTextColorDarkMode.ValueStringPointer(),
 		DecimalPlaces:                     plan.DecimalPlaces.ValueInt64Pointer(),
+		PublicDisplayLiveStateOnly:        plan.PublicDisplayLiveStateOnly.ValueBool(),
+		PublicHideIncidentDetails:         plan.PublicHideIncidentDetails.ValueBool(),
+		PublicHideMaintenances:            plan.PublicHideMaintenances.ValueBool(),
+		PasswordProtectionPassword:        passwordProtectionPasswordForAPI(plan),
 	}
+}
+
+func passwordProtectionPasswordForAPI(plan *StatusPageModel) *string {
+	if plan.PasswordProtectionPassword.IsNull() || plan.PasswordProtectionPassword.IsUnknown() {
+		return nil
+	}
+	s := plan.PasswordProtectionPassword.ValueString()
+	return &s
 }
 
 func mapStatusPageServiceGroupsRequestToModel(plan *[]StatusPageServiceGroupModel) *[]statusPageServiceGroupRequest {
