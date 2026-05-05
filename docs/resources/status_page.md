@@ -192,6 +192,7 @@ resource "allquiet_status_page" "private_status_page" {
 - `disable_public_json` (Boolean) Disable public access to the status page JSON API. When enabled, the JSON API endpoint will not be publicly accessible.
 - `disable_public_page` (Boolean) Disable public access to the status page. When enabled, the status page will not be publicly accessible.
 - `enable_sms_subscription` (Boolean) Enable SMS subscription for status page updates. Allows users to subscribe to status updates via SMS.
+- `password_protection_password` (String, Sensitive) Password for public status page access (minimum 6 characters when non-empty). Omit to leave the current password unchanged on update. Use an empty string to clear password protection. The API does not return this value; it remains in Terraform state only.
 - `primary_text_color` (String) The primary text color of the status page. Must be a valid hex color.
 - `primary_text_color_dark_mode` (String) The primary text color dark mode of the status page. Must be a valid hex color.
 - `private_ip_filter` (String) Private IP filter (CIDR format) to restrict access to the status page. Only IPs matching the filter will be able to access the page.
@@ -199,6 +200,9 @@ resource "allquiet_status_page" "private_status_page" {
 - `public_company_name` (String) The public company name of the status page
 - `public_company_url` (String) The public company url of the status page
 - `public_description` (String) The public description of the status page
+- `public_display_live_state_only` (Boolean) When true, the public page hides history, graphs, and uptime percentage and shows only the current operational state.
+- `public_hide_incident_details` (Boolean) When true, the public page omits incident details and incident history.
+- `public_hide_maintenances` (Boolean) When true, the public page hides scheduled and ongoing maintenances.
 - `public_severity_mapping_critical` (String) The public severity mapping critical of the status page
 - `public_severity_mapping_minor` (String) The public severity mapping minor of the status page
 - `public_severity_mapping_warning` (String) The public severity mapping warning of the status page
@@ -216,6 +220,7 @@ resource "allquiet_status_page" "private_status_page" {
 ### Read-Only
 
 - `id` (String) Id
+- `is_password_protection_configured` (Boolean) Whether password protection is configured for the public status page.
 
 <a id="nestedatt--custom_host_settings"></a>
 ### Nested Schema for `custom_host_settings`
