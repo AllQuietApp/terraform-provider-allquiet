@@ -11,6 +11,7 @@ import (
 
 type AuthTransport struct {
 	APIKey    string
+	UserAgent string
 	Transport http.RoundTripper
 	BasicAuth *BasicAuth
 }
@@ -26,6 +27,10 @@ func (t *AuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		req.SetBasicAuth(t.BasicAuth.Username, t.BasicAuth.Password)
 	}
 
+	if t.UserAgent != "" {
+		req.Header.Set("User-Agent", t.UserAgent)
+	}
+
 	req.Header.Add("X-Authorization", t.APIKey)
 	return t.Transport.RoundTrip(req)
 }
@@ -36,18 +41,26 @@ type AllQuietAPIClient struct {
 	HTTPClient  *http.Client
 }
 
-func NewAllQuietAPIClient(apiKey, endpointURL string, basicAuth *BasicAuth) *AllQuietAPIClient {
+func NewAllQuietAPIClient(apiKey, endpointURL string, basicAuth *BasicAuth, providerVersion string) *AllQuietAPIClient {
 	return &AllQuietAPIClient{
 		APIKey:      apiKey,
 		EndpointURL: endpointURL,
 		HTTPClient: &http.Client{
 			Transport: &AuthTransport{
 				APIKey:    apiKey,
+				UserAgent: providerHTTPUserAgent(providerVersion),
 				Transport: http.DefaultTransport,
 				BasicAuth: basicAuth,
 			},
 		},
 	}
+}
+
+func providerHTTPUserAgent(version string) string {
+	if version == "" {
+		version = "unknown"
+	}
+	return "terraform-provider-allquiet/" + version
 }
 
 // newRequest creates a new HTTP request with the base URL and provided path.
