@@ -130,7 +130,7 @@ func (p *AllQuietProvider) Configure(ctx context.Context, req provider.Configure
 		return
 	}
 
-	client := NewAllQuietAPIClient(apiKey, endpoint, basicAuth)
+	client := NewAllQuietAPIClient(apiKey, endpoint, basicAuth, p.version)
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
