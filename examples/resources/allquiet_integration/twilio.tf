@@ -20,8 +20,8 @@ resource "allquiet_integration" "twilio_call_routing" {
         route = {
           team_id = allquiet_team.on_call.id
           voicemail_message = {
-            type = "Text"
-            text = "Please leave a message after the tone."
+            type   = "Text"
+            text   = "Please leave a message after the tone."
             locale = "en-US"
           }
         }

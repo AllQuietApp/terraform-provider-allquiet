@@ -258,6 +258,7 @@ Optional:
 - `heartbeat_monitor` (Attributes) The heartbeat monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--heartbeat_monitor))
 - `http_monitoring` (Attributes) The http monitoring of the integration (see [below for nested schema](#nestedatt--integration_settings--http_monitoring))
 - `ping_monitor` (Attributes) The ping monitor of the integration (see [below for nested schema](#nestedatt--integration_settings--ping_monitor))
+- `twilio` (Attributes) Twilio call routing integration settings (see [below for nested schema](#nestedatt--integration_settings--twilio))
 
 <a id="nestedatt--integration_settings--cronjob_monitor"></a>
 ### Nested Schema for `integration_settings.cronjob_monitor`
@@ -339,6 +340,286 @@ Optional:
 - `max_retries` (Number) The max retries of the ping monitor
 - `severity_degraded` (String) The severity degraded of the ping monitor. Possible values are: Critical, Warning, Minor
 - `severity_down` (String) The severity down of the ping monitor. Possible values are: Critical, Warning, Minor
+
+
+<a id="nestedatt--integration_settings--twilio"></a>
+### Nested Schema for `integration_settings.twilio`
+
+Optional:
+
+- `access_settings` (Attributes) Twilio account credentials and inbound phone number (see [below for nested schema](#nestedatt--integration_settings--twilio--access_settings))
+- `call_flow_config` (Attributes) Inbound call routing flow configuration (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config))
+
+<a id="nestedatt--integration_settings--twilio--access_settings"></a>
+### Nested Schema for `integration_settings.twilio.access_settings`
+
+Required:
+
+- `account_sid` (String, Sensitive) Twilio account SID
+- `auth_token` (String, Sensitive) Twilio auth token
+- `phone_number` (String) Inbound phone number in E.164 format
+
+Optional:
+
+- `api_base_domain` (String) Twilio API base domain
+- `phone_number_sid` (String, Sensitive) Twilio phone number SID
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config`
+
+Optional:
+
+- `attach_voicemail_transcript` (Boolean) Attach voicemail transcript to incidents
+- `call_display_mode` (String) Caller ID display mode. Possible values: ShowCallerNumber, ShowInboundNumber
+- `caller_allowlist` (List of String) Phone numbers or country prefixes allowed to call (E.164, e.g. +14155552671 or +1)
+- `caller_blocklist` (List of String) Phone numbers or country prefixes blocked from calling (E.164)
+- `menu` (Attributes) IVR menu configuration (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu))
+- `route` (Attributes) Default route when no menu is configured or after menu selection (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--route))
+- `welcome_message` (Attributes) Welcome message played at the start of the call (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--welcome_message))
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu`
+
+Optional:
+
+- `menu_gather_timeout_seconds` (Number) Seconds to wait for menu input (3-60)
+- `menu_max_attempts` (Number) Maximum menu input attempts (1-5)
+- `options` (Attributes List) Menu options (max 9) (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options))
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options`
+
+Required:
+
+- `key` (String) DTMF key (0-9)
+- `route` (Attributes) Route for this menu option (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options--route))
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options--route"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options.route`
+
+Optional:
+
+- `accept_call_prompt` (Attributes) Prompt played when dialing on-call users (text only) (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--accept_call_prompt))
+- `auto_resolve_on_answer` (Boolean) Auto-resolve incident when call is answered
+- `closing_message` (Attributes) Closing message after voicemail (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--closing_message))
+- `dial_timeout_per_user_in_seconds` (Number) Dial timeout per user in seconds (5-120)
+- `direct_voicemail` (Boolean) Send callers directly to voicemail
+- `incident_severity` (String) Incident severity for routed calls. Possible values: Critical, Warning, Minor
+- `max_users_to_try` (Number) Maximum on-call users to try (1-10)
+- `send_to_voicemail_if_no_response` (Boolean) Send to voicemail if on-call users do not answer
+- `skip_already_dialed_numbers` (Boolean) Skip phone numbers already dialed in this session
+- `target_confirm_gather_timeout_seconds` (Number) Seconds to wait for accept-call confirmation (3-60)
+- `target_confirm_max_attempts` (Number) Maximum accept-call confirmation attempts (1-5)
+- `team_id` (String) Team to route calls to
+- `voicemail_message` (Attributes) Voicemail greeting message (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--voicemail_message))
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--accept_call_prompt"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options.route.accept_call_prompt`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--closing_message"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options.route.closing_message`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `audio_file` (Attributes) Uploaded audio file when type is Audio (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--closing_message--audio_file))
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--closing_message--audio_file"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options.route.closing_message.audio_file`
+
+Required:
+
+- `source` (String) Local path to MP3 or WAV file to upload
+
+Read-Only:
+
+- `content_type` (String) Uploaded content type
+- `file_name` (String) Original file name
+- `file_size_bytes` (Number) Uploaded file size in bytes
+- `object_key` (String) S3 object key for the uploaded audio
+- `source_hash` (String) SHA-256 hash of the source file content
+
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--voicemail_message"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options.route.voicemail_message`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `audio_file` (Attributes) Uploaded audio file when type is Audio (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--voicemail_message--audio_file))
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--menu--options--route--voicemail_message--audio_file"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.menu.options.route.voicemail_message.audio_file`
+
+Required:
+
+- `source` (String) Local path to MP3 or WAV file to upload
+
+Read-Only:
+
+- `content_type` (String) Uploaded content type
+- `file_name` (String) Original file name
+- `file_size_bytes` (Number) Uploaded file size in bytes
+- `object_key` (String) S3 object key for the uploaded audio
+- `source_hash` (String) SHA-256 hash of the source file content
+
+
+
+
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--route"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.route`
+
+Optional:
+
+- `accept_call_prompt` (Attributes) Prompt played when dialing on-call users (text only) (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--route--accept_call_prompt))
+- `auto_resolve_on_answer` (Boolean) Auto-resolve incident when call is answered
+- `closing_message` (Attributes) Closing message after voicemail (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--route--closing_message))
+- `dial_timeout_per_user_in_seconds` (Number) Dial timeout per user in seconds (5-120)
+- `direct_voicemail` (Boolean) Send callers directly to voicemail
+- `incident_severity` (String) Incident severity for routed calls. Possible values: Critical, Warning, Minor
+- `max_users_to_try` (Number) Maximum on-call users to try (1-10)
+- `send_to_voicemail_if_no_response` (Boolean) Send to voicemail if on-call users do not answer
+- `skip_already_dialed_numbers` (Boolean) Skip phone numbers already dialed in this session
+- `target_confirm_gather_timeout_seconds` (Number) Seconds to wait for accept-call confirmation (3-60)
+- `target_confirm_max_attempts` (Number) Maximum accept-call confirmation attempts (1-5)
+- `team_id` (String) Team to route calls to
+- `voicemail_message` (Attributes) Voicemail greeting message (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--route--voicemail_message))
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--route--accept_call_prompt"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.route.accept_call_prompt`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--route--closing_message"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.route.closing_message`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `audio_file` (Attributes) Uploaded audio file when type is Audio (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--route--closing_message--audio_file))
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--route--closing_message--audio_file"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.route.closing_message.audio_file`
+
+Required:
+
+- `source` (String) Local path to MP3 or WAV file to upload
+
+Read-Only:
+
+- `content_type` (String) Uploaded content type
+- `file_name` (String) Original file name
+- `file_size_bytes` (Number) Uploaded file size in bytes
+- `object_key` (String) S3 object key for the uploaded audio
+- `source_hash` (String) SHA-256 hash of the source file content
+
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--route--voicemail_message"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.route.voicemail_message`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `audio_file` (Attributes) Uploaded audio file when type is Audio (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--route--voicemail_message--audio_file))
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--route--voicemail_message--audio_file"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.route.voicemail_message.audio_file`
+
+Required:
+
+- `source` (String) Local path to MP3 or WAV file to upload
+
+Read-Only:
+
+- `content_type` (String) Uploaded content type
+- `file_name` (String) Original file name
+- `file_size_bytes` (Number) Uploaded file size in bytes
+- `object_key` (String) S3 object key for the uploaded audio
+- `source_hash` (String) SHA-256 hash of the source file content
+
+
+
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--welcome_message"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.welcome_message`
+
+Required:
+
+- `type` (String) Prompt type: Text or Audio
+
+Optional:
+
+- `audio_file` (Attributes) Uploaded audio file when type is Audio (see [below for nested schema](#nestedatt--integration_settings--twilio--call_flow_config--welcome_message--audio_file))
+- `locale` (String) Voice locale for text prompts (see call-routing-options API)
+- `text` (String) Text-to-speech content when type is Text
+- `voice` (String) Voice name for text prompts
+
+<a id="nestedatt--integration_settings--twilio--call_flow_config--welcome_message--audio_file"></a>
+### Nested Schema for `integration_settings.twilio.call_flow_config.welcome_message.audio_file`
+
+Required:
+
+- `source` (String) Local path to MP3 or WAV file to upload
+
+Read-Only:
+
+- `content_type` (String) Uploaded content type
+- `file_name` (String) Original file name
+- `file_size_bytes` (Number) Uploaded file size in bytes
+- `object_key` (String) S3 object key for the uploaded audio
+- `source_hash` (String) SHA-256 hash of the source file content
+
+
+
 
 
 
