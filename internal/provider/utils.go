@@ -263,6 +263,18 @@ func SeverityValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidSeverities...)
 }
 
+var ValidCallDisplayModes = []string{"ShowCallerNumber", "ShowInboundNumber"}
+
+func CallDisplayModeValidator(message string) validator.String {
+	return stringvalidator.OneOf(ValidCallDisplayModes...)
+}
+
+var ValidPromptTypes = []string{"Text", "Audio"}
+
+func PromptTypeValidator(message string) validator.String {
+	return stringvalidator.OneOf(ValidPromptTypes...)
+}
+
 var ValidStatuses = []string{"Open", "Resolved"}
 
 func StatusValidator(message string) validator.String {

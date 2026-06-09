@@ -57,6 +57,7 @@ type IntegrationSettingsModel struct {
 	CronjobMonitor   *CronjobMonitorModel   `tfsdk:"cronjob_monitor"`
 	PingMonitor      *PingMonitorModel      `tfsdk:"ping_monitor"`
 	Email            *EmailSettingsModel    `tfsdk:"email"`
+	Twilio           *TwilioSettingsModel   `tfsdk:"twilio"`
 }
 
 type HttpMonitoringModel struct {
@@ -496,6 +497,11 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 							},
 						},
 					},
+					"twilio": schema.SingleNestedAttribute{
+						MarkdownDescription: "Twilio call routing integration settings",
+						Optional:            true,
+						Attributes:          twilioIntegrationSettingsSchemaAttributes(),
+					},
 				},
 			},
 		},
@@ -537,7 +543,22 @@ func (r *Integration) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	mapIntegrationResponseToModel(ctx, integrationResponse, &data)
+	data.Id = types.StringValue(integrationResponse.Id)
+
+	if data.IntegrationSettings != nil && twilioSettingsNeedsAudioUpload(data.IntegrationSettings.Twilio) {
+		if err := uploadChangedTwilioAudio(ctx, r.client, integrationResponse.Id, data.IntegrationSettings.Twilio); err != nil {
+			resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to upload call routing audio, got error: %s", err))
+			return
+		}
+
+		integrationResponse, err = r.client.UpdateIntegrationResource(ctx, integrationResponse.Id, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update integration with uploaded audio, got error: %s", err))
+			return
+		}
+	}
+
+	mapIntegrationResponseToModel(ctx, integrationResponse, &data, data.IntegrationSettings)
 
 	tflog.Trace(ctx, "created integration resource")
 
@@ -565,7 +586,8 @@ func (r *Integration) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	mapIntegrationResponseToModel(ctx, integrationResponse, &data)
+	priorSettings := data.IntegrationSettings
+	mapIntegrationResponseToModel(ctx, integrationResponse, &data, priorSettings)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -580,13 +602,20 @@ func (r *Integration) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
+	if data.IntegrationSettings != nil && data.IntegrationSettings.Twilio != nil {
+		if err := uploadChangedTwilioAudio(ctx, r.client, data.Id.ValueString(), data.IntegrationSettings.Twilio); err != nil {
+			resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to upload call routing audio, got error: %s", err))
+			return
+		}
+	}
+
 	integrationResponse, err := r.client.UpdateIntegrationResource(ctx, data.Id.ValueString(), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update integration resource, got error: %s", err))
 		return
 	}
 
-	mapIntegrationResponseToModel(ctx, integrationResponse, &data)
+	mapIntegrationResponseToModel(ctx, integrationResponse, &data, data.IntegrationSettings)
 
 	tflog.Trace(ctx, "updated integration resource")
 
@@ -618,7 +647,7 @@ func (r *Integration) ImportState(ctx context.Context, req resource.ImportStateR
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapIntegrationResponseToModel(ctx context.Context, response *integrationResponse, data *IntegrationModel) {
+func mapIntegrationResponseToModel(ctx context.Context, response *integrationResponse, data *IntegrationModel, priorSettings *IntegrationSettingsModel) {
 
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
@@ -630,20 +659,25 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
 	data.WebhookAuthentication = mapWebhookAuthenticationResponseToModel(response.WebhookAuthentication)
-	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(ctx, response.IntegrationSettings)
+	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(ctx, response.IntegrationSettings, priorSettings)
 }
 
-func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integrationSettingsResponse) *IntegrationSettingsModel {
+func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integrationSettingsResponse, priorSettings *IntegrationSettingsModel) *IntegrationSettingsModel {
 	if response == nil {
 		return nil
 	}
 
-	// Check if all fields are nil - if so, return nil
+	var priorTwilio *TwilioSettingsModel
+	if priorSettings != nil {
+		priorTwilio = priorSettings.Twilio
+	}
+
 	if response.HttpMonitoring == nil &&
 		response.HeartbeatMonitor == nil &&
 		response.CronjobMonitor == nil &&
 		response.PingMonitor == nil &&
-		response.Email == nil {
+		response.Email == nil &&
+		response.Twilio == nil {
 		return nil
 	}
 
@@ -653,6 +687,7 @@ func mapIntegrationSettingsResponseToModel(ctx context.Context, response *integr
 		CronjobMonitor:   mapCronjobMonitorResponseToModel(response.CronjobMonitor),
 		PingMonitor:      mapPingMonitorResponseToModel(response.PingMonitor),
 		Email:            mapEmailResponseToModel(ctx, response.Email),
+		Twilio:           mapTwilioResponseToModel(ctx, response.Twilio, priorTwilio),
 	}
 }
 

@@ -400,3 +400,81 @@ func replaceEmailAliases(str string) string {
 	}
 
 }
+
+func TestAccIntegrationResourceTwilio(t *testing.T) {
+	accountSid := os.Getenv("ALLQUIET_TWILIO_ACCOUNT_SID")
+	authToken := os.Getenv("ALLQUIET_TWILIO_AUTH_TOKEN")
+	phoneNumber := os.Getenv("ALLQUIET_TWILIO_PHONE_NUMBER")
+	welcomeAudioPath := os.Getenv("ALLQUIET_TWILIO_WELCOME_AUDIO_PATH")
+	if accountSid == "" || authToken == "" || phoneNumber == "" {
+		t.Skip("Skipping Twilio acceptance test: set ALLQUIET_TWILIO_ACCOUNT_SID, ALLQUIET_TWILIO_AUTH_TOKEN, and ALLQUIET_TWILIO_PHONE_NUMBER")
+	}
+	if welcomeAudioPath == "" {
+		welcomeAudioPath = "/Users/madsquist/Downloads/Max Welcome.mp3"
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccIntegrationResourceTwilioConfig(accountSid, authToken, phoneNumber, welcomeAudioPath),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_integration.twilio", "type", "Twilio"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.twilio", "integration_settings.twilio.access_settings.api_base_domain"),
+					resource.TestCheckResourceAttr("allquiet_integration.twilio", "integration_settings.twilio.call_flow_config.welcome_message.type", "Audio"),
+					resource.TestCheckResourceAttrSet("allquiet_integration.twilio", "integration_settings.twilio.call_flow_config.welcome_message.audio_file.object_key"),
+				),
+			},
+			{
+				ResourceName:      "allquiet_integration.twilio",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"integration_settings.twilio.access_settings.auth_token",
+					"integration_settings.twilio.call_flow_config.welcome_message.audio_file.source",
+				},
+			},
+		},
+	})
+}
+
+func testAccIntegrationResourceTwilioConfig(accountSid, authToken, phoneNumber, welcomeAudioPath string) string {
+	return fmt.Sprintf(`
+resource "allquiet_team" "twilio" {
+  display_name = "Twilio Call Routing"
+}
+
+resource "allquiet_integration" "twilio" {
+  display_name = "Twilio inbound number"
+  team_id      = allquiet_team.twilio.id
+  type         = "Twilio"
+
+  integration_settings = {
+    twilio = {
+      access_settings = {
+        account_sid  = %[1]q
+        auth_token   = %[2]q
+        phone_number = %[3]q
+      }
+      call_flow_config = {
+        welcome_message = {
+          type = "Audio"
+          audio_file = {
+            source = %[4]q
+          }
+        }
+        route = {
+          team_id = allquiet_team.twilio.id
+          voicemail_message = {
+            type = "Text"
+            text = "Please leave a message after the tone."
+            locale = "en-US"
+          }
+        }
+      }
+    }
+  }
+}
+`, accountSid, authToken, phoneNumber, welcomeAudioPath)
+}

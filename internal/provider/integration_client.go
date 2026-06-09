@@ -51,6 +51,7 @@ type integrationSettingsResponse struct {
 	CronjobMonitor   *cronjobMonitorResponse   `json:"cronjobMonitor"`
 	PingMonitor      *pingMonitorResponse      `json:"pingMonitor"`
 	Email            *emailResponse            `json:"email"`
+	Twilio           *twilioSettingsResponse   `json:"twilio"`
 }
 
 type emailResponse struct {
@@ -142,6 +143,7 @@ func mapIntegrationSettingsCreateRequest(plan *IntegrationSettingsModel) *integr
 		CronjobMonitor:   mapCronjobMonitorCreateRequest(plan.CronjobMonitor),
 		PingMonitor:      mapPingMonitorCreateRequest(plan.PingMonitor),
 		Email:            mapEmailCreateRequest(plan.Email),
+		Twilio:           mapTwilioCreateRequest(plan.Twilio),
 	}
 }
 
