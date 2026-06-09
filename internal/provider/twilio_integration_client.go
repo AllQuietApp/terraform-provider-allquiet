@@ -250,7 +250,7 @@ func mapCallFlowConfigResponseToModel(ctx context.Context, response *callFlowCon
 		CallerAllowlist:           MapNullableList(ctx, response.CallerAllowlist),
 		CallerBlocklist:           MapNullableList(ctx, response.CallerBlocklist),
 		Route:                     mapRouteConfigResponseToModel(response.Route, priorRoute),
-		Menu:                      mapMenuConfigResponseToModel(ctx, response.Menu, priorMenu),
+		Menu:                      mapMenuConfigResponseToModel(response.Menu, priorMenu),
 	}
 
 	if prior != nil {
@@ -263,7 +263,7 @@ func mapCallFlowConfigResponseToModel(ctx context.Context, response *callFlowCon
 	return model
 }
 
-func mapMenuConfigResponseToModel(ctx context.Context, response *menuConfigResponse, prior *MenuConfigModel) *MenuConfigModel {
+func mapMenuConfigResponseToModel(response *menuConfigResponse, prior *MenuConfigModel) *MenuConfigModel {
 	if response == nil {
 		return nil
 	}

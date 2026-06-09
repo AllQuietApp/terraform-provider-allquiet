@@ -299,7 +299,7 @@ func (r *User) Create(ctx context.Context, req resource.CreateRequest, resp *res
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create user resource, got error: %s", err))
 		return
 	}
-	mapUserResponseToModel(ctx, userResponse, &data)
+	mapUserResponseToModel(userResponse, &data)
 
 	tflog.Trace(ctx, "created user resource")
 
@@ -327,7 +327,7 @@ func (r *User) Read(ctx context.Context, req resource.ReadRequest, resp *resourc
 		return
 	}
 
-	mapUserResponseToModel(ctx, userResponse, &data)
+	mapUserResponseToModel(userResponse, &data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -348,7 +348,7 @@ func (r *User) Update(ctx context.Context, req resource.UpdateRequest, resp *res
 		return
 	}
 
-	mapUserResponseToModel(ctx, userResponse, &data)
+	mapUserResponseToModel(userResponse, &data)
 
 	tflog.Trace(ctx, "updated user resource")
 
@@ -380,7 +380,7 @@ func (r *User) ImportState(ctx context.Context, req resource.ImportStateRequest,
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func mapUserResponseToModel(ctx context.Context, response *userResponse, data *UserModel) {
+func mapUserResponseToModel(response *userResponse, data *UserModel) {
 	data.Id = types.StringValue(response.Id)
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.Email = types.StringValue(response.Email)
