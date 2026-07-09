@@ -33,6 +33,7 @@ func TestAccRoutingResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_repeat_alerts_false", "rules.0.actions.assign_to_teams_repeat_alerts", "false"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.0.display_name", "Assign Critical to Test Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.1.display_name", "Route Web Incidents to Sales"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_exclude_from_uptime_calculation", "rules.0.actions.exclude_from_uptime_calculation", "true"),
 				),
 			},
 			// ImportState testing
@@ -57,6 +58,7 @@ func TestAccRoutingResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_repeat_alerts_false", "rules.0.actions.assign_to_teams_repeat_alerts", "false"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.0.display_name", "Assign Critical to Test Team"),
 					resource.TestCheckResourceAttr("allquiet_routing.test_with_display_names", "rules.1.display_name", "Route Web Incidents to Sales"),
+					resource.TestCheckResourceAttr("allquiet_routing.test_with_exclude_from_uptime_calculation", "rules.0.actions.exclude_from_uptime_calculation", "true"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -374,6 +376,28 @@ resource "allquiet_routing" "test_with_display_names" {
 	  }
 	]
   }
+
+resource "allquiet_service" "test" {
+  display_name = "Test Service"
+  public_title = "Test Service"
+}
+
+resource "allquiet_routing" "test_with_exclude_from_uptime_calculation" {
+  display_name = %[1]q
+  team_id = allquiet_team.root.id
+  rules = [
+    {
+      conditions = {
+        statuses = ["Open"]
+      }
+      actions = {
+        add_interaction                  = "Affects"
+        affects_services                 = [allquiet_service.test.id]
+        exclude_from_uptime_calculation  = true
+      }
+    }
+  ]
+}
 `, display_name)
 
 }

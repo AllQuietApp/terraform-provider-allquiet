@@ -227,8 +227,9 @@ resource "allquiet_routing" "example_8" {
         ]
       },
       actions = {
-        add_interaction  = "Affects"
-        affects_services = [allquiet_service.pre_sales.id]
+        add_interaction                 = "Affects"
+        affects_services                = [allquiet_service.pre_sales.id]
+        exclude_from_uptime_calculation = true
       }
     }
   ]
@@ -469,6 +470,7 @@ Optional:
 - `change_severity` (String) Will change the severity of the incident. Possible values are: Critical, Warning, Minor
 - `delay_actions_in_minutes` (Number) Delay actions in minutes
 - `discard` (Boolean) If true will discard and delete the incident
+- `exclude_from_uptime_calculation` (Boolean) When true and add_interaction is 'Affects', affected services are excluded from uptime calculation. When false, the incident affects uptime for the selected services.
 - `forward_to_outbound_integrations` (List of String) Will forward to the specified outbound integrations. Only with add_interaction 'Forwarded'.
 - `rule_flow_control` (String) If 'Skip' will not evaluate further rules. Possible values are: Continue, Skip
 - `set_attributes` (Attributes List) (see [below for nested schema](#nestedatt--rules--actions--set_attributes))

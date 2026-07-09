@@ -51,6 +51,7 @@ type routingRuleActions struct {
 	Discard                       bool                       `json:"discard"`
 	DelayActionsInMinutes         *int64                     `json:"delayActionsInMinutes"`
 	AffectsServices               *[]string                  `json:"affectsServices"`
+	ExcludeFromUptimeCalculation  bool                       `json:"excludeFromUptimeCalculation"`
 	ForwardToOutboundIntegrations *[]string                  `json:"forwardToOutboundIntegrations"`
 	SetAttributes                 *[]routingRuleSetAttribute `json:"setAttributes"`
 	SnoozeForRelativeInMinutes    *int64                     `json:"snoozeForRelativeInMinutes"`
@@ -179,6 +180,7 @@ func mapRoutingRuleActions(actions *RoutingRuleActionsModel) *routingRuleActions
 		Discard:                       actions.Discard.ValueBool(),
 		DelayActionsInMinutes:         actions.DelayActionsInMinutes.ValueInt64Pointer(),
 		AffectsServices:               ListToStringArray(actions.AffectsServices),
+		ExcludeFromUptimeCalculation:  actions.ExcludeFromUptimeCalculation.ValueBool(),
 		ForwardToOutboundIntegrations: ListToStringArray(actions.ForwardToOutboundIntegrations),
 		SetAttributes:                 mapRoutingRuleSetAttributes(actions.SetAttributes),
 		SnoozeForRelativeInMinutes:    actions.SnoozeForRelativeInMinutes.ValueInt64Pointer(),

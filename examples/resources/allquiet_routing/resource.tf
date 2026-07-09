@@ -212,8 +212,9 @@ resource "allquiet_routing" "example_8" {
         ]
       },
       actions = {
-        add_interaction  = "Affects"
-        affects_services = [allquiet_service.pre_sales.id]
+        add_interaction                 = "Affects"
+        affects_services                = [allquiet_service.pre_sales.id]
+        exclude_from_uptime_calculation = true
       }
     }
   ]

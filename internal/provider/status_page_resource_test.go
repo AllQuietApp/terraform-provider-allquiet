@@ -299,6 +299,65 @@ resource "allquiet_status_page" "test_with_groups" {
 	`, display_name, slug)
 }
 
+func TestAccStatusPageResourcePrivacySettings(t *testing.T) {
+	var slug = "privacy-status-page-test" + uuid.New().String()
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccStatusPageResourcePrivacySettingsConfig("Privacy Status Page", slug),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "display_name", "Privacy Status Page"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "public_display_live_state_only", "true"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "public_hide_incident_details", "true"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "public_hide_maintenances", "true"),
+				),
+			},
+			{
+				ResourceName:      "allquiet_status_page.test_privacy",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccStatusPageResourcePrivacySettingsConfig("Privacy Status Page Updated", slug),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "display_name", "Privacy Status Page Updated"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "public_display_live_state_only", "false"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "public_hide_incident_details", "false"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_privacy", "public_hide_maintenances", "false"),
+				),
+			},
+		},
+	})
+}
+
+func testAccStatusPageResourcePrivacySettingsConfig(displayName string, slug string) string {
+	return fmt.Sprintf(`
+resource "allquiet_service" "privacy_test_service" {
+  display_name = "Privacy Test Service"
+  public_title = "Privacy Test Service"
+}
+
+resource "allquiet_status_page" "test_privacy" {
+  slug                            = %[2]q
+  display_name                    = %[1]q
+  public_title                    = %[1]q
+  history_in_days                 = 30
+  disable_public_subscription     = false
+  public_display_live_state_only  = %[3]t
+  public_hide_incident_details    = %[3]t
+  public_hide_maintenances        = %[3]t
+  service_groups = [
+    {
+      public_display_name = "Services"
+      services = [allquiet_service.privacy_test_service.id]
+    }
+  ]
+}
+`, displayName, slug, displayName == "Privacy Status Page")
+}
+
 func testAccStatusPageResourceExample() string {
 	absPath, _ := filepath.Abs("../../examples/resources/allquiet_status_page/resource.tf")
 
@@ -310,6 +369,7 @@ func testAccStatusPageResourceExample() string {
 	var result = RandomizeExample(string(dat))
 	result = strings.Replace(result, "public-status-page-test", "public-status-page-test"+uuid.New().String(), -1)
 	result = strings.Replace(result, "private-status-page-test", "private-status-page-test"+uuid.New().String(), -1)
+	result = strings.Replace(result, "privacy-status-page-test", "privacy-status-page-test"+uuid.New().String(), -1)
 	result = strings.Replace(result, "status-page-test-resource.allquiet.com", "status-page-test-resource-"+uuid.New().String()+".allquiet.com", -1)
 	return result
 }

@@ -79,6 +79,7 @@ type RoutingRuleActionsModel struct {
 	RuleFlowControl               types.String                           `tfsdk:"rule_flow_control"`
 	DelayActionsInMinutes         types.Int64                            `tfsdk:"delay_actions_in_minutes"`
 	AffectsServices               types.List                             `tfsdk:"affects_services"`
+	ExcludeFromUptimeCalculation  types.Bool                             `tfsdk:"exclude_from_uptime_calculation"`
 	ForwardToOutboundIntegrations types.List                             `tfsdk:"forward_to_outbound_integrations"`
 	SetAttributes                 []RoutingRuleActionsSetAttributesModel `tfsdk:"set_attributes"`
 	SnoozeForRelativeInMinutes    types.Int64                            `tfsdk:"snooze_for_relative_in_minutes"`
@@ -306,6 +307,12 @@ func (r *Routing) Schema(ctx context.Context, req resource.SchemaRequest, resp *
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(GuidValidator("Not a valid GUID")),
 									},
+								},
+								"exclude_from_uptime_calculation": schema.BoolAttribute{
+									Optional:            true,
+									Computed:            true,
+									Default:             booldefault.StaticBool(false),
+									MarkdownDescription: "When true and add_interaction is 'Affects', affected services are excluded from uptime calculation. When false, the incident affects uptime for the selected services.",
 								},
 								"forward_to_outbound_integrations": schema.ListAttribute{
 									Optional:            true,
@@ -626,6 +633,7 @@ func mapRoutingRuleActionsResponseToModel(ctx context.Context, actions *routingR
 		RuleFlowControl:               types.StringPointerValue(actions.RuleFlowControl),
 		DelayActionsInMinutes:         types.Int64PointerValue(actions.DelayActionsInMinutes),
 		AffectsServices:               MapNullableList(ctx, actions.AffectsServices),
+		ExcludeFromUptimeCalculation:  types.BoolValue(actions.ExcludeFromUptimeCalculation),
 		ForwardToOutboundIntegrations: MapNullableList(ctx, actions.ForwardToOutboundIntegrations),
 		SetAttributes:                 mapRoutingRuleActionsSetAttributesResponseToModel(actions.SetAttributes),
 		SnoozeForRelativeInMinutes:    types.Int64PointerValue(actions.SnoozeForRelativeInMinutes),
