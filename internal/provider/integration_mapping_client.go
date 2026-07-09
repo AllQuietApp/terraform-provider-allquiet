@@ -51,8 +51,8 @@ func (c *AllQuietAPIClient) CreateIntegrationMappingResource(ctx context.Context
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result integrationMappingResponse
@@ -100,8 +100,8 @@ func (c *AllQuietAPIClient) DeleteIntegrationMappingResource(ctx context.Context
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

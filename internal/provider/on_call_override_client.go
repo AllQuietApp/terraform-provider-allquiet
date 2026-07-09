@@ -50,8 +50,8 @@ func (c *AllQuietAPIClient) CreateOnCallOverrideResource(ctx context.Context, da
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result onCallOverrideResponse
@@ -71,8 +71,8 @@ func (c *AllQuietAPIClient) DeleteOnCallOverrideResource(ctx context.Context, id
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

@@ -241,8 +241,8 @@ func (c *AllQuietAPIClient) CreateTeamEscalationsResource(ctx context.Context, d
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result teamEscalationsResponse
@@ -262,8 +262,8 @@ func (c *AllQuietAPIClient) DeleteTeamEscalationsResource(ctx context.Context, i
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

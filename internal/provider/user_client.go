@@ -64,8 +64,8 @@ func (c *AllQuietAPIClient) CreateUserResource(ctx context.Context, data *UserMo
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result userResponse
@@ -85,8 +85,8 @@ func (c *AllQuietAPIClient) DeleteUserResource(ctx context.Context, id string) e
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

@@ -56,8 +56,8 @@ func (c *AllQuietAPIClient) CreateTeamResource(ctx context.Context, data *TeamMo
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result teamResponse
@@ -77,8 +77,8 @@ func (c *AllQuietAPIClient) DeleteTeamResource(ctx context.Context, id string) e
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

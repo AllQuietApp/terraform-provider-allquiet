@@ -100,8 +100,8 @@ func (c *AllQuietAPIClient) CreateUserIncidentNotificationSettingsResource(ctx c
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, reqBody)
+	if err := ensureCreateSuccess(httpResp, reqBody); err != nil {
+		return nil, err
 	}
 
 	var result userIncidentNotificationSettingsResponse

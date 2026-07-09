@@ -344,8 +344,8 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, plan 
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, request)
+	if err := ensureCreateSuccess(httpResp, request); err != nil {
+		return nil, err
 	}
 
 	var result integrationResponse
@@ -365,8 +365,8 @@ func (c *AllQuietAPIClient) DeleteIntegrationResource(ctx context.Context, id st
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

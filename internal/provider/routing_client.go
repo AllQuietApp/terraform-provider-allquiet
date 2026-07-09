@@ -223,8 +223,8 @@ func (c *AllQuietAPIClient) CreateRoutingResource(ctx context.Context, data *Rou
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result routingResponse
@@ -244,8 +244,8 @@ func (c *AllQuietAPIClient) DeleteRoutingResource(ctx context.Context, id string
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

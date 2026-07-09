@@ -225,6 +225,28 @@ func logErrorResponse(resp *http.Response, req interface{}) error {
 	return err
 }
 
+func isCreateSuccessStatus(statusCode int) bool {
+	return statusCode == http.StatusOK || statusCode == http.StatusCreated
+}
+
+func ensureCreateSuccess(resp *http.Response, req interface{}) error {
+	if isCreateSuccessStatus(resp.StatusCode) {
+		return nil
+	}
+	return logErrorResponse(resp, req)
+}
+
+func isDeleteSuccessStatus(statusCode int) bool {
+	return statusCode == http.StatusOK || statusCode == http.StatusNoContent
+}
+
+func ensureDeleteSuccess(resp *http.Response) error {
+	if isDeleteSuccessStatus(resp.StatusCode) {
+		return nil
+	}
+	return logErrorResponse(resp, nil)
+}
+
 var ValidTimes = []string{"00:00", "00:15", "00:30", "00:45", "01:00",
 	"01:15", "01:30", "01:45", "02:00", "02:15", "02:30", "02:45", "03:00",
 	"03:15", "03:30", "03:45", "04:00", "04:15", "04:30", "04:45", "05:00",

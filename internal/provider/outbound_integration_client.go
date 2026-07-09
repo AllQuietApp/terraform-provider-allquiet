@@ -53,8 +53,8 @@ func (c *AllQuietAPIClient) CreateOutboundIntegrationResource(ctx context.Contex
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result outboundIntegrationResponse
@@ -74,8 +74,8 @@ func (c *AllQuietAPIClient) DeleteOutboundIntegrationResource(ctx context.Contex
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil

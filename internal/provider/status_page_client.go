@@ -273,8 +273,8 @@ func (c *AllQuietAPIClient) CreateStatusPageResource(ctx context.Context, data *
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return nil, logErrorResponse(httpResp, nil)
+	if err := ensureCreateSuccess(httpResp, nil); err != nil {
+		return nil, err
 	}
 
 	var result statusPageResponse
@@ -294,8 +294,8 @@ func (c *AllQuietAPIClient) DeleteStatusPageResource(ctx context.Context, id str
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return logErrorResponse(httpResp, nil)
+	if err := ensureDeleteSuccess(httpResp); err != nil {
+		return err
 	}
 
 	return nil
