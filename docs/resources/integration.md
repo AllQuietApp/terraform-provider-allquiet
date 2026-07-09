@@ -37,7 +37,8 @@ resource "allquiet_integration" "webhook" {
     snooze_window_in_minutes = 1440
   }
   webhook_authentication = {
-    type = "bearer"
+    type              = "bearer"
+    private_ip_filter = "203.0.113.0/24"
     bearer = {
       token = "your_secret_token"
     }
@@ -650,11 +651,12 @@ Optional:
 
 Required:
 
-- `type` (String) The type of the webhook authentication. Possible values are: bearer
+- `type` (String) The type of the webhook authentication. Possible values are: none, bearer
 
 Optional:
 
 - `bearer` (Attributes) The bearer token of the webhook authentication (see [below for nested schema](#nestedatt--webhook_authentication--bearer))
+- `private_ip_filter` (String) IP filter (CIDR format) to restrict webhook access. Only IPs matching the filter can POST to the webhook URL. Multiple CIDR ranges can be comma-separated.
 
 <a id="nestedatt--webhook_authentication--bearer"></a>
 ### Nested Schema for `webhook_authentication.bearer`

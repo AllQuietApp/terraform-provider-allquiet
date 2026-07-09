@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -48,12 +49,13 @@ type User struct {
 }
 
 type UserModel struct {
-	Id                           types.String                       `tfsdk:"id"`
-	DisplayName                  types.String                       `tfsdk:"display_name"`
-	Email                        types.String                       `tfsdk:"email"`
-	PhoneNumber                  types.String                       `tfsdk:"phone_number"`
-	TimeZoneId                   types.String                       `tfsdk:"time_zone_id"`
-	IncidentNotificationSettings *IncidentNotificationSettingsModel `tfsdk:"incident_notification_settings"`
+	Id                                    types.String                       `tfsdk:"id"`
+	DisplayName                           types.String                       `tfsdk:"display_name"`
+	Email                                 types.String                       `tfsdk:"email"`
+	PhoneNumber                           types.String                       `tfsdk:"phone_number"`
+	TimeZoneId                            types.String                       `tfsdk:"time_zone_id"`
+	DisableWeeklyIncidentEngagementReport types.Bool                         `tfsdk:"disable_weekly_incident_engagement_report"`
+	IncidentNotificationSettings          *IncidentNotificationSettingsModel `tfsdk:"incident_notification_settings"`
 }
 
 type IncidentNotificationSettingsModel struct {
@@ -127,6 +129,12 @@ func (r *User) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 				Optional:            true,
 				Default:             stringdefault.StaticString("UTC"),
 				Computed:            true,
+			},
+			"disable_weekly_incident_engagement_report": schema.BoolAttribute{
+				MarkdownDescription: "When true, the user will not receive the weekly incident engagement summary by email.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
 			},
 			"incident_notification_settings": schema.SingleNestedAttribute{
 				MarkdownDescription: "Deprecated: this attribute has been split out into the dedicated `allquiet_user_incident_notification_settings` resource. " +
@@ -385,6 +393,7 @@ func mapUserResponseToModel(response *userResponse, data *UserModel) {
 	data.DisplayName = types.StringValue(response.DisplayName)
 	data.Email = types.StringValue(response.Email)
 	data.TimeZoneId = types.StringValue(response.TimeZoneId)
+	data.DisableWeeklyIncidentEngagementReport = types.BoolValue(response.DisableWeeklyIncidentEngagementReport)
 
 	// Phone number and notification settings are owned by the dedicated
 	// allquiet_user_incident_notification_settings resource. Drop them from the

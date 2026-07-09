@@ -4,8 +4,9 @@ resource "allquiet_user" "millie_brown" {
 }
 
 resource "allquiet_user" "taylor" {
-  display_name = "Taylor Swift"
-  email        = "acceptance-tests+taylor@allquiet.app"
+  display_name                              = "Taylor Swift"
+  email                                     = "acceptance-tests+taylor@allquiet.app"
+  disable_weekly_incident_engagement_report = true
 }
 
 # Phone numbers and incident notification settings have moved to the

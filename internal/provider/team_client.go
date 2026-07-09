@@ -17,8 +17,9 @@ type teamResponse struct {
 }
 
 type incidentEngagementReportSettings struct {
-	DayOfWeek string
-	Time      string
+	DayOfWeek                           string
+	Time                                string
+	DisableWeeklyIncidentEngagementReport bool
 }
 
 type teamCreateRequest struct {
@@ -33,8 +34,9 @@ func mapTeamCreateRequest(plan *TeamModel) *teamCreateRequest {
 
 	if plan.IncidentEngagementReportSettings != nil {
 		settings = &incidentEngagementReportSettings{
-			DayOfWeek: *plan.IncidentEngagementReportSettings.DayOfWeek.ValueStringPointer(),
-			Time:      plan.IncidentEngagementReportSettings.Time.ValueString(),
+			DayOfWeek:                           *plan.IncidentEngagementReportSettings.DayOfWeek.ValueStringPointer(),
+			Time:                                plan.IncidentEngagementReportSettings.Time.ValueString(),
+			DisableWeeklyIncidentEngagementReport: plan.IncidentEngagementReportSettings.DisableWeeklyIncidentEngagementReport.ValueBool(),
 		}
 	}
 

@@ -22,7 +22,8 @@ resource "allquiet_integration" "webhook" {
     snooze_window_in_minutes = 1440
   }
   webhook_authentication = {
-    type = "bearer"
+    type              = "bearer"
+    private_ip_filter = "203.0.113.0/24"
     bearer = {
       token = "your_secret_token"
     }

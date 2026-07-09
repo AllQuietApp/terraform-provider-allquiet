@@ -9,12 +9,13 @@ import (
 )
 
 type userResponse struct {
-	Id                           string                                `json:"id"`
-	DisplayName                  string                                `json:"displayName"`
-	Email                        string                                `json:"email"`
-	PhoneNumber                  *string                               `json:"phoneNumber"`
-	TimeZoneId                   string                                `json:"timeZoneId"`
-	IncidentNotificationSettings *incidentNotificationSettingsResponse `json:"incidentNotificationSettings"`
+	Id                                    string                                `json:"id"`
+	DisplayName                           string                                `json:"displayName"`
+	Email                                 string                                `json:"email"`
+	PhoneNumber                           *string                               `json:"phoneNumber"`
+	TimeZoneId                            string                                `json:"timeZoneId"`
+	DisableWeeklyIncidentEngagementReport bool                                  `json:"disableWeeklyIncidentEngagementReport"`
+	IncidentNotificationSettings          *incidentNotificationSettingsResponse `json:"incidentNotificationSettings"`
 }
 
 type incidentNotificationSettingsResponse struct {
@@ -41,17 +42,25 @@ type incidentNotificationSettingsResponse struct {
 }
 
 type userCreateRequest struct {
-	DisplayName string `json:"displayName"`
-	Email       string `json:"email"`
-	TimeZoneId  string `json:"timeZoneId"`
+	DisplayName                           string `json:"displayName"`
+	Email                                 string `json:"email"`
+	TimeZoneId                            string `json:"timeZoneId"`
+	DisableWeeklyIncidentEngagementReport *bool  `json:"disableWeeklyIncidentEngagementReport,omitempty"`
 }
 
 func mapUserCreateRequest(plan *UserModel) *userCreateRequest {
-	return &userCreateRequest{
+	request := &userCreateRequest{
 		DisplayName: plan.DisplayName.ValueString(),
 		Email:       plan.Email.ValueString(),
 		TimeZoneId:  plan.TimeZoneId.ValueString(),
 	}
+
+	if !plan.DisableWeeklyIncidentEngagementReport.IsNull() && !plan.DisableWeeklyIncidentEngagementReport.IsUnknown() {
+		value := plan.DisableWeeklyIncidentEngagementReport.ValueBool()
+		request.DisableWeeklyIncidentEngagementReport = &value
+	}
+
+	return request
 }
 
 func (c *AllQuietAPIClient) CreateUserResource(ctx context.Context, data *UserModel) (*userResponse, error) {

@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -34,8 +35,9 @@ type Team struct {
 }
 
 type IncidentEngagementReportSettingsModel struct {
-	DayOfWeek types.String `tfsdk:"day_of_week"`
-	Time      types.String `tfsdk:"time"`
+	DayOfWeek                           types.String `tfsdk:"day_of_week"`
+	Time                                types.String `tfsdk:"time"`
+	DisableWeeklyIncidentEngagementReport types.Bool   `tfsdk:"disable_weekly_incident_engagement_report"`
 }
 
 // TeamModel describes the resource data model.
@@ -90,6 +92,12 @@ func (r *Team) Schema(ctx context.Context, req resource.SchemaRequest, resp *res
 							regexp.MustCompile(`^([01]\d|2[0-3]):([0-5]\d)$`),
 							"must contain time matching the pattern '^([01]\\d|2[0-3]):([0-5]\\d)$'",
 						)},
+					},
+					"disable_weekly_incident_engagement_report": schema.BoolAttribute{
+						MarkdownDescription: "When true, disables the weekly incident engagement report for this team.",
+						Optional:            true,
+						Computed:            true,
+						Default:             booldefault.StaticBool(false),
 					},
 				},
 			},
@@ -225,8 +233,9 @@ func mapTeamResponseToModel(ctx context.Context, response *teamResponse, data *T
 	data.Labels = MapNullableList(ctx, response.Labels)
 	if response.IncidentEngagementReportSettings != nil {
 		data.IncidentEngagementReportSettings = &IncidentEngagementReportSettingsModel{
-			DayOfWeek: types.StringValue(response.IncidentEngagementReportSettings.DayOfWeek),
-			Time:      types.StringValue(response.IncidentEngagementReportSettings.Time),
+			DayOfWeek:                           types.StringValue(response.IncidentEngagementReportSettings.DayOfWeek),
+			Time:                                types.StringValue(response.IncidentEngagementReportSettings.Time),
+			DisableWeeklyIncidentEngagementReport: types.BoolValue(response.IncidentEngagementReportSettings.DisableWeeklyIncidentEngagementReport),
 		}
 	}
 

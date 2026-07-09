@@ -37,8 +37,9 @@ type integrationCreateRequest struct {
 }
 
 type webhookAuthenticationResponse struct {
-	Type   string                               `json:"type"`
-	Bearer *webhookAuthenticationBearerResponse `json:"bearer"`
+	Type            string                               `json:"type"`
+	PrivateIpFilter *string                              `json:"privateIpFilter"`
+	Bearer          *webhookAuthenticationBearerResponse `json:"bearer"`
 }
 
 type webhookAuthenticationBearerResponse struct {
@@ -271,8 +272,9 @@ func mapWebhookAuthenticationCreateRequest(plan *WebhookAuthenticationModel) *we
 	}
 
 	return &webhookAuthenticationResponse{
-		Type:   plan.Type.ValueString(),
-		Bearer: mapWebhookAuthenticationBearerCreateRequest(plan.Bearer),
+		Type:            plan.Type.ValueString(),
+		PrivateIpFilter: plan.PrivateIpFilter.ValueStringPointer(),
+		Bearer:          mapWebhookAuthenticationBearerCreateRequest(plan.Bearer),
 	}
 }
 

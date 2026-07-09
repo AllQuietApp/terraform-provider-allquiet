@@ -17,8 +17,9 @@ resource "allquiet_team" "my_team" {
   display_name = "My Team"
   time_zone_id = "America/Los_Angeles"
   incident_engagement_report_settings = {
-    day_of_week = "mon"
-    time        = "09:00"
+    day_of_week                               = "mon"
+    time                                      = "09:00"
+    disable_weekly_incident_engagement_report = false
   }
   labels = ["Product", "Services", "Operations"]
 }
@@ -48,3 +49,7 @@ Required:
 
 - `day_of_week` (String) Which day of the week to send the report
 - `time` (String) Time of the day to send the report
+
+Optional:
+
+- `disable_weekly_incident_engagement_report` (Boolean) When true, disables the weekly incident engagement report for this team.

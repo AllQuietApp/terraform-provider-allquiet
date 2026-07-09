@@ -111,8 +111,9 @@ type CronjobMonitorModel struct {
 }
 
 type WebhookAuthenticationModel struct {
-	Type   types.String `tfsdk:"type"`
-	Bearer *BearerModel `tfsdk:"bearer"`
+	Type            types.String `tfsdk:"type"`
+	PrivateIpFilter types.String `tfsdk:"private_ip_filter"`
+	Bearer          *BearerModel `tfsdk:"bearer"`
 }
 
 type BearerModel struct {
@@ -247,6 +248,10 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 						MarkdownDescription: "The type of the webhook authentication. Possible values are: " + strings.Join(ValidWebhookAuthenticationTypes, ", "),
 						Required:            true,
 						Validators:          []validator.String{WebhookAuthenticationTypeValidator("Not a valid webhook authentication type")},
+					},
+					"private_ip_filter": schema.StringAttribute{
+						MarkdownDescription: "IP filter (CIDR format) to restrict webhook access. Only IPs matching the filter can POST to the webhook URL. Multiple CIDR ranges can be comma-separated.",
+						Optional:            true,
 					},
 					"bearer": schema.SingleNestedAttribute{
 						MarkdownDescription: "The bearer token of the webhook authentication",
@@ -799,8 +804,9 @@ func mapWebhookAuthenticationResponseToModel(response *webhookAuthenticationResp
 	}
 
 	return &WebhookAuthenticationModel{
-		Type:   types.StringValue(response.Type),
-		Bearer: mapBearerResponseToModel(response.Bearer),
+		Type:            types.StringValue(response.Type),
+		PrivateIpFilter: types.StringPointerValue(response.PrivateIpFilter),
+		Bearer:          mapBearerResponseToModel(response.Bearer),
 	}
 }
 
