@@ -56,6 +56,20 @@ resource "allquiet_outbound_integration" "slack_with_channels" {
   }
 }
 
+resource "allquiet_outbound_integration" "slack_critical_only" {
+  display_name = "My Slack Integration (Critical Only)"
+  team_id      = allquiet_team.root.id
+  type         = "Slack"
+
+  slack_settings = {
+    severity_based_channel_settings = {
+      selected_channel_ids_minor    = []
+      selected_channel_ids_warning  = []
+      selected_channel_ids_critical = ["C3333333333"]
+    }
+  }
+}
+
 resource "allquiet_outbound_integration" "slack_with_severity_channels" {
   display_name = "My Slack Integration (Severity-Based Channels)"
   team_id      = allquiet_team.root.id
