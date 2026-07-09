@@ -171,4 +171,27 @@ resource "allquiet_status_page" "privacy_status_page" {
   ]
 }
 
+resource "allquiet_status_page" "ungrouped_status_page" {
+  slug                        = "ungrouped-status-page-test"
+  display_name                = "Ungrouped Status Page"
+  public_title                = "Ungrouped Status Page"
+  history_in_days             = 30
+  disable_public_subscription = false
+
+  time_zone_id = "Europe/Amsterdam"
+  service_groups = [
+    {
+      services = [
+        allquiet_service.payment_api.id,
+        allquiet_service.chat_gpt.id,
+      ]
+    },
+    {
+      services = [
+        allquiet_service.shipping_api.id,
+      ]
+    }
+  ]
+}
+
 

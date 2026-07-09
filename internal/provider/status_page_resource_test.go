@@ -332,6 +332,60 @@ func TestAccStatusPageResourcePrivacySettings(t *testing.T) {
 	})
 }
 
+func TestAccStatusPageResourceWithoutGroupTitle(t *testing.T) {
+	slug := "ungrouped-status-page-test" + uuid.New().String()
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccStatusPageResourceWithoutGroupTitleConfig("Ungrouped Status Page", slug),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_status_page.test_ungrouped", "display_name", "Ungrouped Status Page"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_ungrouped", "service_groups.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_ungrouped", "service_groups.0.public_display_name", ""),
+					resource.TestCheckResourceAttr("allquiet_status_page.test_ungrouped", "service_groups.1.public_display_name", ""),
+				),
+			},
+			{
+				ResourceName:      "allquiet_status_page.test_ungrouped",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func testAccStatusPageResourceWithoutGroupTitleConfig(displayName string, slug string) string {
+	return fmt.Sprintf(`
+resource "allquiet_service" "ungrouped_service_1" {
+  display_name = "Ungrouped Service 1"
+  public_title = "Ungrouped Service 1"
+}
+
+resource "allquiet_service" "ungrouped_service_2" {
+  display_name = "Ungrouped Service 2"
+  public_title = "Ungrouped Service 2"
+}
+
+resource "allquiet_status_page" "test_ungrouped" {
+  display_name                = %[1]q
+  public_title                = %[1]q
+  history_in_days             = 30
+  disable_public_subscription = false
+  slug                        = %[2]q
+  service_groups = [
+    {
+      services = [allquiet_service.ungrouped_service_1.id]
+    },
+    {
+      services = [allquiet_service.ungrouped_service_2.id]
+    },
+  ]
+}
+`, displayName, slug)
+}
+
 func testAccStatusPageResourcePrivacySettingsConfig(displayName string, slug string) string {
 	return fmt.Sprintf(`
 resource "allquiet_service" "privacy_test_service" {
@@ -370,6 +424,7 @@ func testAccStatusPageResourceExample() string {
 	result = strings.Replace(result, "public-status-page-test", "public-status-page-test"+uuid.New().String(), -1)
 	result = strings.Replace(result, "private-status-page-test", "private-status-page-test"+uuid.New().String(), -1)
 	result = strings.Replace(result, "privacy-status-page-test", "privacy-status-page-test"+uuid.New().String(), -1)
+	result = strings.Replace(result, "ungrouped-status-page-test", "ungrouped-status-page-test"+uuid.New().String(), -1)
 	result = strings.Replace(result, "status-page-test-resource.allquiet.com", "status-page-test-resource-"+uuid.New().String()+".allquiet.com", -1)
 	return result
 }

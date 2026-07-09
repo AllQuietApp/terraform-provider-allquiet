@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -356,8 +357,10 @@ func (r *StatusPage) Schema(ctx context.Context, req resource.SchemaRequest, res
 							MarkdownDescription: "Internal id of the service group",
 						},
 						"public_display_name": schema.StringAttribute{
-							MarkdownDescription: "The public display name of the service group",
-							Required:            true,
+							Optional:            true,
+							Computed:            true,
+							Default:             stringdefault.StaticString(""),
+							MarkdownDescription: "The public display name of the service group. When omitted or empty, services in this group are shown individually on the status page (no group header). Set a title to display a collapsible group, matching the UI 'Service Group Public Title'.",
 						},
 						"public_description": schema.StringAttribute{
 							MarkdownDescription: "The public description of the service group",
