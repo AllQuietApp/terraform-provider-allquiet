@@ -120,6 +120,7 @@ resource "allquiet_integration" "http_monitoring_post" {
       body                                     = "{\"message\": \"Hello, world!\"}"
       is_paused                                = false
       content_test                             = "Expected response text"
+      content_test_mode                        = "Contains"
       ssl_certificate_max_age_in_days_degraded = 30
       ssl_certificate_max_age_in_days_down     = 10
       severity_degraded                        = "Warning"
@@ -314,6 +315,7 @@ Optional:
 - `bearer_authentication_token` (String, Sensitive) The bearer authentication token of the http monitoring
 - `body` (String, Sensitive) The body to send in the http request
 - `content_test` (String) The content test of the http monitoring
+- `content_test_mode` (String) How the response body is compared to content_test. Possible values are: Contains, DoesNotContain, MatchesRegex, DoesNotMatchRegex. Defaults to Contains.
 - `headers` (Map of String, Sensitive) The headers of the http monitoring
 - `ignore_non_http_errors` (Boolean) When true, connection and transport failures (non-HTTP errors) are ignored and do not trigger incidents
 - `is_paused` (Boolean) If the http monitoring is paused

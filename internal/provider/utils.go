@@ -263,6 +263,12 @@ func SeverityValidator(message string) validator.String {
 	return stringvalidator.OneOf(ValidSeverities...)
 }
 
+var ValidContentTestModes = []string{"Contains", "DoesNotContain", "MatchesRegex", "DoesNotMatchRegex"}
+
+func ContentTestModeValidator(message string) validator.String {
+	return stringvalidator.OneOf(ValidContentTestModes...)
+}
+
 var ValidCallDisplayModes = []string{"ShowCallerNumber", "ShowInboundNumber"}
 
 func CallDisplayModeValidator(message string) validator.String {

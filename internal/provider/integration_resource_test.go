@@ -48,6 +48,8 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.headers.Content-Type", "application/json"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.ignore_non_http_errors", "true"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.content_test", "Hello, world!"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.content_test_mode", "Contains"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.interval_in_sec", "60"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.severity", "Warning"),
@@ -107,6 +109,8 @@ func TestAccIntegrationResource(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.authentication_type", "Bearer"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.bearer_authentication_token", "my-token"),
 					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.ignore_non_http_errors", "true"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.content_test", "Hello, world!"),
+					resource.TestCheckResourceAttr("allquiet_integration.http_monitoring", "integration_settings.http_monitoring.content_test_mode", "Contains"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.interval_in_sec", "60"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.grace_period_in_sec", "10"),
 					resource.TestCheckResourceAttr("allquiet_integration.heartbeat_monitor", "integration_settings.heartbeat_monitor.severity", "Warning"),
@@ -252,6 +256,7 @@ resource "allquiet_integration" "http_monitoring" {
 			body = "{\"message\": \"Hello, world!\"}"
 			is_paused = false
 			content_test = "Hello, world!"
+			content_test_mode = "Contains"
 			ssl_certificate_max_age_in_days_degraded = 30
 			ssl_certificate_max_age_in_days_down = 10
 			severity_degraded = "Warning"

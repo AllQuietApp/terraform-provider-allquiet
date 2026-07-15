@@ -73,6 +73,7 @@ type HttpMonitoringModel struct {
 	Headers                            types.Map    `tfsdk:"headers"`
 	Body                               types.String `tfsdk:"body"`
 	ContentTest                        types.String `tfsdk:"content_test"`
+	ContentTestMode                    types.String `tfsdk:"content_test_mode"`
 	SSLCertificateMaxAgeInDaysDegraded types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_degraded"`
 	SSLCertificateMaxAgeInDaysDown     types.Int64  `tfsdk:"ssl_certificate_max_age_in_days_down"`
 	SeverityDegraded                   types.String `tfsdk:"severity_degraded"`
@@ -345,6 +346,13 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 							"content_test": schema.StringAttribute{
 								MarkdownDescription: "The content test of the http monitoring",
 								Optional:            true,
+							},
+							"content_test_mode": schema.StringAttribute{
+								MarkdownDescription: "How the response body is compared to content_test. Possible values are: " + strings.Join(ValidContentTestModes, ", ") + ". Defaults to Contains.",
+								Optional:            true,
+								Validators: []validator.String{
+									ContentTestModeValidator("Not a valid content test mode"),
+								},
 							},
 							"ssl_certificate_max_age_in_days_degraded": schema.Int64Attribute{
 								MarkdownDescription: "The ssl certificate max age in days degraded of the http monitoring",
@@ -764,6 +772,7 @@ func mapHttpMonitoringResponseToModel(ctx context.Context, response *httpMonitor
 		Body:                               types.StringPointerValue(response.Body),
 		IsPaused:                           types.BoolValue(response.IsPaused),
 		ContentTest:                        types.StringPointerValue(response.ContentTest),
+		ContentTestMode:                    types.StringPointerValue(response.ContentTestMode),
 		SSLCertificateMaxAgeInDaysDegraded: types.Int64PointerValue(response.SSLCertificateMaxAgeInDaysDegraded),
 		SSLCertificateMaxAgeInDaysDown:     types.Int64PointerValue(response.SSLCertificateMaxAgeInDaysDown),
 		SeverityDegraded:                   types.StringPointerValue(response.SeverityDegraded),

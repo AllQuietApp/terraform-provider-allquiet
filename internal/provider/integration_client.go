@@ -96,6 +96,7 @@ type httpMonitoringResponse struct {
 	Body                               *string            `json:"body"`
 	IsPaused                           bool               `json:"isPaused"`
 	ContentTest                        *string            `json:"contentTest"`
+	ContentTestMode                    *string            `json:"contentTestMode"`
 	SSLCertificateMaxAgeInDaysDegraded *int64             `json:"sslCertificateMaxAgeInDaysDegraded"`
 	SSLCertificateMaxAgeInDaysDown     *int64             `json:"sslCertificateMaxAgeInDaysDown"`
 	SeverityDegraded                   *string            `json:"severityDegraded"`
@@ -236,6 +237,7 @@ func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringRe
 		Body:                               plan.Body.ValueStringPointer(),
 		IsPaused:                           plan.IsPaused.ValueBool(),
 		ContentTest:                        plan.ContentTest.ValueStringPointer(),
+		ContentTestMode:                    plan.ContentTestMode.ValueStringPointer(),
 		SSLCertificateMaxAgeInDaysDegraded: plan.SSLCertificateMaxAgeInDaysDegraded.ValueInt64Pointer(),
 		SSLCertificateMaxAgeInDaysDown:     plan.SSLCertificateMaxAgeInDaysDown.ValueInt64Pointer(),
 		SeverityDegraded:                   plan.SeverityDegraded.ValueStringPointer(),
