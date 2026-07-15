@@ -106,6 +106,7 @@ resource "allquiet_integration" "http_monitoring_post" {
       body                                     = "{\"message\": \"Hello, world!\"}"
       is_paused                                = false
       content_test                             = "Expected response text"
+      content_test_mode                        = "Contains"
       ssl_certificate_max_age_in_days_degraded = 30
       ssl_certificate_max_age_in_days_down     = 10
       severity_degraded                        = "Warning"
