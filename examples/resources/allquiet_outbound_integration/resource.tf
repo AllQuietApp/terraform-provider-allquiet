@@ -53,6 +53,7 @@ resource "allquiet_outbound_integration" "slack_with_channels" {
     selected_channel_ids               = ["C1234567890", "C0987654321"]
     tag_on_call_members                = true
     is_slack_message_payload_read_only = false
+    hide_activity_history              = false
   }
 }
 
@@ -113,6 +114,16 @@ resource "allquiet_outbound_integration" "slack_full_config" {
     on_call_reminder_channel_ids       = ["C6666666666"]
     tag_on_call_members                = true
     is_slack_message_payload_read_only = false
+    hide_activity_history              = true
+    dedicated_channel = {
+      is_enabled               = true
+      severities               = ["Critical", "Warning"]
+      channel_name_prefix      = "inc"
+      is_private               = true
+      invite_on_call_members   = true
+      archive_on_resolve       = true
+      archive_delay_in_seconds = 3600
+    }
   }
 }
 

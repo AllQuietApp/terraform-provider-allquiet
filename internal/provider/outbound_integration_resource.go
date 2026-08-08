@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -157,6 +158,57 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 					"is_slack_message_payload_read_only": schema.BoolAttribute{
 						MarkdownDescription: "If true, the Slack message payload will be read-only.",
 						Optional:            true,
+					},
+					"hide_activity_history": schema.BoolAttribute{
+						MarkdownDescription: "If true, hide activity history in Slack notifications.",
+						Optional:            true,
+					},
+					"dedicated_channel": schema.SingleNestedAttribute{
+						MarkdownDescription: "Settings for creating a dedicated Slack channel per incident.",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"is_enabled": schema.BoolAttribute{
+								MarkdownDescription: "If true, create a dedicated Slack channel for each matching incident.",
+								Optional:            true,
+							},
+							"severities": schema.ListAttribute{
+								MarkdownDescription: "Incident severities that trigger dedicated channel creation. Allowed values: Critical, Warning, Minor.",
+								Optional:            true,
+								Computed:            true,
+								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.ValueStringsAre(stringvalidator.OneOf("Critical", "Warning", "Minor")),
+								},
+							},
+							"channel_name_prefix": schema.StringAttribute{
+								MarkdownDescription: "Prefix for dedicated channel names. Defaults to 'inc'.",
+								Optional:            true,
+								Computed:            true,
+							},
+							"is_private": schema.BoolAttribute{
+								MarkdownDescription: "If true, create dedicated channels as private. Defaults to true.",
+								Optional:            true,
+								Computed:            true,
+							},
+							"invite_on_call_members": schema.BoolAttribute{
+								MarkdownDescription: "If true, invite on-call members to dedicated channels. Defaults to true.",
+								Optional:            true,
+								Computed:            true,
+							},
+							"archive_on_resolve": schema.BoolAttribute{
+								MarkdownDescription: "If true, archive dedicated channels when incidents are resolved. Defaults to false.",
+								Optional:            true,
+								Computed:            true,
+							},
+							"archive_delay_in_seconds": schema.Int64Attribute{
+								MarkdownDescription: "Delay in seconds before archiving dedicated channels after resolve. Only valid when archive_on_resolve is true.",
+								Optional:            true,
+								Computed:            true,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 2592000),
+								},
+							},
+						},
 					},
 				},
 			},
@@ -364,6 +416,18 @@ type SlackSettings struct {
 	OnCallReminderChannelIds       types.List                    `tfsdk:"on_call_reminder_channel_ids"`
 	TagOnCallMembers               types.Bool                    `tfsdk:"tag_on_call_members"`
 	IsSlackMessagePayloadReadOnly  types.Bool                    `tfsdk:"is_slack_message_payload_read_only"`
+	HideActivityHistory            types.Bool                    `tfsdk:"hide_activity_history"`
+	DedicatedChannel               *DedicatedChannelSettings     `tfsdk:"dedicated_channel"`
+}
+
+type DedicatedChannelSettings struct {
+	IsEnabled               types.Bool   `tfsdk:"is_enabled"`
+	Severities              types.List   `tfsdk:"severities"`
+	ChannelNamePrefix       types.String `tfsdk:"channel_name_prefix"`
+	IsPrivate               types.Bool   `tfsdk:"is_private"`
+	InviteOnCallMembers     types.Bool   `tfsdk:"invite_on_call_members"`
+	ArchiveOnResolve        types.Bool   `tfsdk:"archive_on_resolve"`
+	ArchiveDelayInSeconds   types.Int64  `tfsdk:"archive_delay_in_seconds"`
 }
 
 type SeverityBasedChannelSettings struct {
@@ -402,6 +466,18 @@ type slackSettings struct {
 	OnCallReminderChannelIds       *[]string                     `json:"onCallReminderChannelIds"`
 	TagOnCallMembers               *bool                         `json:"tagOnCallMembers"`
 	IsSlackMessagePayloadReadOnly  *bool                         `json:"isSlackMessagePayloadReadOnly"`
+	HideActivityHistory            *bool                         `json:"hideActivityHistory"`
+	DedicatedChannel               *dedicatedChannelSettings     `json:"dedicatedChannel"`
+}
+
+type dedicatedChannelSettings struct {
+	IsEnabled             *bool     `json:"isEnabled"`
+	Severities            *[]string `json:"severities"`
+	ChannelNamePrefix     *string   `json:"channelNamePrefix"`
+	IsPrivate             *bool     `json:"isPrivate"`
+	InviteOnCallMembers   *bool     `json:"inviteOnCallMembers"`
+	ArchiveOnResolve      *bool     `json:"archiveOnResolve"`
+	ArchiveDelayInSeconds *int64    `json:"archiveDelayInSeconds"`
 }
 
 type severityBasedChannelSettings struct {
@@ -443,6 +519,7 @@ func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
 		OnCallReminderChannelIds:      ListToStringArray(settings.OnCallReminderChannelIds),
 		TagOnCallMembers:              settings.TagOnCallMembers.ValueBoolPointer(),
 		IsSlackMessagePayloadReadOnly: settings.IsSlackMessagePayloadReadOnly.ValueBoolPointer(),
+		HideActivityHistory:           settings.HideActivityHistory.ValueBoolPointer(),
 	}
 
 	if settings.SeverityBasedChannelSettings != nil {
@@ -463,6 +540,32 @@ func MapSlackSettingsToRequest(settings *SlackSettings) *slackSettings {
 			RunTime:    runTime,
 			DaysOfWeek: ListToStringArray(settings.OnCallReminderScheduleSettings.DaysOfWeek),
 		}
+	}
+
+	if settings.DedicatedChannel != nil {
+		result.DedicatedChannel = MapDedicatedChannelToRequest(settings.DedicatedChannel)
+	}
+
+	return result
+}
+
+func MapDedicatedChannelToRequest(settings *DedicatedChannelSettings) *dedicatedChannelSettings {
+	if settings == nil {
+		return nil
+	}
+
+	result := &dedicatedChannelSettings{
+		IsEnabled:             settings.IsEnabled.ValueBoolPointer(),
+		Severities:            ListToStringArray(settings.Severities),
+		InviteOnCallMembers:   settings.InviteOnCallMembers.ValueBoolPointer(),
+		IsPrivate:               settings.IsPrivate.ValueBoolPointer(),
+		ArchiveOnResolve:      settings.ArchiveOnResolve.ValueBoolPointer(),
+		ArchiveDelayInSeconds: settings.ArchiveDelayInSeconds.ValueInt64Pointer(),
+	}
+
+	if !settings.ChannelNamePrefix.IsNull() && !settings.ChannelNamePrefix.IsUnknown() {
+		channelNamePrefix := settings.ChannelNamePrefix.ValueString()
+		result.ChannelNamePrefix = &channelNamePrefix
 	}
 
 	return result
@@ -569,8 +672,10 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 		(settings.OnCallReminderScheduleSettings.RunTime != nil || (settings.OnCallReminderScheduleSettings.DaysOfWeek != nil && len(*settings.OnCallReminderScheduleSettings.DaysOfWeek) > 0))
 	hasTagOnCallMembers := settings.TagOnCallMembers != nil
 	hasIsSlackMessagePayloadReadOnly := settings.IsSlackMessagePayloadReadOnly != nil
+	hasHideActivityHistory := settings.HideActivityHistory != nil
+	hasDedicatedChannel := settings.DedicatedChannel != nil && hasDedicatedChannelSettings(settings.DedicatedChannel)
 
-	if !hasSelectedChannelIds && !hasSeverityBased && !hasOnCallReminderChannelIds && !hasOnCallReminderSchedule && !hasTagOnCallMembers && !hasIsSlackMessagePayloadReadOnly {
+	if !hasSelectedChannelIds && !hasSeverityBased && !hasOnCallReminderChannelIds && !hasOnCallReminderSchedule && !hasTagOnCallMembers && !hasIsSlackMessagePayloadReadOnly && !hasHideActivityHistory && !hasDedicatedChannel {
 		return nil
 	}
 
@@ -579,6 +684,7 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 		OnCallReminderChannelIds:      MapNullableList(ctx, settings.OnCallReminderChannelIds),
 		TagOnCallMembers:              types.BoolPointerValue(settings.TagOnCallMembers),
 		IsSlackMessagePayloadReadOnly: types.BoolPointerValue(settings.IsSlackMessagePayloadReadOnly),
+		HideActivityHistory:           types.BoolPointerValue(settings.HideActivityHistory),
 	}
 
 	if settings.SeverityBasedChannelSettings != nil {
@@ -597,7 +703,41 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 		}
 	}
 
+	if settings.DedicatedChannel != nil {
+		result.DedicatedChannel = MapDedicatedChannelResponseToModel(ctx, settings.DedicatedChannel)
+	}
+
 	return result
+}
+
+func hasDedicatedChannelSettings(settings *dedicatedChannelSettings) bool {
+	if settings == nil {
+		return false
+	}
+
+	return settings.IsEnabled != nil ||
+		settings.Severities != nil ||
+		settings.ChannelNamePrefix != nil ||
+		settings.IsPrivate != nil ||
+		settings.InviteOnCallMembers != nil ||
+		settings.ArchiveOnResolve != nil ||
+		settings.ArchiveDelayInSeconds != nil
+}
+
+func MapDedicatedChannelResponseToModel(ctx context.Context, settings *dedicatedChannelSettings) *DedicatedChannelSettings {
+	if settings == nil {
+		return nil
+	}
+
+	return &DedicatedChannelSettings{
+		IsEnabled:             types.BoolPointerValue(settings.IsEnabled),
+		Severities:            MapNullableList(ctx, settings.Severities),
+		ChannelNamePrefix:     types.StringPointerValue(settings.ChannelNamePrefix),
+		IsPrivate:             types.BoolPointerValue(settings.IsPrivate),
+		InviteOnCallMembers:   types.BoolPointerValue(settings.InviteOnCallMembers),
+		ArchiveOnResolve:      types.BoolPointerValue(settings.ArchiveOnResolve),
+		ArchiveDelayInSeconds: types.Int64PointerValue(settings.ArchiveDelayInSeconds),
+	}
 }
 
 func isActiveSeverityChannelList(channelIds *[]string) bool {

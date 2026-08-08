@@ -68,6 +68,7 @@ resource "allquiet_outbound_integration" "slack_with_channels" {
     selected_channel_ids               = ["C1234567890", "C0987654321"]
     tag_on_call_members                = true
     is_slack_message_payload_read_only = false
+    hide_activity_history              = false
   }
 }
 
@@ -128,6 +129,16 @@ resource "allquiet_outbound_integration" "slack_full_config" {
     on_call_reminder_channel_ids       = ["C6666666666"]
     tag_on_call_members                = true
     is_slack_message_payload_read_only = false
+    hide_activity_history              = true
+    dedicated_channel = {
+      is_enabled               = true
+      severities               = ["Critical", "Warning"]
+      channel_name_prefix      = "inc"
+      is_private               = true
+      invite_on_call_members   = true
+      archive_on_resolve       = true
+      archive_delay_in_seconds = 3600
+    }
   }
 }
 
@@ -220,6 +231,8 @@ Optional:
 
 Optional:
 
+- `dedicated_channel` (Attributes) Settings for creating a dedicated Slack channel per incident. (see [below for nested schema](#nestedatt--slack_settings--dedicated_channel))
+- `hide_activity_history` (Boolean) If true, hide activity history in Slack notifications.
 - `is_slack_message_payload_read_only` (Boolean) If true, the Slack message payload will be read-only.
 - `on_call_reminder_channel_ids` (List of String) List of Slack channel IDs for on-call reminders.
 - `on_call_reminder_schedule_settings` (Attributes) Schedule settings for on-call reminders. (see [below for nested schema](#nestedatt--slack_settings--on_call_reminder_schedule_settings))
@@ -244,6 +257,20 @@ Optional:
 - `selected_channel_ids_critical` (List of String) Slack channel IDs for critical severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.
 - `selected_channel_ids_minor` (List of String) Slack channel IDs for minor severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.
 - `selected_channel_ids_warning` (List of String) Slack channel IDs for warning severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.
+
+
+<a id="nestedatt--slack_settings--dedicated_channel"></a>
+### Nested Schema for `slack_settings.dedicated_channel`
+
+Optional:
+
+- `archive_delay_in_seconds` (Number) Delay in seconds before archiving dedicated channels after resolve. Only valid when archive_on_resolve is true.
+- `archive_on_resolve` (Boolean) If true, archive dedicated channels when incidents are resolved. Defaults to false.
+- `channel_name_prefix` (String) Prefix for dedicated channel names. Defaults to 'inc'.
+- `invite_on_call_members` (Boolean) If true, invite on-call members to dedicated channels. Defaults to true.
+- `is_enabled` (Boolean) If true, create a dedicated Slack channel for each matching incident.
+- `is_private` (Boolean) If true, create dedicated channels as private. Defaults to true.
+- `severities` (List of String) Incident severities that trigger dedicated channel creation. Allowed values: Critical, Warning, Minor.
 
 
 

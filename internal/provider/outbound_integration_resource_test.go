@@ -165,6 +165,7 @@ func TestAccOutboundIntegrationResourceSlackSettings(t *testing.T) {
 					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.selected_channel_ids.1", "channel2"),
 					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.tag_on_call_members", "true"),
 					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.is_slack_message_payload_read_only", "false"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.hide_activity_history", "true"),
 				),
 			},
 			// Create Slack integration with severity_based_channel_settings
@@ -206,6 +207,24 @@ func TestAccOutboundIntegrationResourceSlackSettings(t *testing.T) {
 					resource.TestCheckNoResourceAttr("allquiet_outbound_integration.slack_with_channels", "slack_settings.selected_channel_ids"),
 				),
 			},
+			// Create Slack integration with dedicated_channel settings
+			{
+				Config: testAccOutboundIntegrationSlackSettingsConfig("with_dedicated_channel"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "display_name", "Slack With Dedicated Channel"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "type", "Slack"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.selected_channel_ids.#", "1"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.is_enabled", "true"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.severities.#", "2"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.severities.0", "Critical"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.severities.1", "Warning"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.channel_name_prefix", "inc"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.is_private", "true"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.invite_on_call_members", "true"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.archive_on_resolve", "true"),
+					resource.TestCheckResourceAttr("allquiet_outbound_integration.slack_with_dedicated_channel", "slack_settings.dedicated_channel.archive_delay_in_seconds", "3600"),
+				),
+			},
 		},
 	})
 }
@@ -234,9 +253,10 @@ resource "allquiet_outbound_integration" "slack_with_channels" {
   type         = "Slack"
   
   slack_settings = {
-    selected_channel_ids              = ["channel1", "channel2"]
-    tag_on_call_members               = true
+    selected_channel_ids               = ["channel1", "channel2"]
+    tag_on_call_members                = true
     is_slack_message_payload_read_only = false
+    hide_activity_history              = true
   }
 }
 `
@@ -282,6 +302,27 @@ resource "allquiet_outbound_integration" "slack_with_channels" {
   slack_settings = {
     severity_based_channel_settings = {
       selected_channel_ids_minor    = ["minor_channel"]
+    }
+  }
+}
+`
+	case "with_dedicated_channel":
+		return baseConfig + `
+resource "allquiet_outbound_integration" "slack_with_dedicated_channel" {
+  display_name = "Slack With Dedicated Channel"
+  team_id      = allquiet_team.test.id
+  type         = "Slack"
+
+  slack_settings = {
+    selected_channel_ids = ["channel1"]
+    dedicated_channel = {
+      is_enabled               = true
+      severities               = ["Critical", "Warning"]
+      channel_name_prefix      = "inc"
+      is_private               = true
+      invite_on_call_members   = true
+      archive_on_resolve       = true
+      archive_delay_in_seconds = 3600
     }
   }
 }
