@@ -212,17 +212,17 @@ Optional:
 - `is_message_read_only` (Boolean) If true, the Mattermost message will be read-only.
 - `selected_channel_ids` (List of String) List of Mattermost channel IDs to send notifications to. Either this or severity_based_channel_settings must be provided, but not both.
 - `selected_team_id` (String) The Mattermost team ID.
-- `severity_based_channel_settings` (Attributes) Severity-based channel routing. Per severity: omitted/null sends to all available channels in the selected team, an empty list sends to none, and a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both. (see [below for nested schema](#nestedatt--mattermost_settings--severity_based_channel_settings))
+- `severity_based_channel_settings` (Attributes) Severity-based channel routing. All three severity lists are required. An empty list disables notifications for that severity; a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both. (see [below for nested schema](#nestedatt--mattermost_settings--severity_based_channel_settings))
 - `slash_command_token` (String, Sensitive) The Mattermost slash command token.
 
 <a id="nestedatt--mattermost_settings--severity_based_channel_settings"></a>
 ### Nested Schema for `mattermost_settings.severity_based_channel_settings`
 
-Optional:
+Required:
 
-- `selected_channel_ids_critical` (List of String) Mattermost channel IDs for critical severity. Omit or set to null to send to all available channels in the selected team. Set to an empty list to disable notifications for this severity.
-- `selected_channel_ids_minor` (List of String) Mattermost channel IDs for minor severity. Omit or set to null to send to all available channels in the selected team. Set to an empty list to disable notifications for this severity.
-- `selected_channel_ids_warning` (List of String) Mattermost channel IDs for warning severity. Omit or set to null to send to all available channels in the selected team. Set to an empty list to disable notifications for this severity.
+- `selected_channel_ids_critical` (List of String) Mattermost channel IDs for critical severity. Set to an empty list to disable notifications for this severity.
+- `selected_channel_ids_minor` (List of String) Mattermost channel IDs for minor severity. Set to an empty list to disable notifications for this severity.
+- `selected_channel_ids_warning` (List of String) Mattermost channel IDs for warning severity. Set to an empty list to disable notifications for this severity.
 
 
 
@@ -237,27 +237,8 @@ Optional:
 - `on_call_reminder_channel_ids` (List of String) List of Slack channel IDs for on-call reminders.
 - `on_call_reminder_schedule_settings` (Attributes) Schedule settings for on-call reminders. (see [below for nested schema](#nestedatt--slack_settings--on_call_reminder_schedule_settings))
 - `selected_channel_ids` (List of String) List of Slack channel IDs to send notifications to. Either this or severity_based_channel_settings must be provided, but not both.
-- `severity_based_channel_settings` (Attributes) Severity-based channel routing. Per severity: omitted/null sends to all available channels, an empty list sends to none, and a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both. (see [below for nested schema](#nestedatt--slack_settings--severity_based_channel_settings))
+- `severity_based_channel_settings` (Attributes) Severity-based channel routing. All three severity lists are required. An empty list disables notifications for that severity; a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both. (see [below for nested schema](#nestedatt--slack_settings--severity_based_channel_settings))
 - `tag_on_call_members` (Boolean) If true, tag on-call members in Slack notifications.
-
-<a id="nestedatt--slack_settings--on_call_reminder_schedule_settings"></a>
-### Nested Schema for `slack_settings.on_call_reminder_schedule_settings`
-
-Optional:
-
-- `days_of_week` (List of String) List of days of the week for the reminder schedule (e.g., ['Monday', 'Wednesday']).
-- `run_time` (String) The time to run the reminder in HH:mm format (e.g., '09:00').
-
-
-<a id="nestedatt--slack_settings--severity_based_channel_settings"></a>
-### Nested Schema for `slack_settings.severity_based_channel_settings`
-
-Optional:
-
-- `selected_channel_ids_critical` (List of String) Slack channel IDs for critical severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.
-- `selected_channel_ids_minor` (List of String) Slack channel IDs for minor severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.
-- `selected_channel_ids_warning` (List of String) Slack channel IDs for warning severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.
-
 
 <a id="nestedatt--slack_settings--dedicated_channel"></a>
 ### Nested Schema for `slack_settings.dedicated_channel`
@@ -271,6 +252,25 @@ Optional:
 - `is_enabled` (Boolean) If true, create a dedicated Slack channel for each matching incident.
 - `is_private` (Boolean) If true, create dedicated channels as private. Defaults to true.
 - `severities` (List of String) Incident severities that trigger dedicated channel creation. Allowed values: Critical, Warning, Minor.
+
+
+<a id="nestedatt--slack_settings--on_call_reminder_schedule_settings"></a>
+### Nested Schema for `slack_settings.on_call_reminder_schedule_settings`
+
+Optional:
+
+- `days_of_week` (List of String) List of days of the week for the reminder schedule (e.g., ['Monday', 'Wednesday']).
+- `run_time` (String) The time to run the reminder in HH:mm format (e.g., '09:00').
+
+
+<a id="nestedatt--slack_settings--severity_based_channel_settings"></a>
+### Nested Schema for `slack_settings.severity_based_channel_settings`
+
+Required:
+
+- `selected_channel_ids_critical` (List of String) Slack channel IDs for critical severity. Set to an empty list to disable notifications for this severity.
+- `selected_channel_ids_minor` (List of String) Slack channel IDs for minor severity. Set to an empty list to disable notifications for this severity.
+- `selected_channel_ids_warning` (List of String) Slack channel IDs for warning severity. Set to an empty list to disable notifications for this severity.
 
 
 

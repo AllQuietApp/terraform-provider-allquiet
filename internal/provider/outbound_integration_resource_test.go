@@ -302,6 +302,8 @@ resource "allquiet_outbound_integration" "slack_with_channels" {
   slack_settings = {
     severity_based_channel_settings = {
       selected_channel_ids_minor    = ["minor_channel"]
+      selected_channel_ids_warning  = []
+      selected_channel_ids_critical = []
     }
   }
 }
@@ -456,7 +458,9 @@ resource "allquiet_outbound_integration" "mattermost_with_channels" {
     base_url                     = "https://mattermost.com"
     selected_team_id             = "team-id-1"
     severity_based_channel_settings = {
-      selected_channel_ids_minor = ["minor_channel"]
+      selected_channel_ids_minor    = ["minor_channel"]
+      selected_channel_ids_warning  = []
+      selected_channel_ids_critical = []
     }
   }
 }

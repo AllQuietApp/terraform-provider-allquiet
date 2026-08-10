@@ -116,6 +116,16 @@ func MapNullableList(ctx context.Context, stringArray *[]string) types.List {
 	return mapNullableListWithEmpty(ctx, stringArray)
 }
 
+// MapListOrEmpty maps nil API lists to an empty Terraform list so required list
+// attributes stay consistent with config that uses [].
+func MapListOrEmpty(ctx context.Context, stringArray *[]string) types.List {
+	if stringArray == nil {
+		listValue, _ := types.ListValueFrom(ctx, types.StringType, []string{})
+		return listValue
+	}
+	return mapNullableListWithEmpty(ctx, stringArray)
+}
+
 // BoolPointerWithDefaultTrue returns types.BoolValue(true) when v is nil (API omitted field),
 // otherwise returns the value. Use for optional bool attributes whose schema default is true.
 func BoolPointerWithDefaultTrue(v *bool) types.Bool {

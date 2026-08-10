@@ -111,22 +111,22 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 						ElementType:         types.StringType,
 					},
 					"severity_based_channel_settings": schema.SingleNestedAttribute{
-						MarkdownDescription: "Severity-based channel routing. Per severity: omitted/null sends to all available channels, an empty list sends to none, and a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both.",
+						MarkdownDescription: "Severity-based channel routing. All three severity lists are required. An empty list disables notifications for that severity; a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both.",
 						Optional:            true,
 						Attributes: map[string]schema.Attribute{
 							"selected_channel_ids_minor": schema.ListAttribute{
-								MarkdownDescription: "Slack channel IDs for minor severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.",
-								Optional:            true,
+								MarkdownDescription: "Slack channel IDs for minor severity. Set to an empty list to disable notifications for this severity.",
+								Required:            true,
 								ElementType:         types.StringType,
 							},
 							"selected_channel_ids_warning": schema.ListAttribute{
-								MarkdownDescription: "Slack channel IDs for warning severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.",
-								Optional:            true,
+								MarkdownDescription: "Slack channel IDs for warning severity. Set to an empty list to disable notifications for this severity.",
+								Required:            true,
 								ElementType:         types.StringType,
 							},
 							"selected_channel_ids_critical": schema.ListAttribute{
-								MarkdownDescription: "Slack channel IDs for critical severity. Omit or set to null to send to all available channels. Set to an empty list to disable notifications for this severity.",
-								Optional:            true,
+								MarkdownDescription: "Slack channel IDs for critical severity. Set to an empty list to disable notifications for this severity.",
+								Required:            true,
 								ElementType:         types.StringType,
 							},
 						},
@@ -244,22 +244,22 @@ func (r *OutboundIntegration) Schema(ctx context.Context, req resource.SchemaReq
 						ElementType:         types.StringType,
 					},
 					"severity_based_channel_settings": schema.SingleNestedAttribute{
-						MarkdownDescription: "Severity-based channel routing. Per severity: omitted/null sends to all available channels in the selected team, an empty list sends to none, and a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both.",
+						MarkdownDescription: "Severity-based channel routing. All three severity lists are required. An empty list disables notifications for that severity; a list of IDs sends only to those channels. Either this or selected_channel_ids must be provided, but not both.",
 						Optional:            true,
 						Attributes: map[string]schema.Attribute{
 							"selected_channel_ids_minor": schema.ListAttribute{
-								MarkdownDescription: "Mattermost channel IDs for minor severity. Omit or set to null to send to all available channels in the selected team. Set to an empty list to disable notifications for this severity.",
-								Optional:            true,
+								MarkdownDescription: "Mattermost channel IDs for minor severity. Set to an empty list to disable notifications for this severity.",
+								Required:            true,
 								ElementType:         types.StringType,
 							},
 							"selected_channel_ids_warning": schema.ListAttribute{
-								MarkdownDescription: "Mattermost channel IDs for warning severity. Omit or set to null to send to all available channels in the selected team. Set to an empty list to disable notifications for this severity.",
-								Optional:            true,
+								MarkdownDescription: "Mattermost channel IDs for warning severity. Set to an empty list to disable notifications for this severity.",
+								Required:            true,
 								ElementType:         types.StringType,
 							},
 							"selected_channel_ids_critical": schema.ListAttribute{
-								MarkdownDescription: "Mattermost channel IDs for critical severity. Omit or set to null to send to all available channels in the selected team. Set to an empty list to disable notifications for this severity.",
-								Optional:            true,
+								MarkdownDescription: "Mattermost channel IDs for critical severity. Set to an empty list to disable notifications for this severity.",
+								Required:            true,
 								ElementType:         types.StringType,
 							},
 						},
@@ -624,10 +624,7 @@ func MapMattermostSettingsResponseToModel(ctx context.Context, settings *matterm
 	hasBotToken := settings.BotToken != nil && *settings.BotToken != ""
 	hasSlashCommandToken := settings.SlashCommandToken != nil && *settings.SlashCommandToken != ""
 	hasSelectedChannelIds := settings.SelectedChannelIds != nil && len(*settings.SelectedChannelIds) > 0
-	hasSeverityBased := settings.SeverityBasedChannelSettings != nil &&
-		(isActiveSeverityChannelList(settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor) ||
-			isActiveSeverityChannelList(settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning) ||
-			isActiveSeverityChannelList(settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical))
+	hasSeverityBased := settings.SeverityBasedChannelSettings != nil
 	hasSelectedTeamId := settings.SelectedTeamId != nil && *settings.SelectedTeamId != ""
 	hasIsMessageReadOnly := settings.IsMessageReadOnly != nil
 
@@ -648,9 +645,9 @@ func MapMattermostSettingsResponseToModel(ctx context.Context, settings *matterm
 
 	if settings.SeverityBasedChannelSettings != nil {
 		result.SeverityBasedChannelSettings = &MattermostSeverityBasedChannelSettings{
-			SelectedChannelIdsMinor:    MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
-			SelectedChannelIdsWarning:  MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
-			SelectedChannelIdsCritical: MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
+			SelectedChannelIdsMinor:    MapListOrEmpty(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
+			SelectedChannelIdsWarning:  MapListOrEmpty(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
+			SelectedChannelIdsCritical: MapListOrEmpty(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
 		}
 	}
 
@@ -663,10 +660,7 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 	}
 
 	hasSelectedChannelIds := settings.SelectedChannelIds != nil && len(*settings.SelectedChannelIds) > 0
-	hasSeverityBased := settings.SeverityBasedChannelSettings != nil &&
-		(isActiveSeverityChannelList(settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor) ||
-			isActiveSeverityChannelList(settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning) ||
-			isActiveSeverityChannelList(settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical))
+	hasSeverityBased := settings.SeverityBasedChannelSettings != nil
 	hasOnCallReminderChannelIds := settings.OnCallReminderChannelIds != nil && len(*settings.OnCallReminderChannelIds) > 0
 	hasOnCallReminderSchedule := settings.OnCallReminderScheduleSettings != nil &&
 		(settings.OnCallReminderScheduleSettings.RunTime != nil || (settings.OnCallReminderScheduleSettings.DaysOfWeek != nil && len(*settings.OnCallReminderScheduleSettings.DaysOfWeek) > 0))
@@ -689,9 +683,9 @@ func MapSlackSettingsResponseToModel(ctx context.Context, settings *slackSetting
 
 	if settings.SeverityBasedChannelSettings != nil {
 		result.SeverityBasedChannelSettings = &SeverityBasedChannelSettings{
-			SelectedChannelIdsMinor:    MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
-			SelectedChannelIdsWarning:  MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
-			SelectedChannelIdsCritical: MapNullableList(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
+			SelectedChannelIdsMinor:    MapListOrEmpty(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsMinor),
+			SelectedChannelIdsWarning:  MapListOrEmpty(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsWarning),
+			SelectedChannelIdsCritical: MapListOrEmpty(ctx, settings.SeverityBasedChannelSettings.SelectedChannelIdsCritical),
 		}
 	}
 
@@ -740,6 +734,3 @@ func MapDedicatedChannelResponseToModel(ctx context.Context, settings *dedicated
 	}
 }
 
-func isActiveSeverityChannelList(channelIds *[]string) bool {
-	return channelIds == nil || len(*channelIds) > 0
-}
