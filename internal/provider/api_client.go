@@ -42,16 +42,18 @@ type AllQuietAPIClient struct {
 }
 
 func NewAllQuietAPIClient(apiKey, endpointURL string, basicAuth *BasicAuth, providerVersion string) *AllQuietAPIClient {
+	authTransport := &AuthTransport{
+		APIKey:    apiKey,
+		UserAgent: providerHTTPUserAgent(providerVersion),
+		Transport: http.DefaultTransport,
+		BasicAuth: basicAuth,
+	}
+
 	return &AllQuietAPIClient{
 		APIKey:      apiKey,
 		EndpointURL: endpointURL,
 		HTTPClient: &http.Client{
-			Transport: &AuthTransport{
-				APIKey:    apiKey,
-				UserAgent: providerHTTPUserAgent(providerVersion),
-				Transport: http.DefaultTransport,
-				BasicAuth: basicAuth,
-			},
+			Transport: newThrottledTransport(authTransport),
 		},
 	}
 }
@@ -63,8 +65,7 @@ func providerHTTPUserAgent(version string) string {
 	return "terraform-provider-allquiet/" + version
 }
 
-// newRequest creates a new HTTP request with the base URL and provided path.
-func (c *AllQuietAPIClient) newRequest(method, path string, data interface{}) (*http.Request, error) {
+func (c *AllQuietAPIClient) newRequest(ctx context.Context, method, path string, data interface{}) (*http.Request, error) {
 	var buf bytes.Buffer
 	if data != nil {
 		err := json.NewEncoder(&buf).Encode(data)
@@ -73,7 +74,7 @@ func (c *AllQuietAPIClient) newRequest(method, path string, data interface{}) (*
 		}
 	}
 
-	req, err := http.NewRequest(method, c.EndpointURL+path, &buf)
+	req, err := http.NewRequestWithContext(ctx, method, c.EndpointURL+path, &buf)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (c *AllQuietAPIClient) newRequest(method, path string, data interface{}) (*
 func (c *AllQuietAPIClient) post(ctx context.Context, path string, data interface{}) (*http.Response, error) {
 
 	tflog.Trace(ctx, "%POST "+path)
-	req, err := c.newRequest("POST", path, data)
+	req, err := c.newRequest(ctx, "POST", path, data)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +97,7 @@ func (c *AllQuietAPIClient) post(ctx context.Context, path string, data interfac
 // post sends a PUT request with the given data as JSON.
 func (c *AllQuietAPIClient) put(ctx context.Context, path string, data interface{}) (*http.Response, error) {
 	tflog.Trace(ctx, "PUT "+path)
-	req, err := c.newRequest("PUT", path, data)
+	req, err := c.newRequest(ctx, "PUT", path, data)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +110,7 @@ func (c *AllQuietAPIClient) get(ctx context.Context, path string) (*http.Respons
 
 	tflog.Trace(ctx, "GET "+path)
 
-	req, err := c.newRequest("GET", path, nil)
+	req, err := c.newRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +121,7 @@ func (c *AllQuietAPIClient) get(ctx context.Context, path string) (*http.Respons
 // post sends a DELETE request with the given data as JSON.
 func (c *AllQuietAPIClient) delete(ctx context.Context, path string) (*http.Response, error) {
 	tflog.Trace(ctx, "DELETE "+path)
-	req, err := c.newRequest("DELETE", path, nil)
+	req, err := c.newRequest(ctx, "DELETE", path, nil)
 	if err != nil {
 		return nil, err
 	}

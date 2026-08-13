@@ -74,6 +74,16 @@ This document records all top-level dependencies included in this Terraform prov
 
 ---
 
+### golang.org/x/time v0.10.0
+
+- **License:** BSD-3-Clause (BSD 3-Clause License)
+- **Date of Decision to Include:** 2026-08-13
+- **Why it's needed:** Provides a token-bucket rate limiter used by the provider's HTTP transport to proactively throttle Public API requests and stay within All Quiet rate limits (300 requests per 20 seconds, 2,700 per 5 minutes). Combined with shared pause-on-429 handling, it prevents large Terraform applies from hitting rate limits and allows the provider to honor `Retry-After` responses without hard-coding server-side limits in the binary.
+- **Security Concerns:** No known security vulnerabilities found. Official Go extended library maintained by the Go team, widely used across the Go ecosystem for rate limiting.
+- **Approver:** @madsquist
+
+---
+
 ## Notes
 
 - All HashiCorp dependencies are licensed under MPL-2.0, which is compatible with most open-source licenses.
@@ -85,4 +95,4 @@ This document records all top-level dependencies included in this Terraform prov
 ---
 
 **Document Maintained By:** Maximilian Beller  
-**Last Updated:** 2025-11-04
+**Last Updated:** 2026-08-13
