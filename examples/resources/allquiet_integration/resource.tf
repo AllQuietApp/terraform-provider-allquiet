@@ -15,9 +15,10 @@ resource "allquiet_integration" "amazon_cloudwatch" {
 }
 
 resource "allquiet_integration" "webhook" {
-  display_name = "My Webhook Integration"
-  team_id      = allquiet_team.root.id
-  type         = "Webhook"
+  display_name           = "My Webhook Integration"
+  team_id                = allquiet_team.root.id
+  type                   = "Webhook"
+  noise_limit_in_seconds = 120
   snooze_settings = {
     snooze_window_in_minutes = 1440
   }

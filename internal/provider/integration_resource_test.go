@@ -24,6 +24,7 @@ func TestAccIntegrationResource(t *testing.T) {
 				Config: testAccIntegrationResourceConfig("Integration One"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration One"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "noise_limit_in_seconds", "120"),
 					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.#", "2"),
 					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.0", "prod"),
 					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.1", "monitoring"),
@@ -84,6 +85,7 @@ func TestAccIntegrationResource(t *testing.T) {
 				Config: testAccIntegrationResourceConfig("Integration Two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("allquiet_integration.test", "display_name", "Integration Two"),
+					resource.TestCheckResourceAttr("allquiet_integration.test", "noise_limit_in_seconds", "120"),
 					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.#", "2"),
 					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.0", "prod"),
 					resource.TestCheckResourceAttr("allquiet_integration.test", "labels.1", "monitoring"),
@@ -183,6 +185,7 @@ resource "allquiet_integration" "test" {
   team_id = allquiet_team.test.id
   type = "Datadog"
   labels = ["prod", "monitoring"]
+  noise_limit_in_seconds = 120
 }
 
 resource "allquiet_integration" "webhook_snooze_absolute" {

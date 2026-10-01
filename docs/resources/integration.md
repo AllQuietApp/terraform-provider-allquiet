@@ -30,9 +30,10 @@ resource "allquiet_integration" "amazon_cloudwatch" {
 }
 
 resource "allquiet_integration" "webhook" {
-  display_name = "My Webhook Integration"
-  team_id      = allquiet_team.root.id
-  type         = "Webhook"
+  display_name           = "My Webhook Integration"
+  team_id                = allquiet_team.root.id
+  type                   = "Webhook"
+  noise_limit_in_seconds = 120
   snooze_settings = {
     snooze_window_in_minutes = 1440
   }
@@ -242,6 +243,7 @@ locals {
 - `is_in_maintenance` (Boolean) If the integration is in maintenance mode. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `is_muted` (Boolean) If the integration is muted. Deprecated: Use resource `allquiet_integration_maintenance_window` instead.
 - `labels` (List of String) Labels applied to the integration for filtering and organization
+- `noise_limit_in_seconds` (Number) Incidents that are created and auto-resolved by this integration within the noise limit are counted as noise in incident reports. Leave unset to use the default (60 seconds). Valid range is 1 to 86400 seconds (24 hours).
 - `snooze_settings` (Attributes) The snooze settings of the integration (see [below for nested schema](#nestedatt--snooze_settings))
 - `webhook_authentication` (Attributes) The webhook authentication of the integration (see [below for nested schema](#nestedatt--webhook_authentication))
 

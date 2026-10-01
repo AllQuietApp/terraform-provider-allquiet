@@ -47,6 +47,7 @@ type IntegrationModel struct {
 	Type                  types.String                `tfsdk:"type"`
 	WebhookUrl            types.String                `tfsdk:"webhook_url"`
 	SnoozeSettings        *SnoozeSettingsModel        `tfsdk:"snooze_settings"`
+	NoiseLimitInSeconds   types.Int64                 `tfsdk:"noise_limit_in_seconds"`
 	WebhookAuthentication *WebhookAuthenticationModel `tfsdk:"webhook_authentication"`
 	IntegrationSettings   *IntegrationSettingsModel   `tfsdk:"integration_settings"`
 }
@@ -171,6 +172,13 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
+			},
+			"noise_limit_in_seconds": schema.Int64Attribute{
+				MarkdownDescription: "Incidents that are created and auto-resolved by this integration within the noise limit are counted as noise in incident reports. Leave unset to use the default (60 seconds). Valid range is 1 to 86400 seconds (24 hours).",
+				Optional:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 86400),
+				},
 			},
 			"snooze_settings": schema.SingleNestedAttribute{
 				MarkdownDescription: "The snooze settings of the integration",
@@ -672,6 +680,7 @@ func mapIntegrationResponseToModel(ctx context.Context, response *integrationRes
 	data.Labels = MapNullableList(ctx, response.Labels)
 	data.WebhookUrl = types.StringPointerValue(response.WebhookUrl)
 	data.SnoozeSettings = mapSnoozeSettingsResponseToModel(ctx, response.SnoozeSettings)
+	data.NoiseLimitInSeconds = types.Int64PointerValue(response.NoiseLimitInSeconds)
 	data.WebhookAuthentication = mapWebhookAuthenticationResponseToModel(response.WebhookAuthentication)
 	data.IntegrationSettings = mapIntegrationSettingsResponseToModel(ctx, response.IntegrationSettings, priorSettings)
 }

@@ -20,6 +20,7 @@ type integrationResponse struct {
 	Type                  string                         `json:"type"`
 	WebhookUrl            *string                        `json:"webhookUrl"`
 	SnoozeSettings        *snoozeSettingsResponse        `json:"snoozeSettings"`
+	NoiseLimitInSeconds   *int64                         `json:"noiseLimitInSeconds"`
 	WebhookAuthentication *webhookAuthenticationResponse `json:"webhookAuthentication"`
 	IntegrationSettings   *integrationSettingsResponse   `json:"integrationSettings"`
 }
@@ -32,6 +33,7 @@ type integrationCreateRequest struct {
 	IsInMaintenance       bool                           `json:"isInMaintenance"`
 	Type                  string                         `json:"type"`
 	SnoozeSettings        *snoozeSettingsResponse        `json:"snoozeSettings"`
+	NoiseLimitInSeconds   *int64                         `json:"noiseLimitInSeconds"`
 	WebhookAuthentication *webhookAuthenticationResponse `json:"webhookAuthentication"`
 	IntegrationSettings   *integrationSettingsResponse   `json:"integrationSettings"`
 }
@@ -129,6 +131,7 @@ func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateReque
 		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
 		Type:                  plan.Type.ValueString(),
 		SnoozeSettings:        mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
+		NoiseLimitInSeconds:   plan.NoiseLimitInSeconds.ValueInt64Pointer(),
 		WebhookAuthentication: mapWebhookAuthenticationCreateRequest(plan.WebhookAuthentication),
 		IntegrationSettings:   mapIntegrationSettingsCreateRequest(plan.IntegrationSettings),
 	}
@@ -342,6 +345,7 @@ func (c *AllQuietAPIClient) CreateIntegrationResource(ctx context.Context, plan 
 		IsInMaintenance:       plan.IsInMaintenance.ValueBool(),
 		Type:                  plan.Type.ValueString(),
 		SnoozeSettings:        mapSnoozeSettingsCreateRequest(plan.SnoozeSettings),
+		NoiseLimitInSeconds:   plan.NoiseLimitInSeconds.ValueInt64Pointer(),
 		WebhookAuthentication: mapWebhookAuthenticationCreateRequest(plan.WebhookAuthentication),
 		IntegrationSettings:   mapIntegrationSettingsCreateRequest(plan.IntegrationSettings),
 	}
