@@ -56,7 +56,7 @@ type integrationSettingsResponse struct {
 }
 
 type emailResponse struct {
-	Aliases      *[]string `json:"aliases"`
+	Aliases      *[]string `json:"aliases,omitempty"`
 	EmailAddress string    `json:"emailAddress"`
 }
 
@@ -154,8 +154,13 @@ func mapEmailCreateRequest(plan *EmailSettingsModel) *emailResponse {
 		return nil
 	}
 
+	var aliases *[]string
+	if !plan.Aliases.IsNull() && !plan.Aliases.IsUnknown() {
+		aliases = ListToStringArray(plan.Aliases)
+	}
+
 	return &emailResponse{
-		Aliases: ListToStringArray(plan.Aliases),
+		Aliases: aliases,
 	}
 }
 

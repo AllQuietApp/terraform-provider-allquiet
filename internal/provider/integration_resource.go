@@ -500,9 +500,10 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 						Optional:            true,
 						Attributes: map[string]schema.Attribute{
 							"aliases": schema.ListAttribute{
-								MarkdownDescription: "The custom aliases of the email if you want to use custom aliases instead of the auto generated email address",
+								MarkdownDescription: "Custom email aliases on the integrations domain. Omit to leave existing aliases unchanged; set to an empty list to clear them.",
 								ElementType:         types.StringType,
 								Optional:            true,
+								Computed:            true,
 							},
 							"email_address": schema.StringAttribute{
 								MarkdownDescription: "The auto generated email address of the integration",

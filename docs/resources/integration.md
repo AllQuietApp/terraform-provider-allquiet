@@ -281,7 +281,7 @@ Optional:
 
 Optional:
 
-- `aliases` (List of String) The custom aliases of the email if you want to use custom aliases instead of the auto generated email address
+- `aliases` (List of String) Custom email aliases on the integrations domain. Omit to leave existing aliases unchanged; set to an empty list to clear them.
 
 Read-Only:
 
