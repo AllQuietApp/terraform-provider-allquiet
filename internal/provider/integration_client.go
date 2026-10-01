@@ -106,6 +106,7 @@ type httpMonitoringResponse struct {
 	SeverityDown                       *string            `json:"severityDown"`
 	OverrideAcceptedStatusCodes        *[]int             `json:"overrideAcceptedStatusCodes"`
 	IgnoreNonHttpErrors                bool               `json:"ignoreNonHttpErrors"`
+	DisableFollowRedirect              bool               `json:"disableFollowRedirect"`
 }
 
 type snoozeSettingsResponse struct {
@@ -253,6 +254,7 @@ func mapHttpMonitoringCreateRequest(plan *HttpMonitoringModel) *httpMonitoringRe
 		SeverityDown:                       plan.SeverityDown.ValueStringPointer(),
 		OverrideAcceptedStatusCodes:        listInt64ToIntSlice(plan.OverrideAcceptedStatusCodes),
 		IgnoreNonHttpErrors:                plan.IgnoreNonHttpErrors.ValueBool(),
+		DisableFollowRedirect:              plan.DisableFollowRedirect.ValueBool(),
 	}
 }
 

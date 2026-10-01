@@ -112,6 +112,7 @@ resource "allquiet_integration" "http_monitoring_post" {
       ssl_certificate_max_age_in_days_down     = 10
       severity_degraded                        = "Warning"
       severity_down                            = "Critical"
+      disable_follow_redirect                  = false
     }
   }
 }

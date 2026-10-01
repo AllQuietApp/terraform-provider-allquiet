@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -77,5 +78,45 @@ func TestMapIntegrationResponseToModel_NullNoiseLimit(t *testing.T) {
 
 	if !data.NoiseLimitInSeconds.IsNull() {
 		t.Fatalf("expected null noise limit, got %#v", data.NoiseLimitInSeconds)
+	}
+}
+
+func TestMapHttpMonitoringCreateRequest_DisableFollowRedirect(t *testing.T) {
+	plan := &HttpMonitoringModel{
+		Headers:                     types.MapNull(types.StringType),
+		OverrideAcceptedStatusCodes: types.ListNull(types.Int64Type),
+		DisableFollowRedirect:       types.BoolValue(true),
+	}
+
+	request := mapHttpMonitoringCreateRequest(plan)
+	if request == nil || !request.DisableFollowRedirect {
+		t.Fatalf("expected disableFollowRedirect true, got %#v", request)
+	}
+
+	body, err := json.Marshal(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal(body, &payload); err != nil {
+		t.Fatal(err)
+	}
+	if payload["disableFollowRedirect"] != true {
+		t.Fatalf("expected disableFollowRedirect true in JSON, got %#v", payload["disableFollowRedirect"])
+	}
+}
+
+func TestMapHttpMonitoringResponseToModel_DisableFollowRedirect(t *testing.T) {
+	ctx := context.Background()
+	response := &httpMonitoringResponse{
+		Url:                   "https://example.com",
+		Method:                "GET",
+		DisableFollowRedirect: true,
+	}
+
+	model := mapHttpMonitoringResponseToModel(ctx, response)
+	if model == nil || model.DisableFollowRedirect.IsNull() || !model.DisableFollowRedirect.ValueBool() {
+		t.Fatalf("expected disable_follow_redirect true, got %#v", model)
 	}
 }

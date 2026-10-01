@@ -82,6 +82,7 @@ type HttpMonitoringModel struct {
 	IsPaused                           types.Bool   `tfsdk:"is_paused"`
 	OverrideAcceptedStatusCodes        types.List   `tfsdk:"override_accepted_status_codes"`
 	IgnoreNonHttpErrors                types.Bool   `tfsdk:"ignore_non_http_errors"`
+	DisableFollowRedirect              types.Bool   `tfsdk:"disable_follow_redirect"`
 }
 
 type EmailSettingsModel struct {
@@ -399,6 +400,12 @@ func (r *Integration) Schema(ctx context.Context, req resource.SchemaRequest, re
 							},
 							"ignore_non_http_errors": schema.BoolAttribute{
 								MarkdownDescription: "When true, connection and transport failures (non-HTTP errors) are ignored and do not trigger incidents",
+								Optional:            true,
+								Computed:            true,
+								Default:             booldefault.StaticBool(false),
+							},
+							"disable_follow_redirect": schema.BoolAttribute{
+								MarkdownDescription: "When true, the monitor uses the first HTTP response and does not follow redirects. Defaults to false, so redirects are followed to the final URL.",
 								Optional:            true,
 								Computed:            true,
 								Default:             booldefault.StaticBool(false),
@@ -794,6 +801,7 @@ func mapHttpMonitoringResponseToModel(ctx context.Context, response *httpMonitor
 		SeverityDown:                       types.StringPointerValue(response.SeverityDown),
 		OverrideAcceptedStatusCodes:        MapIntSliceToNullableList(ctx, response.OverrideAcceptedStatusCodes),
 		IgnoreNonHttpErrors:                types.BoolValue(response.IgnoreNonHttpErrors),
+		DisableFollowRedirect:              types.BoolValue(response.DisableFollowRedirect),
 	}
 }
 func mapHeadersResponseToModel(response *map[string]string) types.Map {
