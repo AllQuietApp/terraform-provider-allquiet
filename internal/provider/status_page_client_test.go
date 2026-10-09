@@ -1,13 +1,14 @@
 package provider
 
 import (
+	"context"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func TestMapStatusPageServiceGroupsRequestToModel_EmptyPublicDisplayName(t *testing.T) {
-	serviceIds, _ := types.ListValueFrom(nil, types.StringType, []string{
+	serviceIds, _ := types.ListValueFrom(context.TODO(), types.StringType, []string{
 		"11111111-1111-1111-1111-111111111111",
 	})
 	plan := []StatusPageServiceGroupModel{

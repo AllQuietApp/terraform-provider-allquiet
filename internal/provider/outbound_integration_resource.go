@@ -421,13 +421,13 @@ type SlackSettings struct {
 }
 
 type DedicatedChannelSettings struct {
-	IsEnabled               types.Bool   `tfsdk:"is_enabled"`
-	Severities              types.List   `tfsdk:"severities"`
-	ChannelNamePrefix       types.String `tfsdk:"channel_name_prefix"`
-	IsPrivate               types.Bool   `tfsdk:"is_private"`
-	InviteOnCallMembers     types.Bool   `tfsdk:"invite_on_call_members"`
-	ArchiveOnResolve        types.Bool   `tfsdk:"archive_on_resolve"`
-	ArchiveDelayInSeconds   types.Int64  `tfsdk:"archive_delay_in_seconds"`
+	IsEnabled             types.Bool   `tfsdk:"is_enabled"`
+	Severities            types.List   `tfsdk:"severities"`
+	ChannelNamePrefix     types.String `tfsdk:"channel_name_prefix"`
+	IsPrivate             types.Bool   `tfsdk:"is_private"`
+	InviteOnCallMembers   types.Bool   `tfsdk:"invite_on_call_members"`
+	ArchiveOnResolve      types.Bool   `tfsdk:"archive_on_resolve"`
+	ArchiveDelayInSeconds types.Int64  `tfsdk:"archive_delay_in_seconds"`
 }
 
 type SeverityBasedChannelSettings struct {
@@ -558,7 +558,7 @@ func MapDedicatedChannelToRequest(settings *DedicatedChannelSettings) *dedicated
 		IsEnabled:             settings.IsEnabled.ValueBoolPointer(),
 		Severities:            ListToStringArray(settings.Severities),
 		InviteOnCallMembers:   settings.InviteOnCallMembers.ValueBoolPointer(),
-		IsPrivate:               settings.IsPrivate.ValueBoolPointer(),
+		IsPrivate:             settings.IsPrivate.ValueBoolPointer(),
 		ArchiveOnResolve:      settings.ArchiveOnResolve.ValueBoolPointer(),
 		ArchiveDelayInSeconds: settings.ArchiveDelayInSeconds.ValueInt64Pointer(),
 	}
@@ -733,4 +733,3 @@ func MapDedicatedChannelResponseToModel(ctx context.Context, settings *dedicated
 		ArchiveDelayInSeconds: types.Int64PointerValue(settings.ArchiveDelayInSeconds),
 	}
 }
-

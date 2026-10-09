@@ -133,7 +133,9 @@ func TestThrottledTransportGlobalPauseOn429(t *testing.T) {
 				t.Errorf("Do() error = %v", err)
 				return
 			}
-			io.Copy(io.Discard, resp.Body)
+			if _, err := io.Copy(io.Discard, resp.Body); err != nil {
+				t.Errorf("Copy() error = %v", err)
+			}
 			resp.Body.Close()
 
 			if resp.StatusCode != http.StatusOK {

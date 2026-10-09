@@ -35,8 +35,8 @@ type Team struct {
 }
 
 type IncidentEngagementReportSettingsModel struct {
-	DayOfWeek                           types.String `tfsdk:"day_of_week"`
-	Time                                types.String `tfsdk:"time"`
+	DayOfWeek                             types.String `tfsdk:"day_of_week"`
+	Time                                  types.String `tfsdk:"time"`
 	DisableWeeklyIncidentEngagementReport types.Bool   `tfsdk:"disable_weekly_incident_engagement_report"`
 }
 
@@ -233,8 +233,8 @@ func mapTeamResponseToModel(ctx context.Context, response *teamResponse, data *T
 	data.Labels = MapNullableList(ctx, response.Labels)
 	if response.IncidentEngagementReportSettings != nil {
 		data.IncidentEngagementReportSettings = &IncidentEngagementReportSettingsModel{
-			DayOfWeek:                           types.StringValue(response.IncidentEngagementReportSettings.DayOfWeek),
-			Time:                                types.StringValue(response.IncidentEngagementReportSettings.Time),
+			DayOfWeek:                             types.StringValue(response.IncidentEngagementReportSettings.DayOfWeek),
+			Time:                                  types.StringValue(response.IncidentEngagementReportSettings.Time),
 			DisableWeeklyIncidentEngagementReport: types.BoolValue(response.IncidentEngagementReportSettings.DisableWeeklyIncidentEngagementReport),
 		}
 	}
