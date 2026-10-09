@@ -107,6 +107,123 @@ func TestMapHttpMonitoringCreateRequest_DisableFollowRedirect(t *testing.T) {
 	}
 }
 
+func TestMapWebhookAuthenticationUpdateRequest_OmitsWhenPlanAndPriorAbsent(t *testing.T) {
+	got := mapWebhookAuthenticationUpdateRequest(nil, nil)
+	if got != nil {
+		t.Fatalf("expected nil, got %#v", got)
+	}
+}
+
+func TestMapWebhookAuthenticationUpdateRequest_ClearsWhenRemovedFromPlan(t *testing.T) {
+	prior := &WebhookAuthenticationModel{
+		Type: types.StringValue("bearer"),
+		Bearer: &BearerModel{
+			Token: types.StringValue("secret"),
+		},
+	}
+	got := mapWebhookAuthenticationUpdateRequest(nil, prior)
+	if got == nil || got.Type != "none" {
+		t.Fatalf("expected type none, got %#v", got)
+	}
+	if got.Bearer != nil || got.PrivateIpFilter != nil {
+		t.Fatalf("expected no bearer or ip filter, got %#v", got)
+	}
+}
+
+func TestMapWebhookAuthenticationUpdateRequest_SendsPlannedBearer(t *testing.T) {
+	plan := &WebhookAuthenticationModel{
+		Type: types.StringValue("bearer"),
+		Bearer: &BearerModel{
+			Token: types.StringValue("my-token"),
+		},
+	}
+	got := mapWebhookAuthenticationUpdateRequest(plan, nil)
+	if got == nil || got.Type != "bearer" || got.Bearer == nil || got.Bearer.Token != "my-token" {
+		t.Fatalf("expected bearer token, got %#v", got)
+	}
+}
+
+func TestMapIntegrationUpdateRequest_OmitsWebhookAuthWhenNeverConfigured(t *testing.T) {
+	plan := &IntegrationModel{
+		DisplayName:     types.StringValue("Datadog"),
+		TeamId:          types.StringValue("team-id"),
+		Labels:          types.ListNull(types.StringType),
+		IsMuted:         types.BoolValue(false),
+		IsInMaintenance: types.BoolValue(false),
+		Type:            types.StringValue("Datadog"),
+	}
+	prior := &IntegrationModel{
+		DisplayName:     types.StringValue("Datadog"),
+		TeamId:          types.StringValue("team-id"),
+		IsMuted:         types.BoolValue(false),
+		IsInMaintenance: types.BoolValue(false),
+		Type:            types.StringValue("Datadog"),
+	}
+
+	request := mapIntegrationUpdateRequest(plan, prior)
+	if request.WebhookAuthentication != nil {
+		t.Fatalf("expected nil webhook authentication, got %#v", request.WebhookAuthentication)
+	}
+}
+
+func TestNormalizeWebhookAuthenticationInState_PlanOmitted(t *testing.T) {
+	mapped := &WebhookAuthenticationModel{
+		Type: types.StringValue("bearer"),
+		Bearer: &BearerModel{
+			Token: types.StringValue("secret"),
+		},
+	}
+	got := normalizeWebhookAuthenticationInState(mapped, mapped, true)
+	if got != nil {
+		t.Fatalf("expected nil when plan omitted block, got %#v", got)
+	}
+}
+
+func TestNormalizeWebhookAuthenticationInState_ClearedApiWithNullPrior(t *testing.T) {
+	mapped := mapWebhookAuthenticationResponseToModel(&webhookAuthenticationResponse{Type: "none"})
+	got := normalizeWebhookAuthenticationInState(mapped, nil, false)
+	if got != nil {
+		t.Fatalf("expected nil for cleared api shape, got %#v", got)
+	}
+}
+
+func TestNormalizeWebhookAuthenticationInState_KeepsBearerFromApi(t *testing.T) {
+	mapped := mapWebhookAuthenticationResponseToModel(&webhookAuthenticationResponse{
+		Type: "bearer",
+		Bearer: &webhookAuthenticationBearerResponse{
+			Token: "secret",
+		},
+	})
+	got := normalizeWebhookAuthenticationInState(mapped, nil, false)
+	if got == nil || got.Bearer == nil || got.Bearer.Token.ValueString() != "secret" {
+		t.Fatalf("expected bearer in state, got %#v", got)
+	}
+}
+
+func TestNormalizeWebhookAuthenticationInState_KeepsExplicitNoneInPrior(t *testing.T) {
+	prior := &WebhookAuthenticationModel{
+		Type: types.StringValue("none"),
+	}
+	mapped := mapWebhookAuthenticationResponseToModel(&webhookAuthenticationResponse{Type: "none"})
+	got := normalizeWebhookAuthenticationInState(mapped, prior, false)
+	if got == nil || got.Type.ValueString() != "none" {
+		t.Fatalf("expected explicit none in state, got %#v", got)
+	}
+}
+
+func TestWebhookAuthenticationResponseIsAbsentEffectively(t *testing.T) {
+	if !webhookAuthenticationResponseIsAbsentEffectively(nil) {
+		t.Fatal("expected nil response to be absent")
+	}
+	if !webhookAuthenticationResponseIsAbsentEffectively(&webhookAuthenticationResponse{Type: "none"}) {
+		t.Fatal("expected type none to be absent")
+	}
+	ip := "203.0.113.1"
+	if webhookAuthenticationResponseIsAbsentEffectively(&webhookAuthenticationResponse{Type: "none", PrivateIpFilter: &ip}) {
+		t.Fatal("expected ip filter to count as present")
+	}
+}
+
 func TestMapHttpMonitoringResponseToModel_DisableFollowRedirect(t *testing.T) {
 	ctx := context.Background()
 	response := &httpMonitoringResponse{

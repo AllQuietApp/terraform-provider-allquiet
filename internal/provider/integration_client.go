@@ -138,6 +138,26 @@ func mapIntegrationCreateRequest(plan *IntegrationModel) *integrationCreateReque
 	}
 }
 
+func mapIntegrationUpdateRequest(plan *IntegrationModel, priorState *IntegrationModel) *integrationCreateRequest {
+	request := mapIntegrationCreateRequest(plan)
+	var priorWebhookAuth *WebhookAuthenticationModel
+	if priorState != nil {
+		priorWebhookAuth = priorState.WebhookAuthentication
+	}
+	request.WebhookAuthentication = mapWebhookAuthenticationUpdateRequest(plan.WebhookAuthentication, priorWebhookAuth)
+	return request
+}
+
+func mapWebhookAuthenticationUpdateRequest(plan *WebhookAuthenticationModel, prior *WebhookAuthenticationModel) *webhookAuthenticationResponse {
+	if plan != nil {
+		return mapWebhookAuthenticationCreateRequest(plan)
+	}
+	if prior != nil {
+		return &webhookAuthenticationResponse{Type: "none"}
+	}
+	return nil
+}
+
 func mapIntegrationSettingsCreateRequest(plan *IntegrationSettingsModel) *integrationSettingsResponse {
 	if plan == nil {
 		return nil
@@ -387,8 +407,8 @@ func (c *AllQuietAPIClient) DeleteIntegrationResource(ctx context.Context, id st
 	return nil
 }
 
-func (c *AllQuietAPIClient) UpdateIntegrationResource(ctx context.Context, id string, data *IntegrationModel) (*integrationResponse, error) {
-	reqBody := mapIntegrationCreateRequest(data)
+func (c *AllQuietAPIClient) UpdateIntegrationResource(ctx context.Context, id string, plan *IntegrationModel, priorState *IntegrationModel) (*integrationResponse, error) {
+	reqBody := mapIntegrationUpdateRequest(plan, priorState)
 
 	url := fmt.Sprintf("/inbound-integration/%s", url.PathEscape(id))
 	httpResp, err := c.put(ctx, url, reqBody)

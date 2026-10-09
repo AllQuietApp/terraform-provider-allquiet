@@ -580,7 +580,7 @@ func (r *Integration) Create(ctx context.Context, req resource.CreateRequest, re
 			return
 		}
 
-		integrationResponse, err = r.client.UpdateIntegrationResource(ctx, integrationResponse.Id, &data)
+		integrationResponse, err = r.client.UpdateIntegrationResource(ctx, integrationResponse.Id, &data, nil)
 		if err != nil {
 			resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update integration with uploaded audio, got error: %s", err))
 			return
@@ -615,21 +615,26 @@ func (r *Integration) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
+	priorWebhookAuth := data.WebhookAuthentication
 	priorSettings := data.IntegrationSettings
 	mapIntegrationResponseToModel(ctx, integrationResponse, &data, priorSettings)
+	data.WebhookAuthentication = normalizeWebhookAuthenticationInState(data.WebhookAuthentication, priorWebhookAuth, false)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *Integration) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data IntegrationModel
+	var priorState IntegrationModel
 
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &priorState)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	planOmittedWebhookAuth := data.WebhookAuthentication == nil
 
 	if data.IntegrationSettings != nil && data.IntegrationSettings.Twilio != nil {
 		if err := uploadChangedTwilioAudio(ctx, r.client, data.Id.ValueString(), data.IntegrationSettings.Twilio); err != nil {
@@ -638,13 +643,14 @@ func (r *Integration) Update(ctx context.Context, req resource.UpdateRequest, re
 		}
 	}
 
-	integrationResponse, err := r.client.UpdateIntegrationResource(ctx, data.Id.ValueString(), &data)
+	integrationResponse, err := r.client.UpdateIntegrationResource(ctx, data.Id.ValueString(), &data, &priorState)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update integration resource, got error: %s", err))
 		return
 	}
 
 	mapIntegrationResponseToModel(ctx, integrationResponse, &data, data.IntegrationSettings)
+	data.WebhookAuthentication = normalizeWebhookAuthenticationInState(data.WebhookAuthentication, priorState.WebhookAuthentication, planOmittedWebhookAuth)
 
 	tflog.Trace(ctx, "updated integration resource")
 
@@ -835,6 +841,49 @@ func mapWebhookAuthenticationResponseToModel(response *webhookAuthenticationResp
 		PrivateIpFilter: types.StringPointerValue(response.PrivateIpFilter),
 		Bearer:          mapBearerResponseToModel(response.Bearer),
 	}
+}
+
+func normalizeWebhookAuthenticationInState(mapped *WebhookAuthenticationModel, prior *WebhookAuthenticationModel, planOmitted bool) *WebhookAuthenticationModel {
+	if planOmitted {
+		return nil
+	}
+	if prior == nil && webhookAuthenticationModelIsAbsentEffectively(mapped) {
+		return nil
+	}
+	return mapped
+}
+
+func webhookAuthenticationResponseIsAbsentEffectively(response *webhookAuthenticationResponse) bool {
+	if response == nil {
+		return true
+	}
+	if response.Type != "none" && response.Type != "" {
+		return false
+	}
+	if response.PrivateIpFilter != nil && *response.PrivateIpFilter != "" {
+		return false
+	}
+	if response.Bearer != nil && response.Bearer.Token != "" {
+		return false
+	}
+	return true
+}
+
+func webhookAuthenticationModelIsAbsentEffectively(model *WebhookAuthenticationModel) bool {
+	if model == nil {
+		return true
+	}
+	authType := model.Type.ValueString()
+	if authType != "none" && authType != "" {
+		return false
+	}
+	if !model.PrivateIpFilter.IsNull() && model.PrivateIpFilter.ValueString() != "" {
+		return false
+	}
+	if model.Bearer != nil && !model.Bearer.Token.IsNull() && model.Bearer.Token.ValueString() != "" {
+		return false
+	}
+	return true
 }
 
 func mapBearerResponseToModel(response *webhookAuthenticationBearerResponse) *BearerModel {
